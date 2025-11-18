@@ -15,18 +15,18 @@ authors = [{ name = "Michael Borck", email = "michael@example.com" }]
 requires-python = ">=3.11"
 
 dependencies = [
-    "fastapi==0.109.0",
-    "uvicorn[standard]==0.27.0",
-    "sqlmodel==0.0.14",
-    "python-multipart==0.0.6",
-    "pydantic-settings==2.1.0",
-    "pydantic==2.5.0",
-    "python-jose[cryptography]==3.3.0",
-    "passlib[bcrypt]==1.7.4",
-    "python-dotenv==1.0.0",
-    "email-validator==2.1.0",
-    "yake==0.3.2",
-    "httpx==0.25.2",
+    "fastapi>=0.109.0",
+    "uvicorn[standard]>=0.27.0",
+    "sqlmodel>=0.0.14",
+    "python-multipart>=0.0.6",
+    "pydantic-settings>=2.1.0",
+    "pydantic>=2.5.0",
+    "python-jose[cryptography]>=3.3.0",
+    "passlib[bcrypt]>=1.7.4",
+    "python-dotenv>=1.0.0",
+    "email-validator>=2.1.0",
+    "yake>=0.3.2",
+    "httpx>=0.25.2",
 ]
 
 [project.optional-dependencies]
