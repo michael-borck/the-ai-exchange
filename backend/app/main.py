@@ -8,6 +8,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.trustedhost import TrustedHostMiddleware
 from sqlmodel import SQLModel
 
+from app.api import auth
 from app.core.config import settings
 from app.services.database import engine
 
@@ -69,7 +70,11 @@ def health_check() -> dict[str, str]:
     return {"status": "ok"}
 
 
-# API v1 routes (to be implemented in phase 2-3)
+# Include API routers
+app.include_router(auth.router)
+
+
+# API v1 routes
 @app.get(f"{settings.api_v1_str}/", tags=["System"])
 def read_root() -> dict[str, str]:
     """API root endpoint.
