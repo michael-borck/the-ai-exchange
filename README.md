@@ -94,8 +94,8 @@ cd backend
 uv venv
 source .venv/bin/activate  # On Windows: .venv\Scripts\activate
 
-# Install dependencies
-uv pip install -r requirements.txt
+# Install dependencies from pyproject.toml
+uv pip install -e ".[dev]"
 
 # Run the server with hot-reload
 uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
@@ -232,8 +232,8 @@ the-ai-exchange/
 │   │   ├── test_admin_subscriptions.py
 │   │   ├── test_notifications.py
 │   │   └── ... (59 tests total)
-│   ├── requirements.txt             # Python dependencies
-│   └── pyproject.toml               # Project configuration
+│   ├── pyproject.toml               # Project dependencies & configuration
+│   └── .env.example                 # Environment variables template
 │
 ├── frontend/                        # React + TypeScript frontend
 │   ├── src/
