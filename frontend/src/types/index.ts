@@ -58,6 +58,7 @@ export interface Resource {
   shadow_tags: string[];
   parent_id?: string;
   is_hidden: boolean;
+  is_verified: boolean;
   created_at: string;
   updated_at: string;
 }
