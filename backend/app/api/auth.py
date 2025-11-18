@@ -269,3 +269,48 @@ def get_me(
         notification_prefs=current_user.notification_prefs,
         created_at=current_user.created_at,
     )
+
+
+class UserUpdateRequest(BaseModel):
+    """User profile update request."""
+
+    full_name: str | None = None
+    notification_prefs: dict[str, bool] | None = None
+
+
+@router.patch("/me", response_model=UserResponse)
+def update_me(
+    user_update: UserUpdateRequest,
+    current_user: User = Depends(get_current_user),
+    session: Session = Depends(get_session),
+) -> UserResponse:
+    """Update current user's profile.
+
+    Args:
+        user_update: Profile update data
+        current_user: Current authenticated user
+        session: Database session
+
+    Returns:
+        Updated user info
+    """
+    if user_update.full_name is not None:
+        current_user.full_name = user_update.full_name
+
+    if user_update.notification_prefs is not None:
+        current_user.notification_prefs = user_update.notification_prefs
+
+    session.add(current_user)
+    session.commit()
+    session.refresh(current_user)
+
+    return UserResponse(
+        id=current_user.id,
+        email=current_user.email,
+        full_name=current_user.full_name,
+        role=current_user.role,
+        is_active=current_user.is_active,
+        is_approved=current_user.is_approved,
+        notification_prefs=current_user.notification_prefs,
+        created_at=current_user.created_at,
+    )

@@ -18,6 +18,7 @@ from app.models import (
 )
 from app.services.auto_tagger import extract_keywords
 from app.services.database import get_session
+from app.services.email_service import notify_new_request, notify_new_solution
 
 router = APIRouter(prefix=f"{settings.api_v1_str}/resources", tags=["resources"])
 
@@ -223,13 +224,38 @@ def create_resource(
     session.commit()
     session.refresh(new_resource)
 
-    # If this is a solution, update parent request status
+    # If this is a solution, update parent request status and notify requester
     if new_resource.parent_id:
         parent = session.get(Resource, new_resource.parent_id)
         if parent and parent.type == ResourceType.REQUEST:
             parent.status = ResourceStatus.SOLVED
             session.add(parent)
             session.commit()
+
+            # Notify the original requester (background task would be ideal)
+            requester = session.get(User, parent.user_id)
+            if requester:
+                notify_new_solution(new_resource, requester)
+
+    # If this is a new request, notify subscribers to related tags
+    if new_resource.type == ResourceType.REQUEST and new_resource.system_tags:
+        from app.models import Subscription
+
+        # Find all subscriptions matching any of the tags
+        subscriptions: list[Subscription] = []
+        for tag in new_resource.system_tags:
+            tag_subscriptions = session.exec(
+                select(Subscription).where(Subscription.tag == tag)
+            ).all()
+            subscriptions.extend(tag_subscriptions)
+
+        if subscriptions:
+            # Get unique users and notify them (background task would be ideal)
+            subscriber_ids = {sub.user_id for sub in subscriptions}
+            subscribers: list[User] = [
+                u for uid in subscriber_ids if (u := session.get(User, uid)) is not None
+            ]
+            notify_new_request(new_resource, subscribers)
 
     return new_resource
 
