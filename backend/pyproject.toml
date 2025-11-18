@@ -37,8 +37,6 @@ dev = [
     "types-passlib==1.7.7.20240106",
 ]
 
-[tool.uv]
-required-version = "3.11"
 
 [tool.ruff]
 line-length = 100
