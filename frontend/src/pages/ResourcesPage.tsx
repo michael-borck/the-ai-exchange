@@ -77,6 +77,7 @@ export default function ResourcesPage() {
               <option value="PAPER">Papers</option>
               <option value="PROJECT">Projects</option>
               <option value="CONFERENCE">Conferences</option>
+              <option value="DATASET">Datasets</option>
             </Select>
             <Select
               value={status}

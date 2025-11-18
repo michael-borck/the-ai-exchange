@@ -6,16 +6,17 @@ The goal is to connect SoMM staff who are experimenting with AI ("The Spark") wi
 
 ## 🚀 Project Overview
 
-This is a **complete full-stack web application** built with modern technologies and production-ready code quality. It features a unified feed where faculty and researchers can post eight distinct types of resources:
+This is a **complete full-stack web application** built with modern technologies and production-ready code quality. It features a unified feed where faculty, researchers, and professional staff can post nine distinct types of resources:
 
 1. **Requests:** Questions and problems that need community solutions
-2. **Use Cases:** Full stories/case studies of AI in teaching or research
+2. **Use Cases:** Full stories/case studies of AI in teaching, research, or operations
 3. **Prompts:** Quick copy-paste blocks of text/code for specific tools
 4. **Tools:** AI software, applications, extensions, and configurations
 5. **Policies:** Official or classroom-level governance documents
 6. **Papers:** Published research papers and literature
 7. **Projects:** Active research projects seeking collaboration or feedback
 8. **Conferences:** Conference proceedings, keynotes, and workshops
+9. **Datasets:** Data files, benchmarks, and curated data collections for research or teaching
 
 ### Key Features
 * **Unified Feed:** Filters content by type, topic/tags, or search with advanced discovery
@@ -276,7 +277,7 @@ the-ai-exchange/
 
 ### The "Resource" Model
 
-To keep the database simple for the MVP, we use **Single Table Inheritance**. All eight resource types are stored in a single `resources` table, distinguished by a `type` enum:
+To keep the database simple for the MVP, we use **Single Table Inheritance**. All nine resource types are stored in a single `resources` table, distinguished by a `type` enum:
 
 ```python
 class ResourceType(str, Enum):
@@ -288,6 +289,7 @@ class ResourceType(str, Enum):
     PAPER = "PAPER"            # Published research papers
     PROJECT = "PROJECT"        # Active research projects
     CONFERENCE = "CONFERENCE"  # Conference proceedings
+    DATASET = "DATASET"        # Data files and benchmarks
 ```
 
 This approach provides:

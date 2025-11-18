@@ -27,6 +27,7 @@ class ResourceType(str, Enum):
     PAPER = "PAPER"
     PROJECT = "PROJECT"
     CONFERENCE = "CONFERENCE"
+    DATASET = "DATASET"
 
 
 class ResourceStatus(str, Enum):

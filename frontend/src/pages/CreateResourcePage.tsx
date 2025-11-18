@@ -79,6 +79,7 @@ export default function CreateResourcePage() {
                 <option value="PAPER">Paper</option>
                 <option value="PROJECT">Project</option>
                 <option value="CONFERENCE">Conference</option>
+                <option value="DATASET">Dataset</option>
               </Select>
             </FormControl>
 
