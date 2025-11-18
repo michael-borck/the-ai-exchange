@@ -1,5 +1,7 @@
 """Pytest configuration and shared fixtures."""
 
+from collections.abc import Generator
+
 import pytest
 from sqlmodel import Session, SQLModel, create_engine
 from sqlmodel.pool import StaticPool
@@ -9,7 +11,7 @@ from app.services.database import get_session
 
 
 @pytest.fixture(name="session")
-def session_fixture():
+def session_fixture() -> Generator[Session, None, None]:
     """Create an in-memory SQLite database for testing.
 
     Yields:
@@ -26,7 +28,7 @@ def session_fixture():
 
 
 @pytest.fixture(name="client")
-def client_fixture(session: Session):
+def client_fixture(session: Session) -> Generator:  # type: ignore[type-arg]
     """Create a test client with test database.
 
     Args:
@@ -35,7 +37,7 @@ def client_fixture(session: Session):
     Yields:
         FastAPI test client
     """
-    def get_session_override():
+    def get_session_override() -> Session:
         return session
 
     app.dependency_overrides[get_session] = get_session_override

@@ -1,7 +1,6 @@
 """Auto-tagging service using YAKE and optional LLM."""
 
 import logging
-from typing import Optional
 
 import yake
 
@@ -36,7 +35,7 @@ def extract_keywords_yake(text: str) -> list[str]:
         return []
 
 
-def extract_keywords_llm(text: str) -> list[str]:
+def extract_keywords_llm(_text: str) -> list[str]:
     """Extract keywords using configured LLM.
 
     Args:

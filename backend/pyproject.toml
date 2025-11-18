@@ -61,6 +61,7 @@ ignore = [
     "E501",  # line too long, handled by formatter
     "C901",  # complexity
     "W292",  # blank line at end of file
+    "B008",  # FastAPI Depends() in function defaults is documented pattern
 ]
 
 [tool.ruff.lint.isort]
@@ -82,9 +83,30 @@ check_untyped_defs = true
 module = [
     "passlib.*",
     "python_jose.*",
+    "python_jose.jwt",
     "yake.*",
 ]
 ignore_missing_imports = true
+
+# SQLModel/SQLAlchemy type issues - it converts models to response schemas at runtime
+[[tool.mypy.overrides]]
+module = "app.api.resources"
+# Suppress SQLAlchemy ORM method attributes that aren't typed
+disable_error_code = ["attr-defined", "return-value"]
+
+[[tool.mypy.overrides]]
+module = [
+    "app.api.admin",
+    "app.api.subscriptions",
+]
+# Suppress return-value type issues that are handled by FastAPI
+disable_error_code = ["return-value"]
+
+# python-jose type issues
+[[tool.mypy.overrides]]
+module = "app.core.security"
+# Suppress any/return type issues from python-jose (untyped library)
+disable_error_code = ["no-any-return", "import-untyped"]
 
 [tool.pytest.ini_options]
 minversion = "7.0"

@@ -1,10 +1,9 @@
 """Authentication routes for user login and registration."""
 
 from datetime import timedelta
-from typing import Optional
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, HTTPException, Header, status
+from fastapi import APIRouter, Depends, Header, HTTPException, status
 from pydantic import BaseModel
 from sqlmodel import Session, select
 
@@ -38,7 +37,7 @@ class LoginRequest(BaseModel):
 
 
 def get_current_user(
-    authorization: Optional[str] = Header(None),
+    authorization: str | None = Header(None),
     session: Session = Depends(get_session),
 ) -> User:
     """Get current user from JWT token.
@@ -83,11 +82,11 @@ def get_current_user(
 
     try:
         user_id = UUID(user_id)
-    except (ValueError, TypeError):
+    except (ValueError, TypeError) as e:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Invalid token",
-        )
+        ) from e
 
     user = session.exec(select(User).where(User.id == user_id)).first()
 

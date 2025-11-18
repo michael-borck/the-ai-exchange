@@ -1,8 +1,8 @@
 """Database models for The AI Exchange."""
 
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from enum import Enum
-from typing import Any, Optional
+from typing import Any
 from uuid import UUID, uuid4
 
 from sqlalchemy import JSON
@@ -50,7 +50,7 @@ class User(SQLModel, table=True):
         sa_column=Column(JSON),
     )
     created_at: datetime = Field(
-        default_factory=lambda: datetime.now(timezone.utc),
+        default_factory=lambda: datetime.now(UTC),
         sa_column=Column(DateTime(timezone=True)),
     )
 
@@ -64,7 +64,7 @@ class Resource(SQLModel, table=True):
 
     id: UUID = Field(default_factory=uuid4, primary_key=True)
     user_id: UUID = Field(foreign_key="user.id", index=True)
-    parent_id: Optional[UUID] = Field(
+    parent_id: UUID | None = Field(
         default=None,
         foreign_key="resource.id",
         index=True,
@@ -74,7 +74,7 @@ class Resource(SQLModel, table=True):
     status: ResourceStatus = Field(default=ResourceStatus.OPEN)
     title: str = Field(index=True)
     content_text: str = Field(sa_column=Column(Text))
-    shadow_description: Optional[str] = Field(
+    shadow_description: str | None = Field(
         default=None,
         sa_column=Column(Text),
         description="Admin-provided improved description",
@@ -103,11 +103,11 @@ class Resource(SQLModel, table=True):
         sa_column=Column(JSON),
     )
     created_at: datetime = Field(
-        default_factory=lambda: datetime.now(timezone.utc),
+        default_factory=lambda: datetime.now(UTC),
         sa_column=Column(DateTime(timezone=True), index=True),
     )
     updated_at: datetime = Field(
-        default_factory=lambda: datetime.now(timezone.utc),
+        default_factory=lambda: datetime.now(UTC),
         sa_column=Column(DateTime(timezone=True)),
     )
 
@@ -124,7 +124,7 @@ class Resource(SQLModel, table=True):
 class Subscription(SQLModel, table=True):
     """Subscription model for tag-based notifications."""
 
-    id: Optional[int] = Field(default=None, primary_key=True)
+    id: int | None = Field(default=None, primary_key=True)
     user_id: UUID = Field(foreign_key="user.id", index=True)
     tag: str = Field(index=True)
 
@@ -150,8 +150,8 @@ class UserCreate(UserBase):
 class UserUpdate(SQLModel):
     """User update schema."""
 
-    full_name: Optional[str] = None
-    notification_prefs: Optional[dict] = None
+    full_name: str | None = None
+    notification_prefs: dict[str, Any] | None = None
 
 
 class UserResponse(UserBase):
@@ -184,8 +184,8 @@ class ResourceBase(SQLModel):
     title: str
     content_text: str
     is_anonymous: bool = False
-    parent_id: Optional[UUID] = None
-    content_meta: dict = Field(default={})
+    parent_id: UUID | None = None
+    content_meta: dict[str, Any] = Field(default={})
 
 
 class ResourceCreate(ResourceBase):
@@ -197,18 +197,18 @@ class ResourceCreate(ResourceBase):
 class ResourceUpdate(SQLModel):
     """Resource update schema."""
 
-    title: Optional[str] = None
-    content_text: Optional[str] = None
-    content_meta: Optional[dict] = None
+    title: str | None = None
+    content_text: str | None = None
+    content_meta: dict[str, Any] | None = None
 
 
 class ResourceTagsUpdate(SQLModel):
     """Update tags for a resource (admin only)."""
 
-    system_tags: Optional[list[str]] = None
-    user_tags: Optional[list[str]] = None
-    shadow_tags: Optional[list[str]] = None
-    shadow_description: Optional[str] = None
+    system_tags: list[str] | None = None
+    user_tags: list[str] | None = None
+    shadow_tags: list[str] | None = None
+    shadow_description: str | None = None
 
 
 class TagSuggestion(SQLModel):
@@ -229,7 +229,7 @@ class ResourceResponse(ResourceBase):
     system_tags: list[str]
     user_tags: list[str]
     shadow_tags: list[str]
-    shadow_description: Optional[str]
+    shadow_description: str | None
     created_at: datetime
     updated_at: datetime
 
@@ -243,7 +243,7 @@ class ResourceWithAuthor(ResourceResponse):
     """Resource with author information."""
 
     author_name: str
-    author_email: Optional[str] = None
+    author_email: str | None = None
     author_id: UUID
 
 

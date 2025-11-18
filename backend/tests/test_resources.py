@@ -4,12 +4,9 @@ import pytest
 from fastapi.testclient import TestClient
 from sqlmodel import Session
 
-from app.core.security import hash_password
-from app.models import Resource, ResourceStatus, ResourceType, User, UserRole
-
 
 @pytest.fixture
-def auth_headers(client: TestClient, session: Session) -> dict[str, str]:
+def auth_headers(client: TestClient, session: Session) -> dict[str, str]:  # noqa: ARG001
     """Create authenticated user and return auth headers.
 
     Args:
@@ -130,7 +127,7 @@ def test_create_use_case(client: TestClient, auth_headers: dict[str, str]) -> No
 def test_create_solution_to_request(
     client: TestClient,
     auth_headers: dict[str, str],
-    session: Session,
+    session: Session,  # noqa: ARG001
 ) -> None:
     """Test creating a solution (response) to a request.
 
@@ -355,7 +352,7 @@ def test_update_resource(
 def test_update_resource_not_owner(
     client: TestClient,
     auth_headers: dict[str, str],
-    session: Session,
+    session: Session,  # noqa: ARG001
 ) -> None:
     """Test that non-owner cannot update resource.
 

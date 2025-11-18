@@ -1,6 +1,5 @@
 """Resource CRUD endpoints for requests, use cases, prompts, and policies."""
 
-from typing import Optional
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException, Query, status
@@ -43,10 +42,10 @@ class TagSuggestion:
 
 @router.get("", response_model=list[ResourceResponse])
 def list_resources(
-    type_filter: Optional[ResourceType] = Query(None, alias="type"),
-    tag: Optional[str] = Query(None),
-    search: Optional[str] = Query(None),
-    status_filter: Optional[ResourceStatus] = Query(None, alias="status"),
+    type_filter: ResourceType | None = Query(None, alias="type"),
+    tag: str | None = Query(None),
+    search: str | None = Query(None),
+    status_filter: ResourceStatus | None = Query(None, alias="status"),
     skip: int = Query(0, ge=0),
     limit: int = Query(10, ge=1, le=100),
     session: Session = Depends(get_session),

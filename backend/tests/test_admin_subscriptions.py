@@ -9,7 +9,7 @@ from app.models import User, UserRole
 
 
 @pytest.fixture
-def admin_headers(client: TestClient, session: Session) -> dict[str, str]:
+def admin_headers(client: TestClient, session: Session) -> dict[str, str]:  # noqa: ARG001
     """Create admin user and return auth headers.
 
     Args:
@@ -33,7 +33,7 @@ def admin_headers(client: TestClient, session: Session) -> dict[str, str]:
 
 
 @pytest.fixture
-def staff_headers(client: TestClient, admin_headers: dict[str, str]) -> dict[str, str]:
+def staff_headers(client: TestClient, admin_headers: dict[str, str]) -> dict[str, str]:  # noqa: ARG001
     """Create staff user and return auth headers.
 
     Args:

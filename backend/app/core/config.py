@@ -1,15 +1,13 @@
 """Application configuration from environment variables."""
 
-from typing import Optional
 
-from pydantic import ConfigDict
-from pydantic_settings import BaseSettings
+from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class Settings(BaseSettings):
     """Application settings from environment variables."""
 
-    model_config = ConfigDict(env_file=".env", case_sensitive=False)
+    model_config = SettingsConfigDict(env_file=".env", case_sensitive=False)
 
     # General
     project_name: str = "The AI Exchange - SoMM"
@@ -39,10 +37,10 @@ class Settings(BaseSettings):
     ]
 
     # LLM Configuration (optional)
-    llm_provider: Optional[str] = None  # openai, claude, gemini, openrouter, ollama
-    llm_api_key: Optional[str] = None
-    llm_model: Optional[str] = None
-    llm_base_url: Optional[str] = None  # For Ollama self-hosted
+    llm_provider: str | None = None  # openai, claude, gemini, openrouter, ollama
+    llm_api_key: str | None = None
+    llm_model: str | None = None
+    llm_base_url: str | None = None  # For Ollama self-hosted
 
     # Logging
     log_level: str = "INFO"

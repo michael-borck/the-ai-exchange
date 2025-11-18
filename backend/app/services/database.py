@@ -1,5 +1,7 @@
 """Database connection and session management."""
 
+from collections.abc import Generator
+
 from sqlalchemy.pool import StaticPool
 from sqlmodel import Session, create_engine
 
@@ -21,7 +23,7 @@ else:
     )
 
 
-def get_session() -> Session:
+def get_session() -> Generator[Session, None, None]:
     """Get database session for dependency injection.
 
     Yields:

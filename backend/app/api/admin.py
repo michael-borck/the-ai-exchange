@@ -1,6 +1,5 @@
 """Admin endpoints for user and resource management."""
 
-from typing import Optional
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException, Query, status

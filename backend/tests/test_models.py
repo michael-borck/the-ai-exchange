@@ -1,11 +1,10 @@
 """Tests for database models."""
 
-from uuid import uuid4
 
 from sqlmodel import Session
 
-from app.models import Resource, ResourceStatus, ResourceType, User, UserRole
 from app.core.security import hash_password
+from app.models import Resource, ResourceStatus, ResourceType, User, UserRole
 
 
 def test_create_user(session: Session) -> None:
