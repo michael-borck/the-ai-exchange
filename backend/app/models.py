@@ -37,6 +37,23 @@ class ResourceStatus(str, Enum):
     SOLVED = "SOLVED"
 
 
+class CollaborationStatus(str, Enum):
+    """Collaboration status for ideas."""
+
+    SEEKING = "SEEKING"  # Open to collaborators
+    PROVEN = "PROVEN"  # Tested in practice
+    HAS_MATERIALS = "HAS_MATERIALS"  # Has supporting files
+
+
+class SharingLevel(str, Enum):
+    """Sharing level for prompts and resources."""
+
+    PRIVATE = "PRIVATE"
+    DEPARTMENT = "DEPARTMENT"
+    SCHOOL = "SCHOOL"
+    PUBLIC = "PUBLIC"
+
+
 class User(SQLModel, table=True):
     """User model."""
 
@@ -107,6 +124,75 @@ class Resource(SQLModel, table=True):
         description="Admin-provided tags",
         sa_column=Column(JSON),
     )
+    # New collaboration and metadata fields
+    discipline: str | None = Field(
+        default=None,
+        description="e.g., Marketing, Management, HR, Finance",
+    )
+    department: str | None = Field(
+        default=None,
+        description="e.g., School of Marketing & Management",
+    )
+    author_title: str | None = Field(
+        default=None,
+        description="e.g., Senior Lecturer, Associate Professor",
+    )
+    tools_used: list[str] = Field(
+        default=[],
+        description="AI tools used, e.g., ChatGPT, Claude, Copilot",
+        sa_column=Column(JSON),
+    )
+    collaboration_status: CollaborationStatus | None = Field(
+        default=None,
+        description="SEEKING, PROVEN, or HAS_MATERIALS",
+    )
+    open_to_collaborate: list[str] = Field(
+        default=[],
+        description="e.g., questions, improvements, workshop, materials",
+        sa_column=Column(JSON),
+    )
+    time_saved_value: float | None = Field(
+        default=None,
+        description="Hours saved (e.g., 3.0)",
+    )
+    time_saved_frequency: str | None = Field(
+        default=None,
+        description="per_week, per_month, or per_semester",
+    )
+    evidence_of_success: list[str] = Field(
+        default=[],
+        description="feedback, quantifiable, peer_reviewed, department_approved",
+        sa_column=Column(JSON),
+    )
+    # Prompt forking support
+    is_fork: bool = Field(default=False, description="True if this is a fork")
+    forked_from_id: UUID | None = Field(
+        default=None,
+        foreign_key="resource.id",
+        description="Original resource if this is a fork",
+    )
+    version_number: int = Field(default=1, description="Version number for forks")
+    # Content enhancements
+    quick_summary: str | None = Field(
+        default=None,
+        sa_column=Column(Text),
+        description="One-liner description for browse view",
+    )
+    workflow_steps: list[str] = Field(
+        default=[],
+        description="Step-by-step workflow instructions",
+        sa_column=Column(JSON),
+    )
+    example_prompt: str | None = Field(
+        default=None,
+        sa_column=Column(Text),
+        description="Example prompt or template",
+    )
+    ethics_limitations: str | None = Field(
+        default=None,
+        sa_column=Column(Text),
+        description="Ethics considerations and limitations",
+    )
     created_at: datetime = Field(
         default_factory=lambda: datetime.now(UTC),
         sa_column=Column(DateTime(timezone=True), index=True),
@@ -136,6 +222,125 @@ class Subscription(SQLModel, table=True):
     def __repr__(self) -> str:
         """String representation."""
         return f"Subscription(user_id={self.user_id}, tag={self.tag})"
+
+
+class Comment(SQLModel, table=True):
+    """Comment model for discussions on resources."""
+
+    id: UUID = Field(default_factory=uuid4, primary_key=True)
+    resource_id: UUID = Field(foreign_key="resource.id", index=True)
+    parent_comment_id: UUID | None = Field(
+        default=None,
+        foreign_key="comment.id",
+        description="Parent comment for threading",
+    )
+    user_id: UUID = Field(foreign_key="user.id", index=True)
+    content: str = Field(sa_column=Column(Text))
+    helpful_count: int = Field(default=0, description="Number of helpful votes")
+    created_at: datetime = Field(
+        default_factory=lambda: datetime.now(UTC),
+        sa_column=Column(DateTime(timezone=True), index=True),
+    )
+    updated_at: datetime = Field(
+        default_factory=lambda: datetime.now(UTC),
+        sa_column=Column(DateTime(timezone=True)),
+    )
+
+    def __repr__(self) -> str:
+        """String representation."""
+        return f"Comment(id={self.id}, resource_id={self.resource_id})"
+
+
+class Prompt(SQLModel, table=True):
+    """Prompt model for prompt library."""
+
+    id: UUID = Field(default_factory=uuid4, primary_key=True)
+    user_id: UUID = Field(foreign_key="user.id", index=True)
+    title: str = Field(index=True)
+    prompt_text: str = Field(sa_column=Column(Text))
+    description: str | None = Field(default=None, sa_column=Column(Text))
+    variables: list[str] = Field(
+        default=[],
+        description="Template variables like {{course}}, {{tone}}",
+        sa_column=Column(JSON),
+    )
+    sharing_level: SharingLevel = Field(default=SharingLevel.PRIVATE)
+    is_fork: bool = Field(default=False, description="True if forked from another prompt")
+    forked_from_id: UUID | None = Field(
+        default=None,
+        foreign_key="prompt.id",
+        description="Original prompt if this is a fork",
+    )
+    version_number: int = Field(default=1, description="Version number")
+    usage_count: int = Field(default=0, description="Number of times used")
+    fork_count: int = Field(default=0, description="Number of forks created")
+    created_at: datetime = Field(
+        default_factory=lambda: datetime.now(UTC),
+        sa_column=Column(DateTime(timezone=True), index=True),
+    )
+    updated_at: datetime = Field(
+        default_factory=lambda: datetime.now(UTC),
+        sa_column=Column(DateTime(timezone=True)),
+    )
+
+    def __repr__(self) -> str:
+        """String representation."""
+        return f"Prompt(id={self.id}, title={self.title})"
+
+
+class Collection(SQLModel, table=True):
+    """Collection model for curated groups of prompts and resources."""
+
+    id: UUID = Field(default_factory=uuid4, primary_key=True)
+    name: str = Field(index=True)
+    description: str | None = Field(default=None, sa_column=Column(Text))
+    owner_id: str = Field(description="User ID or 'SYSTEM' for official collections")
+    resource_ids: list[UUID] = Field(
+        default=[],
+        description="List of resource IDs in collection",
+        sa_column=Column(JSON),
+    )
+    prompt_ids: list[UUID] = Field(
+        default=[],
+        description="List of prompt IDs in collection",
+        sa_column=Column(JSON),
+    )
+    subscriber_count: int = Field(default=0, description="Number of subscribers")
+    created_at: datetime = Field(
+        default_factory=lambda: datetime.now(UTC),
+        sa_column=Column(DateTime(timezone=True), index=True),
+    )
+    updated_at: datetime = Field(
+        default_factory=lambda: datetime.now(UTC),
+        sa_column=Column(DateTime(timezone=True)),
+    )
+
+    def __repr__(self) -> str:
+        """String representation."""
+        return f"Collection(id={self.id}, name={self.name})"
+
+
+class ResourceAnalytics(SQLModel, table=True):
+    """Analytics model for tracking resource engagement."""
+
+    id: int | None = Field(default=None, primary_key=True)
+    resource_id: UUID = Field(foreign_key="resource.id", unique=True, index=True)
+    view_count: int = Field(default=0, description="Total views")
+    unique_viewers: int = Field(default=0, description="Unique user count")
+    save_count: int = Field(default=0, description="Number of saves/bookmarks")
+    tried_count: int = Field(default=0, description="Users who tried it")
+    fork_count: int = Field(default=0, description="Number of forks created")
+    comment_count: int = Field(default=0, description="Total comments")
+    helpful_count: int = Field(default=0, description="Marked as helpful")
+    last_viewed: datetime | None = Field(
+        default=None,
+        sa_column=Column(DateTime(timezone=True)),
+        description="Last viewed timestamp",
+    )
+
+    def __repr__(self) -> str:
+        """String representation."""
+        return f"ResourceAnalytics(resource_id={self.resource_id}, views={self.view_count})"
 
 
 # Response schemas (for API)
@@ -196,7 +401,20 @@ class ResourceBase(SQLModel):
 class ResourceCreate(ResourceBase):
     """Resource creation schema."""
 
-    pass
+    # New collaboration and metadata fields
+    discipline: str | None = None
+    department: str | None = None
+    author_title: str | None = None
+    tools_used: list[str] = Field(default=[])
+    collaboration_status: CollaborationStatus | None = None
+    open_to_collaborate: list[str] = Field(default=[])
+    time_saved_value: float | None = None
+    time_saved_frequency: str | None = None
+    evidence_of_success: list[str] = Field(default=[])
+    quick_summary: str | None = None
+    workflow_steps: list[str] = Field(default=[])
+    example_prompt: str | None = None
+    ethics_limitations: str | None = None
 
 
 class ResourceUpdate(SQLModel):
@@ -205,6 +423,20 @@ class ResourceUpdate(SQLModel):
     title: str | None = None
     content_text: str | None = None
     content_meta: dict[str, Any] | None = None
+    # New collaboration and metadata fields
+    discipline: str | None = None
+    department: str | None = None
+    author_title: str | None = None
+    tools_used: list[str] | None = None
+    collaboration_status: CollaborationStatus | None = None
+    open_to_collaborate: list[str] | None = None
+    time_saved_value: float | None = None
+    time_saved_frequency: str | None = None
+    evidence_of_success: list[str] | None = None
+    quick_summary: str | None = None
+    workflow_steps: list[str] | None = None
+    example_prompt: str | None = None
+    ethics_limitations: str | None = None
 
 
 class ResourceTagsUpdate(SQLModel):
@@ -235,6 +467,23 @@ class ResourceResponse(ResourceBase):
     user_tags: list[str]
     shadow_tags: list[str]
     shadow_description: str | None
+    # New collaboration and metadata fields
+    discipline: str | None
+    department: str | None
+    author_title: str | None
+    tools_used: list[str]
+    collaboration_status: CollaborationStatus | None
+    open_to_collaborate: list[str]
+    time_saved_value: float | None
+    time_saved_frequency: str | None
+    evidence_of_success: list[str]
+    is_fork: bool
+    forked_from_id: UUID | None
+    version_number: int
+    quick_summary: str | None
+    workflow_steps: list[str]
+    example_prompt: str | None
+    ethics_limitations: str | None
     created_at: datetime
     updated_at: datetime
 
@@ -263,6 +512,141 @@ class SubscriptionResponse(SQLModel):
 
     user_id: UUID
     tag: str
+
+    class Config:
+        """Pydantic config."""
+
+        from_attributes = True
+
+
+# Comment schemas
+class CommentCreate(SQLModel):
+    """Comment creation schema."""
+
+    content: str
+    parent_comment_id: UUID | None = None
+
+
+class CommentUpdate(SQLModel):
+    """Comment update schema."""
+
+    content: str
+
+
+class CommentResponse(SQLModel):
+    """Comment response schema."""
+
+    id: UUID
+    resource_id: UUID
+    parent_comment_id: UUID | None
+    user_id: UUID
+    content: str
+    helpful_count: int
+    created_at: datetime
+    updated_at: datetime
+
+    class Config:
+        """Pydantic config."""
+
+        from_attributes = True
+
+
+# Prompt schemas
+class PromptCreate(SQLModel):
+    """Prompt creation schema."""
+
+    title: str
+    prompt_text: str
+    description: str | None = None
+    variables: list[str] = Field(default=[])
+    sharing_level: SharingLevel = SharingLevel.PRIVATE
+
+
+class PromptUpdate(SQLModel):
+    """Prompt update schema."""
+
+    title: str | None = None
+    prompt_text: str | None = None
+    description: str | None = None
+    variables: list[str] | None = None
+    sharing_level: SharingLevel | None = None
+
+
+class PromptResponse(SQLModel):
+    """Prompt response schema."""
+
+    id: UUID
+    user_id: UUID
+    title: str
+    prompt_text: str
+    description: str | None
+    variables: list[str]
+    sharing_level: SharingLevel
+    is_fork: bool
+    forked_from_id: UUID | None
+    version_number: int
+    usage_count: int
+    fork_count: int
+    created_at: datetime
+    updated_at: datetime
+
+    class Config:
+        """Pydantic config."""
+
+        from_attributes = True
+
+
+# Collection schemas
+class CollectionCreate(SQLModel):
+    """Collection creation schema."""
+
+    name: str
+    description: str | None = None
+    resource_ids: list[UUID] = Field(default=[])
+    prompt_ids: list[UUID] = Field(default=[])
+
+
+class CollectionUpdate(SQLModel):
+    """Collection update schema."""
+
+    name: str | None = None
+    description: str | None = None
+    resource_ids: list[UUID] | None = None
+    prompt_ids: list[UUID] | None = None
+
+
+class CollectionResponse(SQLModel):
+    """Collection response schema."""
+
+    id: UUID
+    name: str
+    description: str | None
+    owner_id: str
+    resource_ids: list[UUID]
+    prompt_ids: list[UUID]
+    subscriber_count: int
+    created_at: datetime
+    updated_at: datetime
+
+    class Config:
+        """Pydantic config."""
+
+        from_attributes = True
+
+
+# Analytics schemas
+class ResourceAnalyticsResponse(SQLModel):
+    """Resource analytics response schema."""
+
+    resource_id: UUID
+    view_count: int
+    unique_viewers: int
+    save_count: int
+    tried_count: int
+    fork_count: int
+    comment_count: int
+    helpful_count: int
+    last_viewed: datetime | None
 
     class Config:
         """Pydantic config."""

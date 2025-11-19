@@ -19,6 +19,7 @@ import {
 } from "@chakra-ui/react";
 import { useLogin } from "@/hooks/useAuth";
 import { useAuth } from "@/context/AuthContext";
+import { getErrorMessage } from "@/lib/api";
 
 export default function LoginPage() {
   const navigate = useNavigate();
@@ -55,10 +56,7 @@ export default function LoginPage() {
 
       navigate("/");
     } catch (error: unknown) {
-      const errorMessage =
-        error instanceof Error
-          ? error.message
-          : "Login failed. Please try again.";
+      const errorMessage = getErrorMessage(error);
       toast({
         title: "Login failed",
         description: errorMessage,

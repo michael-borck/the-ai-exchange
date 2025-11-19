@@ -17,6 +17,19 @@ import {
 
 const API_BASE_URL = "/api/v1";
 
+/**
+ * Extract error message from API error response
+ */
+function getErrorMessage(error: any): string {
+  if (error.response?.data?.detail) {
+    return error.response.data.detail;
+  }
+  if (error.message) {
+    return error.message;
+  }
+  return "An error occurred. Please try again.";
+}
+
 class ApiClient {
   axiosInstance: AxiosInstance;
 
@@ -167,3 +180,4 @@ class ApiClient {
 
 export const apiClient = new ApiClient();
 export const api = apiClient.axiosInstance;
+export { getErrorMessage };

@@ -19,6 +19,7 @@ import {
 } from "@chakra-ui/react";
 import { useRegister } from "@/hooks/useAuth";
 import { useAuth } from "@/context/AuthContext";
+import { getErrorMessage } from "@/lib/api";
 
 export default function RegisterPage() {
   const navigate = useNavigate();
@@ -31,6 +32,7 @@ export default function RegisterPage() {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [passwordError, setPasswordError] = useState("");
+  const [apiError, setApiError] = useState("");
 
   // Redirect if already logged in
   React.useEffect(() => {
@@ -42,6 +44,7 @@ export default function RegisterPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setPasswordError("");
+    setApiError("");
 
     if (password !== confirmPassword) {
       setPasswordError("Passwords do not match");
@@ -70,10 +73,8 @@ export default function RegisterPage() {
 
       navigate("/");
     } catch (error: unknown) {
-      const errorMessage =
-        error instanceof Error
-          ? error.message
-          : "Registration failed. Please try again.";
+      const errorMessage = getErrorMessage(error);
+      setApiError(errorMessage);
       toast({
         title: "Registration failed",
         description: errorMessage,
@@ -151,12 +152,11 @@ export default function RegisterPage() {
               />
             </Box>
 
-            {(passwordError || registerMutation.isError) && (
+            {(passwordError || apiError) && (
               <Alert status="error" borderRadius="md">
                 <AlertIcon />
                 <Text fontSize="sm">
-                  {passwordError ||
-                    "Registration failed. Please check your details and try again."}
+                  {passwordError || apiError}
                 </Text>
               </Alert>
             )}
