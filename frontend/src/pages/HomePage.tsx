@@ -18,10 +18,14 @@ import {
   InputGroup,
   InputLeftElement,
   Icon,
+  Spinner,
+  Center,
 } from "@chakra-ui/react";
 import { SearchIcon, ArrowForwardIcon } from "@chakra-ui/icons";
 import { Layout } from "@/components/Layout";
 import { useAuth } from "@/hooks/useAuth";
+import { useResources } from "@/hooks/useResources";
+import { useMemo } from "react";
 
 interface DisciplineCard {
   name: string;
@@ -52,80 +56,9 @@ interface ResourcePreview {
   tried: number;
 }
 
-// Mock recent contributions for MVP (will be fetched from API)
-const recentContributions: ResourcePreview[] = [
-  {
-    id: "1",
-    title: "Using Claude for MBA Case Studies",
-    author: "Dr. Sarah Chen",
-    discipline: "Marketing",
-    tools: ["Claude", "ChatGPT"],
-    quickSummary: "Generates industry-specific cases aligned with learning outcomes...",
-    timeSaved: 3,
-    views: 234,
-    tried: 18,
-  },
-  {
-    id: "2",
-    title: "Automated Rubric Generation",
-    author: "Dr. Mike Torres",
-    discipline: "Management",
-    tools: ["ChatGPT"],
-    quickSummary: "Create consistent assessment criteria in seconds...",
-    timeSaved: 2,
-    views: 156,
-    tried: 12,
-  },
-  {
-    id: "3",
-    title: "Literature Review Synthesis",
-    author: "Prof. Kumar",
-    discipline: "Economics",
-    tools: ["Claude"],
-    quickSummary: "Automatically extract and summarize key findings...",
-    timeSaved: 4,
-    views: 298,
-    tried: 24,
-  },
-];
-
-const trendingThisWeek: ResourcePreview[] = [
-  {
-    id: "4",
-    title: "Video Assessment Grading",
-    author: "Dr. Lee",
-    discipline: "HR",
-    tools: ["ChatGPT", "Canvas LMS"],
-    quickSummary: "AI-assisted feedback generation for recorded presentations...",
-    timeSaved: 2.5,
-    views: 412,
-    tried: 45,
-  },
-  {
-    id: "5",
-    title: "Student Peer Review Templates",
-    author: "Dr. Kumar",
-    discipline: "Finance",
-    tools: ["Claude"],
-    quickSummary: "Structured templates for peer assessment with AI guidance...",
-    timeSaved: 1.5,
-    views: 325,
-    tried: 38,
-  },
-  {
-    id: "6",
-    title: "Discussion Prompt Generator",
-    author: "Prof. Chen",
-    discipline: "Management",
-    tools: ["GPT-4"],
-    quickSummary: "Generate thought-provoking questions for class discussions...",
-    timeSaved: 1,
-    views: 289,
-    tried: 31,
-  },
-];
 
 function ResourceCard({ resource, isLoggedIn }: { resource: ResourcePreview; isLoggedIn: boolean }) {
+  const navigate = useNavigate();
   const displayAuthor = isLoggedIn ? resource.author : "Faculty Member";
 
   return (
@@ -135,8 +68,10 @@ function ResourceCard({ resource, isLoggedIn }: { resource: ResourcePreview; isL
       borderColor="gray.200"
       borderRadius="md"
       p={4}
+      cursor="pointer"
       _hover={{ boxShadow: "md", transform: "translateY(-2px)" }}
       transition="all 0.2s"
+      onClick={() => navigate(`/resources/${resource.id}`)}
     >
       <VStack align="flex-start" spacing={2}>
         <HStack spacing={2} width="full" justify="space-between">
@@ -215,6 +150,45 @@ export default function HomePage() {
   const { user } = useAuth();
   const isLoggedIn = !!user;
 
+  // Fetch all resources
+  const { data: allResources = [], isLoading } = useResources({});
+
+  // Get recent contributions (newest first)
+  const recentResources = useMemo(() => {
+    return [...allResources]
+      .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
+      .slice(0, 3)
+      .map(resource => ({
+        id: resource.id,
+        title: resource.title,
+        author: resource.user?.full_name || "Faculty Member",
+        discipline: resource.discipline,
+        tools: resource.tools_used || [],
+        quickSummary: resource.quick_summary || resource.content_text?.substring(0, 100),
+        timeSaved: resource.time_saved_value,
+        views: resource.analytics?.view_count || 0,
+        tried: resource.analytics?.tried_count || 0,
+      }));
+  }, [allResources]);
+
+  // Get trending this week (most viewed)
+  const trendingResources = useMemo(() => {
+    return [...allResources]
+      .sort((a, b) => (b.analytics?.view_count || 0) - (a.analytics?.view_count || 0))
+      .slice(0, 3)
+      .map(resource => ({
+        id: resource.id,
+        title: resource.title,
+        author: resource.user?.full_name || "Faculty Member",
+        discipline: resource.discipline,
+        tools: resource.tools_used || [],
+        quickSummary: resource.quick_summary || resource.content_text?.substring(0, 100),
+        timeSaved: resource.time_saved_value,
+        views: resource.analytics?.view_count || 0,
+        tried: resource.analytics?.tried_count || 0,
+      }));
+  }, [allResources]);
+
   return (
     <Layout>
       <VStack spacing={12} align="stretch">
@@ -292,11 +266,21 @@ export default function HomePage() {
               View All →
             </Button>
           </HStack>
-          <SimpleGrid columns={{ base: 1, md: 3 }} spacing={4}>
-            {recentContributions.map((r) => (
-              <ResourceCard key={r.id} resource={r} isLoggedIn={isLoggedIn} />
-            ))}
-          </SimpleGrid>
+          {isLoading ? (
+            <Center py={12}>
+              <Spinner />
+            </Center>
+          ) : recentResources.length === 0 ? (
+            <Box bg="gray.50" p={8} borderRadius="md" textAlign="center">
+              <Text color="gray.600">No resources shared yet. Be the first to share an idea!</Text>
+            </Box>
+          ) : (
+            <SimpleGrid columns={{ base: 1, md: 3 }} spacing={4}>
+              {recentResources.map((r) => (
+                <ResourceCard key={r.id} resource={r} isLoggedIn={isLoggedIn} />
+              ))}
+            </SimpleGrid>
+          )}
         </VStack>
 
         {/* Trending This Week */}
@@ -307,11 +291,21 @@ export default function HomePage() {
               View All →
             </Button>
           </HStack>
-          <SimpleGrid columns={{ base: 1, md: 3 }} spacing={4}>
-            {trendingThisWeek.map((r) => (
-              <ResourceCard key={r.id} resource={r} isLoggedIn={isLoggedIn} />
-            ))}
-          </SimpleGrid>
+          {isLoading ? (
+            <Center py={12}>
+              <Spinner />
+            </Center>
+          ) : trendingResources.length === 0 ? (
+            <Box bg="gray.50" p={8} borderRadius="md" textAlign="center">
+              <Text color="gray.600">No resources available yet.</Text>
+            </Box>
+          ) : (
+            <SimpleGrid columns={{ base: 1, md: 3 }} spacing={4}>
+              {trendingResources.map((r) => (
+                <ResourceCard key={r.id} resource={r} isLoggedIn={isLoggedIn} />
+              ))}
+            </SimpleGrid>
+          )}
         </VStack>
       </VStack>
     </Layout>

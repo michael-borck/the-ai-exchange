@@ -4,6 +4,7 @@
 
 import { useState, useMemo } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
+import { useAuth } from "@/hooks/useAuth";
 import { Layout } from "@/components/Layout";
 import {
   VStack,
@@ -40,48 +41,10 @@ interface ResourceCard {
   collaborationStatus: string;
 }
 
-// Mock data - will be replaced with API data
-const mockResources: ResourceCard[] = [
-  {
-    id: "1",
-    title: "Using Claude for MBA Case Studies",
-    author: "Dr. Sarah Chen",
-    discipline: "Marketing",
-    tools: ["Claude", "ChatGPT"],
-    quickSummary: "Generates industry-specific cases aligned with learning outcomes...",
-    timeSaved: 3,
-    views: 234,
-    tried: 18,
-    collaborationStatus: "SEEKING",
-  },
-  {
-    id: "2",
-    title: "Automated Rubric Generation",
-    author: "Dr. Mike Torres",
-    discipline: "Management",
-    tools: ["ChatGPT"],
-    quickSummary: "Create consistent assessment criteria in seconds...",
-    timeSaved: 2,
-    views: 156,
-    tried: 12,
-    collaborationStatus: "PROVEN",
-  },
-  {
-    id: "3",
-    title: "Literature Review Synthesis",
-    author: "Prof. Kumar",
-    discipline: "Economics",
-    tools: ["Claude"],
-    quickSummary: "Automatically extract and summarize key findings...",
-    timeSaved: 4,
-    views: 298,
-    tried: 24,
-    collaborationStatus: "HAS_MATERIALS",
-  },
-];
 
-function BrowseResourceCard({ resource }: { resource: ResourceCard }) {
+function BrowseResourceCard({ resource, isLoggedIn }: { resource: ResourceCard; isLoggedIn: boolean }) {
   const navigate = useNavigate();
+  const displayAuthor = isLoggedIn ? resource.author : "Faculty Member";
 
   const statusColor = {
     SEEKING: "blue",
@@ -141,7 +104,7 @@ function BrowseResourceCard({ resource }: { resource: ResourceCard }) {
 
         {/* Author info */}
         <Text fontSize="xs" color="gray.600">
-          {resource.author} • {resource.timeSaved || 2} hrs/week saved
+          {displayAuthor} • {resource.timeSaved || 2} hrs/week saved
         </Text>
 
         {/* Summary */}
@@ -188,6 +151,8 @@ function BrowseResourceCard({ resource }: { resource: ResourceCard }) {
 
 export default function ResourcesPage() {
   const navigate = useNavigate();
+  const { user } = useAuth();
+  const isLoggedIn = !!user;
   const [searchParams] = useSearchParams();
   const [search, setSearch] = useState(searchParams.get("search") || "");
   const [filters, setFilters] = useState<FilterState>({
@@ -206,9 +171,25 @@ export default function ResourcesPage() {
     limit: 100,
   });
 
+  // Transform API resources to card format
+  const mappedResources: ResourceCard[] = useMemo(() => {
+    return resources.map(resource => ({
+      id: resource.id,
+      title: resource.title,
+      author: resource.user?.full_name || "Faculty Member",
+      discipline: resource.discipline,
+      tools: resource.tools_used || [],
+      quickSummary: resource.quick_summary || resource.content_text?.substring(0, 100),
+      timeSaved: resource.time_saved_value,
+      views: resource.analytics?.view_count || 0,
+      tried: resource.analytics?.tried_count || 0,
+      collaborationStatus: resource.collaboration_status,
+    }));
+  }, [resources]);
+
   // Filter resources based on current filter state
   const filteredResources = useMemo(() => {
-    let result = mockResources;
+    let result = mappedResources;
 
     // Apply search
     if (search) {
@@ -254,7 +235,7 @@ export default function ResourcesPage() {
     // "newest" is default (no additional sorting needed)
 
     return result;
-  }, [search, filters]);
+  }, [search, filters, mappedResources]);
 
   return (
     <Layout>
@@ -325,6 +306,7 @@ export default function ResourcesPage() {
                     <BrowseResourceCard
                       key={resource.id}
                       resource={resource}
+                      isLoggedIn={isLoggedIn}
                     />
                   ))}
                 </SimpleGrid>
