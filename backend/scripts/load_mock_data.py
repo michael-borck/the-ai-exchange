@@ -210,14 +210,6 @@ MOCK_ANALYTICS = [
 ]
 
 
-def flatten_tools(tools_used: dict[str, list[str]]) -> list[str]:
-    """Flatten categorized tools into a single list."""
-    flat = []
-    for category, tools in tools_used.items():
-        flat.extend(tools)
-    return flat
-
-
 def load_mock_data():
     """Load mock data into database."""
     from sqlmodel import SQLModel
@@ -258,9 +250,6 @@ def load_mock_data():
         mock_resources = []
         for resource_data in MOCK_RESOURCES:
             user = mock_users_map[resource_data.pop("user_email")]
-            # Auto-populate tools_used_flat from tools_used
-            if "tools_used" in resource_data and isinstance(resource_data["tools_used"], dict):
-                resource_data["tools_used_flat"] = flatten_tools(resource_data["tools_used"])
             resource = Resource(
                 **resource_data,
                 user_id=user.id,
