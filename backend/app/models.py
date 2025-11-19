@@ -372,6 +372,23 @@ class UserSavedResource(SQLModel, table=True):
         return f"UserSavedResource(user_id={self.user_id}, resource_id={self.resource_id})"
 
 
+class UserTriedResource(SQLModel, table=True):
+    """Model tracking which users tried which resources."""
+
+    id: int | None = Field(default=None, primary_key=True)
+    user_id: UUID = Field(foreign_key="user.id", index=True)
+    resource_id: UUID = Field(foreign_key="resource.id", index=True)
+    tried_at: datetime = Field(
+        default_factory=lambda: datetime.now(UTC),
+        sa_column=Column(DateTime(timezone=True), index=True),
+        description="When the resource was tried",
+    )
+
+    def __repr__(self) -> str:
+        """String representation."""
+        return f"UserTriedResource(user_id={self.user_id}, resource_id={self.resource_id})"
+
+
 # Response schemas (for API)
 class UserBase(SQLModel):
     """Base user schema."""

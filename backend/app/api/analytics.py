@@ -13,6 +13,7 @@ from app.models import (
     User,
     UserRole,
     UserSavedResource,
+    UserTriedResource,
 )
 from app.services.database import get_session
 
@@ -122,8 +123,24 @@ def track_resource_tried(
     # Get or create analytics
     analytics = get_or_create_analytics(resource_id, session)
 
-    # Increment tried count
-    analytics.tried_count += 1
+    # Check if user already tried this resource
+    existing_try = session.exec(
+        select(UserTriedResource).where(
+            (UserTriedResource.user_id == current_user.id) &
+            (UserTriedResource.resource_id == resource_id)
+        )
+    ).first()
+
+    # Only increment and track if this is the first time
+    if not existing_try:
+        # Create tracking record
+        tried = UserTriedResource(
+            user_id=current_user.id,
+            resource_id=resource_id,
+        )
+        session.add(tried)
+        # Increment tried count
+        analytics.tried_count += 1
 
     session.add(analytics)
     session.commit()
@@ -437,3 +454,53 @@ def get_analytics_by_discipline(
                 discipline_stats[resource.discipline]["total_saves"] += analytics.save_count
 
     return {"by_discipline": discipline_stats}
+
+
+@router.get("/resources/{resource_id}/users-tried-it", response_model=list[dict])
+def get_users_who_tried_resource(
+    resource_id: UUID,
+    session: Session = Depends(get_session),
+) -> list[dict]:
+    """Get list of users who marked a resource as tried.
+
+    This enables peer discovery - users can connect with others who have
+    actually tried the implementation rather than just the creator.
+
+    Args:
+        resource_id: Resource ID
+        session: Database session
+
+    Returns:
+        List of users who tried the resource with basic info
+
+    Raises:
+        HTTPException: If resource not found
+    """
+    # Verify resource exists
+    resource = session.exec(select(Resource).where(Resource.id == resource_id)).first()
+    if not resource:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Resource not found",
+        )
+
+    # Get users who tried this resource
+    tried_records = session.exec(
+        select(UserTriedResource)
+        .where(UserTriedResource.resource_id == resource_id)
+        .order_by(UserTriedResource.tried_at.desc())
+    ).all()
+
+    # Get user details
+    result = []
+    for tried_record in tried_records:
+        user = session.get(User, tried_record.user_id)
+        if user:
+            result.append({
+                "id": str(user.id),
+                "full_name": user.full_name,
+                "email": user.email,
+                "tried_at": tried_record.tried_at.isoformat(),
+            })
+
+    return result
