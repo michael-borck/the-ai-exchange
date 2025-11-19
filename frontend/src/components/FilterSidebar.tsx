@@ -18,8 +18,11 @@ import {
   Divider,
   Badge,
   Stack,
+  Spinner,
 } from "@chakra-ui/react";
-import { useState } from "react";
+import { useState, useMemo } from "react";
+import { useResources } from "@/hooks/useResources";
+import { Resource } from "@/types/index";
 
 interface FilterSidebarProps {
   onFiltersChange: (filters: FilterState) => void;
@@ -34,32 +37,60 @@ export interface FilterState {
   sortBy: "newest" | "popular" | "most_tried";
 }
 
-const DISCIPLINES = [
-  "Marketing",
-  "Management",
-  "HR",
-  "Analytics",
-  "Finance",
-  "Economics",
-  "Tourism",
-  "Entrepreneurship",
-];
-
-const TOOLS = [
-  "Claude",
-  "ChatGPT",
-  "GPT-4",
-  "Copilot",
-  "Midjourney",
-  "Canvas LMS",
-];
-
 const COLLABORATION_STATUS = ["SEEKING", "PROVEN", "HAS_MATERIALS"];
+
+/**
+ * Extract unique disciplines from resources
+ */
+function extractDisciplines(resources: Resource[]): string[] {
+  const disciplines = new Set<string>();
+  resources.forEach((resource) => {
+    if (resource.discipline) {
+      disciplines.add(resource.discipline);
+    }
+  });
+  return Array.from(disciplines).sort();
+}
+
+/**
+ * Extract tool categories from resources
+ * Returns the top-level category keys (LLM, CUSTOM_APP, VISION, etc.)
+ */
+function extractToolCategories(resources: Resource[]): string[] {
+  const categories = new Set<string>();
+  resources.forEach((resource) => {
+    if (resource.tools_used && typeof resource.tools_used === "object") {
+      Object.keys(resource.tools_used).forEach((category) => {
+        categories.add(category);
+      });
+    }
+  });
+  return Array.from(categories).sort();
+}
+
+/**
+ * Format tool category name for display
+ */
+function formatCategoryName(category: string): string {
+  return category
+    .split("_")
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+    .join(" ");
+}
 
 export function FilterSidebar({
   onFiltersChange,
   initialFilters,
 }: FilterSidebarProps) {
+  const { data: resources = [], isLoading } = useResources({ limit: 100 });
+
+  // Extract unique disciplines and tool categories from resources
+  const disciplines = useMemo(() => extractDisciplines(resources), [resources]);
+  const toolCategories = useMemo(
+    () => extractToolCategories(resources),
+    [resources]
+  );
+
   const [filters, setFilters] = useState<FilterState>(
     initialFilters || {
       disciplines: [],
@@ -196,17 +227,25 @@ export function FilterSidebar({
           <Text fontSize="sm" fontWeight="semibold" color="gray.700">
             Discipline
           </Text>
-          <VStack align="stretch" spacing={2}>
-            {DISCIPLINES.map((discipline) => (
-              <Checkbox
-                key={discipline}
-                isChecked={filters.disciplines.includes(discipline)}
-                onChange={() => handleDisciplineChange(discipline)}
-              >
-                {discipline}
-              </Checkbox>
-            ))}
-          </VStack>
+          {isLoading ? (
+            <Spinner size="sm" />
+          ) : disciplines.length === 0 ? (
+            <Text fontSize="sm" color="gray.500">
+              No disciplines available
+            </Text>
+          ) : (
+            <VStack align="stretch" spacing={2}>
+              {disciplines.map((discipline) => (
+                <Checkbox
+                  key={discipline}
+                  isChecked={filters.disciplines.includes(discipline)}
+                  onChange={() => handleDisciplineChange(discipline)}
+                >
+                  {discipline}
+                </Checkbox>
+              ))}
+            </VStack>
+          )}
         </VStack>
 
         <Divider />
@@ -214,19 +253,27 @@ export function FilterSidebar({
         {/* Tools */}
         <VStack align="stretch" spacing={3}>
           <Text fontSize="sm" fontWeight="semibold" color="gray.700">
-            AI Tools Used
+            AI Tool Categories
           </Text>
-          <VStack align="stretch" spacing={2}>
-            {TOOLS.map((tool) => (
-              <Checkbox
-                key={tool}
-                isChecked={filters.tools.includes(tool)}
-                onChange={() => handleToolChange(tool)}
-              >
-                {tool}
-              </Checkbox>
-            ))}
-          </VStack>
+          {isLoading ? (
+            <Spinner size="sm" />
+          ) : toolCategories.length === 0 ? (
+            <Text fontSize="sm" color="gray.500">
+              No tools available
+            </Text>
+          ) : (
+            <VStack align="stretch" spacing={2}>
+              {toolCategories.map((category) => (
+                <Checkbox
+                  key={category}
+                  isChecked={filters.tools.includes(category)}
+                  onChange={() => handleToolChange(category)}
+                >
+                  {formatCategoryName(category)}
+                </Checkbox>
+              ))}
+            </VStack>
+          )}
         </VStack>
 
         <Divider />

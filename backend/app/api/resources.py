@@ -106,11 +106,16 @@ def list_resources(
         query = query.where(Resource.discipline == discipline)
 
     if tools:
-        # Parse comma-separated tools
-        tool_list = [t.strip() for t in tools.split(",")]
-        # Match resources that use any of these tools
-        for tool in tool_list:
-            query = query.where(Resource.tools_used.contains([tool]))
+        # Parse comma-separated tool categories (e.g., "LLM,CUSTOM_APP")
+        # tools_used is a JSON dict: {"LLM": ["Claude"], "CUSTOM_APP": ["Talk-Buddy"]}
+        # Filter resources that have any of the specified categories
+        tool_categories = [t.strip() for t in tools.split(",")]
+        # For each category, check if it exists as a key in the tools_used JSON
+        # SQLite JSON support: check if the key exists in the JSON dict
+        for category in tool_categories:
+            # Check if the category key exists in tools_used dict
+            # In SQLite: json_extract(tools_used, '$.' || category) is not null
+            query = query.where(Resource.tools_used[category].astext.isnot(None))
 
     if collaboration_status:
         query = query.where(Resource.collaboration_status == collaboration_status)
