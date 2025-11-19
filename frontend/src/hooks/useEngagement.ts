@@ -124,3 +124,26 @@ export const useUserSavedResources = (options?: {
     },
   });
 };
+
+/**
+ * Get users who tried implementing a resource
+ */
+interface UserTriedInfo {
+  id: string;
+  full_name: string;
+  email: string;
+  tried_at: string;
+}
+
+export const useResourceUsersTried = (resourceId: string) => {
+  return useQuery({
+    queryKey: ["resourceUsersTried", resourceId],
+    queryFn: async () => {
+      const response = await apiClient.get<UserTriedInfo[]>(
+        `/resources/${resourceId}/users-tried-it`
+      );
+      return response.data;
+    },
+    enabled: !!resourceId,
+  });
+};

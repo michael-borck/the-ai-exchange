@@ -27,7 +27,7 @@ import {
 } from "@chakra-ui/react";
 import { useAuth } from "@/hooks/useAuth";
 import { useResource, useDeleteResource, useResources } from "@/hooks/useResources";
-import { useSaveResource, useTriedResource, useIsResourceSaved } from "@/hooks/useEngagement";
+import { useSaveResource, useTriedResource, useIsResourceSaved, useResourceUsersTried } from "@/hooks/useEngagement";
 import { CollaborationModal } from "@/components/CollaborationModal";
 import { useMemo } from "react";
 
@@ -45,6 +45,7 @@ export default function ResourceDetailPage() {
   const saveResourceMutation = useSaveResource();
   const triedResourceMutation = useTriedResource();
   const { data: isSavedData } = useIsResourceSaved(id || "");
+  const { data: usersTried = [] } = useResourceUsersTried(id || "");
   const hasSaved = isSavedData ?? false;
 
   // Get engagement stats from resource analytics
@@ -342,6 +343,52 @@ export default function ResourceDetailPage() {
                 {/* Community Tab */}
                 <TabPanel>
                   <VStack align="stretch" spacing={4}>
+                    {/* Users who tried it */}
+                    <Box>
+                      <Text fontSize="sm" fontWeight="bold" color="gray.600" mb={3}>
+                        Users Who Tried It ({usersTried.length})
+                      </Text>
+                      {usersTried.length === 0 ? (
+                        <Text fontSize="xs" color="gray.500" fontStyle="italic">
+                          Be the first to try and share your experience!
+                        </Text>
+                      ) : (
+                        <VStack align="stretch" spacing={2}>
+                          {usersTried.map((user) => (
+                            <Box
+                              key={user.id}
+                              p={3}
+                              border="1px"
+                              borderColor="gray.200"
+                              borderRadius="md"
+                              bg="gray.50"
+                            >
+                              <HStack justify="space-between" width="full">
+                                <VStack align="flex-start" spacing={0}>
+                                  <Text fontSize="sm" fontWeight="semibold">
+                                    {user.full_name}
+                                  </Text>
+                                  <Text fontSize="xs" color="gray.600">
+                                    {user.email}
+                                  </Text>
+                                </VStack>
+                                <Button
+                                  size="xs"
+                                  variant="outline"
+                                  colorScheme="blue"
+                                  onClick={() => {
+                                    window.location.href = `mailto:${user.email}?subject=Re: ${resource?.title || "Resource"}`;
+                                  }}
+                                >
+                                  Contact
+                                </Button>
+                              </HStack>
+                            </Box>
+                          ))}
+                        </VStack>
+                      )}
+                    </Box>
+
                     <Box>
                       <Text fontSize="sm" fontWeight="bold" color="gray.600" mb={3}>
                         Similar Ideas
