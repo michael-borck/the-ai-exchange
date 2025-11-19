@@ -33,17 +33,6 @@ interface DisciplineCard {
   icon?: string;
 }
 
-const disciplines: DisciplineCard[] = [
-  { name: "Marketing", count: 18 },
-  { name: "Management", count: 15 },
-  { name: "HR", count: 8 },
-  { name: "Analytics", count: 12 },
-  { name: "Finance", count: 9 },
-  { name: "Economics", count: 7 },
-  { name: "Tourism", count: 6 },
-  { name: "Entrepreneurship", count: 11 },
-];
-
 interface ResourcePreview {
   id: string;
   title: string;
@@ -166,6 +155,26 @@ export default function HomePage() {
   // Fetch all resources
   const { data: allResources = [], isLoading } = useResources({});
 
+  // Calculate disciplines dynamically from resources
+  const disciplines = useMemo(() => {
+    const disciplineMap = new Map<string, number>();
+
+    allResources.forEach(resource => {
+      if (resource.discipline) {
+        disciplineMap.set(
+          resource.discipline,
+          (disciplineMap.get(resource.discipline) || 0) + 1
+        );
+      }
+    });
+
+    // Convert to array and sort by count (descending), limit to top 8
+    return Array.from(disciplineMap.entries())
+      .map(([name, count]) => ({ name, count }))
+      .sort((a, b) => b.count - a.count)
+      .slice(0, 8);
+  }, [allResources]);
+
   // Get recent contributions (newest first)
   const recentResources = useMemo(() => {
     return [...allResources]
@@ -184,8 +193,8 @@ export default function HomePage() {
       }));
   }, [allResources]);
 
-  // Get trending this week (most viewed)
-  const trendingResources = useMemo(() => {
+  // Get most popular resources (most viewed)
+  const mostPopularResources = useMemo(() => {
     return [...allResources]
       .sort((a, b) => (b.analytics?.view_count || 0) - (a.analytics?.view_count || 0))
       .slice(0, 3)
@@ -296,10 +305,10 @@ export default function HomePage() {
           )}
         </VStack>
 
-        {/* Trending This Week */}
+        {/* Most Popular */}
         <VStack align="stretch" spacing={4} pb={8}>
           <HStack justify="space-between">
-            <Heading size="lg">Trending This Week</Heading>
+            <Heading size="lg">Most Popular</Heading>
             <Button variant="link" colorScheme="blue" onClick={() => navigate("/resources?sort=popular")}>
               View All →
             </Button>
@@ -308,13 +317,13 @@ export default function HomePage() {
             <Center py={12}>
               <Spinner />
             </Center>
-          ) : trendingResources.length === 0 ? (
+          ) : mostPopularResources.length === 0 ? (
             <Box bg="gray.50" p={8} borderRadius="md" textAlign="center">
               <Text color="gray.600">No resources available yet.</Text>
             </Box>
           ) : (
             <SimpleGrid columns={{ base: 1, md: 3 }} spacing={4}>
-              {trendingResources.map((r) => (
+              {mostPopularResources.map((r) => (
                 <ResourceCard key={r.id} resource={r} isLoggedIn={isLoggedIn} />
               ))}
             </SimpleGrid>
