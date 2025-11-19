@@ -59,7 +59,7 @@ export function Layout({ children, isPublic = false }: LayoutProps) {
 
   const handleLogout = () => {
     logout();
-    navigate("/login");
+    navigate("/");
   };
 
   const handleNavClick = (href: string) => {
