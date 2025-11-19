@@ -415,6 +415,7 @@ class UserCreate(UserBase):
     """User creation schema."""
 
     password: str
+    disciplines: list[str] | None = None
 
 
 class UserUpdate(SQLModel):
@@ -434,7 +435,6 @@ class UserResponse(UserBase):
     is_active: bool
     is_approved: bool
     disciplines: list[str]
-    department: str | None
     notification_prefs: dict[str, Any]
     created_at: datetime
 

@@ -161,6 +161,7 @@ def register(
         role="ADMIN" if is_first_user else "STAFF",
         is_active=True,
         is_approved=is_curtin,  # Auto-approve if curtin domain
+        disciplines=user_create.disciplines or [],
     )
 
     session.add(new_user)
