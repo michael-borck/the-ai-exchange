@@ -467,7 +467,6 @@ class ResourceCreate(ResourceBase):
 
     # New collaboration and metadata fields
     discipline: str | None = None
-    department: str | None = None
     author_title: str | None = None
     tools_used: dict[str, list[str]] | list[str] = Field(default={})
     collaboration_status: CollaborationStatus | None = None
@@ -489,7 +488,6 @@ class ResourceUpdate(SQLModel):
     content_meta: dict[str, Any] | None = None
     # New collaboration and metadata fields
     discipline: str | None = None
-    department: str | None = None
     author_title: str | None = None
     tools_used: dict[str, list[str]] | None = None
     collaboration_status: CollaborationStatus | None = None
@@ -533,7 +531,6 @@ class ResourceResponse(ResourceBase):
     shadow_description: str | None
     # New collaboration and metadata fields
     discipline: str | None
-    department: str | None
     author_title: str | None
     tools_used: dict[str, list[str]]
     collaboration_status: CollaborationStatus | None
