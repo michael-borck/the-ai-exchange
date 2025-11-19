@@ -30,6 +30,7 @@ export function useResource(id: string) {
     queryKey: ["resource", id],
     queryFn: () => apiClient.getResource(id),
     enabled: !!id,
+    staleTime: 5000, // Consider data stale after 5 seconds for real-time updates
   });
 }
 
