@@ -182,9 +182,18 @@ export default function ResourcesPage() {
     sortBy: "newest",
   });
 
-  const { data: resources = [], isLoading } = useResources({
+  // Build API params from filters
+  const apiParams = useMemo(() => ({
     limit: 100,
-  });
+    search: search || undefined,
+    discipline: filters.disciplines.length > 0 ? filters.disciplines[0] : undefined,
+    tools: filters.tools.length > 0 ? filters.tools.join(",") : undefined,
+    collaboration_status: filters.collaborationStatus.length > 0 ? filters.collaborationStatus[0] : undefined,
+    min_time_saved: filters.minTimeSaved > 0 ? filters.minTimeSaved : undefined,
+    sort_by: filters.sortBy,
+  }), [search, filters]);
+
+  const { data: resources = [], isLoading } = useResources(apiParams);
 
   // Transform API resources to card format
   const mappedResources: ResourceCard[] = useMemo(() => {
@@ -201,56 +210,6 @@ export default function ResourcesPage() {
       collaborationStatus: resource.collaboration_status,
     }));
   }, [resources]);
-
-  // Filter resources based on current filter state
-  const filteredResources = useMemo(() => {
-    let result = mappedResources;
-
-    // Apply search
-    if (search) {
-      const query = search.toLowerCase();
-      result = result.filter(
-        (r) =>
-          r.title.toLowerCase().includes(query) ||
-          r.quickSummary.toLowerCase().includes(query) ||
-          r.author.toLowerCase().includes(query)
-      );
-    }
-
-    // Apply discipline filter
-    if (filters.disciplines.length > 0) {
-      result = result.filter((r) => filters.disciplines.includes(r.discipline));
-    }
-
-    // Apply tools filter
-    if (filters.tools.length > 0) {
-      result = result.filter((r) =>
-        r.tools.some((tool) => filters.tools.includes(tool))
-      );
-    }
-
-    // Apply collaboration status filter
-    if (filters.collaborationStatus.length > 0) {
-      result = result.filter((r) =>
-        filters.collaborationStatus.includes(r.collaborationStatus)
-      );
-    }
-
-    // Apply quick wins filter
-    if (filters.minTimeSaved > 0) {
-      result = result.filter((r) => (r.timeSaved || 0) >= filters.minTimeSaved);
-    }
-
-    // Apply sorting
-    if (filters.sortBy === "popular") {
-      result.sort((a, b) => b.views - a.views);
-    } else if (filters.sortBy === "most_tried") {
-      result.sort((a, b) => b.tried - a.tried);
-    }
-    // "newest" is default (no additional sorting needed)
-
-    return result;
-  }, [search, filters, mappedResources]);
 
   return (
     <Layout>
@@ -304,7 +263,7 @@ export default function ResourcesPage() {
               <Center py={12}>
                 <Spinner />
               </Center>
-            ) : filteredResources.length === 0 ? (
+            ) : mappedResources.length === 0 ? (
               <Box bg="white" p={12} borderRadius="lg" textAlign="center">
                 <Text color="gray.600">
                   No ideas found. Try adjusting your filters.
@@ -313,11 +272,11 @@ export default function ResourcesPage() {
             ) : (
               <VStack align="stretch" spacing={4}>
                 <Text color="gray.600" fontSize="sm">
-                  Showing {filteredResources.length} idea
-                  {filteredResources.length !== 1 ? "s" : ""}
+                  Showing {mappedResources.length} idea
+                  {mappedResources.length !== 1 ? "s" : ""}
                 </Text>
                 <SimpleGrid columns={{ base: 1, md: 2 }} spacing={4}>
-                  {filteredResources.map((resource) => (
+                  {mappedResources.map((resource) => (
                     <BrowseResourceCard
                       key={resource.id}
                       resource={resource}
