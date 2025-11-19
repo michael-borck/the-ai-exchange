@@ -2,7 +2,7 @@
  * User Profile Page - Show contributions, collaboration interests, and settings
  */
 
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { Layout } from "@/components/Layout";
 import {
@@ -16,8 +16,6 @@ import {
   Checkbox,
   Text,
   Divider,
-  Grid,
-  GridItem,
   SimpleGrid,
   Badge,
   Tabs,
@@ -28,47 +26,12 @@ import {
   Avatar,
   FormControl,
   FormLabel,
-  Textarea,
+  Spinner,
+  Center,
 } from "@chakra-ui/react";
 import { useAuth } from "@/hooks/useAuth";
 import { useUpdateProfile } from "@/hooks/useAuth";
-
-interface ContributionCard {
-  id: string;
-  title: string;
-  discipline: string;
-  views: number;
-  saves: number;
-  tried: number;
-}
-
-// Mock data - will be replaced with API data
-const mockContributions: ContributionCard[] = [
-  {
-    id: "1",
-    title: "Using Claude for MBA Case Studies",
-    discipline: "Marketing",
-    views: 234,
-    saves: 45,
-    tried: 18,
-  },
-  {
-    id: "2",
-    title: "Automated Rubric Generation",
-    discipline: "Management",
-    views: 156,
-    saves: 32,
-    tried: 12,
-  },
-  {
-    id: "3",
-    title: "Literature Review Synthesis",
-    discipline: "Economics",
-    views: 298,
-    saves: 67,
-    tried: 24,
-  },
-];
+import { useResources } from "@/hooks/useResources";
 
 export default function ProfilePage() {
   const navigate = useNavigate();
@@ -88,17 +51,16 @@ export default function ProfilePage() {
     user?.notification_prefs?.notify_solutions ?? true
   );
 
-  // Collaboration interests (mock data)
-  const [workingOn] = useState([
-    "Automated grading system for video submissions",
-    "Multi-modal content analysis for course materials",
-  ]);
+  // Fetch user's contributions from API
+  const { data: allResources = [], isLoading: isLoadingResources } = useResources({
+    limit: 100,
+  });
 
-  const [openToCollaborate] = useState([
-    "Assessment automation across departments",
-    "AI literacy workshops for faculty",
-    "Curriculum development incorporating AI",
-  ]);
+  // Filter contributions to only those created by current user
+  const userContributions = useMemo(() => {
+    if (!user?.id) return [];
+    return allResources.filter(resource => resource.user_id === user.id);
+  }, [allResources, user?.id]);
 
   const handleSaveProfile = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -185,7 +147,7 @@ export default function ProfilePage() {
         {/* Main Content Tabs */}
         <Tabs variant="soft-rounded" colorScheme="blue">
           <TabList>
-            <Tab>Contributions ({mockContributions.length})</Tab>
+            <Tab>Contributions ({userContributions.length})</Tab>
             <Tab>Collaboration</Tab>
             <Tab>Settings</Tab>
           </TabList>
@@ -198,7 +160,11 @@ export default function ProfilePage() {
                   <Text fontSize="sm" color="gray.600" mb={4}>
                     Ideas you've shared that are helping the community
                   </Text>
-                  {mockContributions.length === 0 ? (
+                  {isLoadingResources ? (
+                    <Center py={12}>
+                      <Spinner />
+                    </Center>
+                  ) : userContributions.length === 0 ? (
                     <Box bg="gray.50" p={8} borderRadius="md" textAlign="center">
                       <Text color="gray.600">
                         You haven't shared any ideas yet.{" "}
@@ -213,7 +179,7 @@ export default function ProfilePage() {
                     </Box>
                   ) : (
                     <SimpleGrid columns={{ base: 1, md: 2, lg: 3 }} spacing={4}>
-                      {mockContributions.map((contribution) => (
+                      {userContributions.map((contribution) => (
                         <Box
                           key={contribution.id}
                           bg="white"
@@ -229,7 +195,7 @@ export default function ProfilePage() {
                           <VStack align="flex-start" spacing={3}>
                             <HStack>
                               <Badge colorScheme="blue" variant="subtle">
-                                {contribution.discipline}
+                                {contribution.discipline || "General"}
                               </Badge>
                             </HStack>
                             <Heading size="sm">{contribution.title}</Heading>
@@ -237,15 +203,15 @@ export default function ProfilePage() {
                             <HStack spacing={4} width="full" fontSize="xs">
                               <HStack spacing={1}>
                                 <Text color="gray.600">👁️</Text>
-                                <Text fontWeight="bold">{contribution.views}</Text>
+                                <Text fontWeight="bold">{contribution.analytics?.view_count || 0}</Text>
                               </HStack>
                               <HStack spacing={1}>
                                 <Text color="gray.600">💾</Text>
-                                <Text fontWeight="bold">{contribution.saves}</Text>
+                                <Text fontWeight="bold">{contribution.analytics?.save_count || 0}</Text>
                               </HStack>
                               <HStack spacing={1}>
                                 <Text color="gray.600">✓</Text>
-                                <Text fontWeight="bold">{contribution.tried}</Text>
+                                <Text fontWeight="bold">{contribution.analytics?.tried_count || 0}</Text>
                               </HStack>
                             </HStack>
                           </VStack>
@@ -262,10 +228,12 @@ export default function ProfilePage() {
                   </Heading>
                   <Box bg="blue.50" p={4} borderRadius="md" border="1px" borderColor="blue.200">
                     <Text fontSize="sm" color="blue.900">
-                      You've saved <strong>12 ideas</strong> to your library.{" "}
-                      <Button variant="link" colorScheme="blue" size="sm">
-                        View your library →
-                      </Button>
+                      You've saved <strong>{userContributions.length} idea{userContributions.length !== 1 ? "s" : ""}</strong> to your library.{" "}
+                      {userContributions.length > 0 && (
+                        <Button variant="link" colorScheme="blue" size="sm">
+                          View your library →
+                        </Button>
+                      )}
                     </Text>
                   </Box>
                 </Box>
@@ -274,73 +242,22 @@ export default function ProfilePage() {
 
             {/* Collaboration Tab */}
             <TabPanel>
-              <VStack align="stretch" spacing={6}>
-                {/* Currently Working On */}
-                <Box>
-                  <Heading size="md" mb={3}>
-                    Currently Working On
+              <Box bg="blue.50" p={6} borderRadius="lg" border="1px" borderColor="blue.200">
+                <VStack align="flex-start" spacing={3}>
+                  <Heading size="md" color="blue.900">
+                    Collaboration Features Coming Soon
                   </Heading>
-                  <Text fontSize="sm" color="gray.600" mb={3}>
-                    Share what you're actively developing to find collaborators
+                  <Text fontSize="sm" color="blue.800">
+                    We're building enhanced collaboration features to help you find and connect with colleagues on shared research interests and projects. This section will include:
                   </Text>
-                  <VStack align="flex-start" spacing={2}>
-                    {workingOn.map((item, idx) => (
-                      <HStack key={idx} spacing={2}>
-                        <Text fontSize="sm">•</Text>
-                        <Text fontSize="sm">{item}</Text>
-                      </HStack>
-                    ))}
+                  <VStack align="flex-start" spacing={2} ml={4} fontSize="sm" color="blue.800">
+                    <Text>• Share what you're currently working on</Text>
+                    <Text>• Highlight topics you're open to collaborating on</Text>
+                    <Text>• Direct messaging with interested colleagues</Text>
+                    <Text>• Shared calendar for coordination</Text>
                   </VStack>
-                  <Button
-                    variant="link"
-                    colorScheme="blue"
-                    size="sm"
-                    mt={3}
-                  >
-                    Edit →
-                  </Button>
-                </Box>
-
-                <Divider />
-
-                {/* Open to Collaborate On */}
-                <Box>
-                  <Heading size="md" mb={3}>
-                    Open to Collaborate On
-                  </Heading>
-                  <Text fontSize="sm" color="gray.600" mb={3}>
-                    Topics where you'd like to work with others
-                  </Text>
-                  <VStack align="flex-start" spacing={2}>
-                    {openToCollaborate.map((item, idx) => (
-                      <HStack key={idx} spacing={2}>
-                        <Text fontSize="sm">•</Text>
-                        <Text fontSize="sm">{item}</Text>
-                      </HStack>
-                    ))}
-                  </VStack>
-                  <Button
-                    variant="link"
-                    colorScheme="blue"
-                    size="sm"
-                    mt={3}
-                  >
-                    Edit →
-                  </Button>
-                </Box>
-
-                <Divider />
-
-                {/* Contact & Actions */}
-                <HStack spacing={3}>
-                  <Button colorScheme="blue" variant="outline">
-                    💬 Message
-                  </Button>
-                  <Button colorScheme="blue" variant="outline">
-                    📅 Calendar
-                  </Button>
-                </HStack>
-              </VStack>
+                </VStack>
+              </Box>
             </TabPanel>
 
             {/* Settings Tab */}
