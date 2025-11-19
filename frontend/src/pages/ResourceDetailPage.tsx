@@ -26,16 +26,9 @@ import {
   useDisclosure,
 } from "@chakra-ui/react";
 import { useAuth } from "@/hooks/useAuth";
-import { useResource, useDeleteResource } from "@/hooks/useResources";
+import { useResource, useDeleteResource, useResources } from "@/hooks/useResources";
 import { CollaborationModal } from "@/components/CollaborationModal";
-import { useState } from "react";
-
-// Mock engagement data - will be replaced with API data
-interface EngagementStats {
-  views: number;
-  saves: number;
-  tried: number;
-}
+import { useState, useMemo } from "react";
 
 export default function ResourceDetailPage() {
   const navigate = useNavigate();
@@ -43,16 +36,36 @@ export default function ResourceDetailPage() {
   const { user } = useAuth();
   const { id } = useParams<{ id: string }>();
   const { data: resource, isLoading, isError } = useResource(id || "");
+  const { data: allResources = [] } = useResources({ limit: 100 });
   const deleteResourceMutation = useDeleteResource();
   const { isOpen, onOpen, onClose } = useDisclosure();
 
   const [hasTriedIt, setHasTriedIt] = useState(false);
   const [hasSaved, setHasSaved] = useState(false);
-  const [stats, setStats] = useState<EngagementStats>({
-    views: 234,
-    saves: 45,
-    tried: 18,
-  });
+
+  // Get engagement stats from resource analytics
+  const engagementStats = useMemo(() => {
+    if (!resource?.analytics) {
+      return { views: 0, saves: 0, tried: 0 };
+    }
+    return {
+      views: resource.analytics.view_count || 0,
+      saves: resource.analytics.save_count || 0,
+      tried: resource.analytics.tried_count || 0,
+    };
+  }, [resource?.analytics]);
+
+  // Get similar resources based on discipline
+  const similarResources = useMemo(() => {
+    if (!resource?.discipline) return [];
+    return allResources
+      .filter(
+        (r) =>
+          r.id !== resource.id && // Don't include current resource
+          r.discipline === resource.discipline // Same discipline
+      )
+      .slice(0, 2); // Limit to 2 similar ideas
+  }, [resource?.id, resource?.discipline, allResources]);
 
   const isOwner = user && resource && user.id === resource.user_id;
 
@@ -86,30 +99,24 @@ export default function ResourceDetailPage() {
 
   const handleTried = () => {
     setHasTriedIt(!hasTriedIt);
-    setStats((prev) => ({
-      ...prev,
-      tried: hasTriedIt ? prev.tried - 1 : prev.tried + 1,
-    }));
     toast({
       title: hasTriedIt ? "Removed from tried" : "Marked as tried!",
       status: "success",
       duration: 2000,
       isClosable: true,
     });
+    // TODO: Save to backend analytics
   };
 
   const handleSave = () => {
     setHasSaved(!hasSaved);
-    setStats((prev) => ({
-      ...prev,
-      saves: hasSaved ? prev.saves - 1 : prev.saves + 1,
-    }));
     toast({
       title: hasSaved ? "Removed from saved" : "Saved!",
       status: "success",
       duration: 2000,
       isClosable: true,
     });
+    // TODO: Save to backend analytics
   };
 
   if (isLoading) {
@@ -320,7 +327,7 @@ export default function ResourceDetailPage() {
                       <SimpleGrid columns={3} gap={4}>
                         <VStack spacing={1}>
                           <Text fontSize="xl" fontWeight="bold" color="blue.600">
-                            {stats.views}
+                            {engagementStats.views}
                           </Text>
                           <Text fontSize="xs" color="gray.600">
                             Views
@@ -328,7 +335,7 @@ export default function ResourceDetailPage() {
                         </VStack>
                         <VStack spacing={1}>
                           <Text fontSize="xl" fontWeight="bold" color="green.600">
-                            {stats.tried}
+                            {engagementStats.tried}
                           </Text>
                           <Text fontSize="xs" color="gray.600">
                             Tried It
@@ -336,7 +343,7 @@ export default function ResourceDetailPage() {
                         </VStack>
                         <VStack spacing={1}>
                           <Text fontSize="xl" fontWeight="bold" color="purple.600">
-                            {stats.saves}
+                            {engagementStats.saves}
                           </Text>
                           <Text fontSize="xs" color="gray.600">
                             Saved
@@ -349,38 +356,33 @@ export default function ResourceDetailPage() {
                       <Text fontSize="sm" fontWeight="bold" color="gray.600" mb={3}>
                         Similar Ideas
                       </Text>
-                      <VStack align="stretch" spacing={2}>
-                        <Box
-                          p={3}
-                          border="1px"
-                          borderColor="gray.200"
-                          borderRadius="md"
-                          cursor="pointer"
-                          _hover={{ bg: "gray.50" }}
-                        >
-                          <Text fontSize="sm" fontWeight="semibold">
-                            Student Peer Review Templates
-                          </Text>
-                          <Text fontSize="xs" color="gray.600" mt={1}>
-                            by Dr. Kumar • Finance
-                          </Text>
-                        </Box>
-                        <Box
-                          p={3}
-                          border="1px"
-                          borderColor="gray.200"
-                          borderRadius="md"
-                          cursor="pointer"
-                          _hover={{ bg: "gray.50" }}
-                        >
-                          <Text fontSize="sm" fontWeight="semibold">
-                            Discussion Prompt Generator
-                          </Text>
-                          <Text fontSize="xs" color="gray.600" mt={1}>
-                            by Prof. Chen • Management
-                          </Text>
-                        </Box>
-                      </VStack>
+                      {similarResources.length === 0 ? (
+                        <Text fontSize="xs" color="gray.500" fontStyle="italic">
+                          No similar ideas in this discipline
+                        </Text>
+                      ) : (
+                        <VStack align="stretch" spacing={2}>
+                          {similarResources.map((similar) => (
+                            <Box
+                              key={similar.id}
+                              p={3}
+                              border="1px"
+                              borderColor="gray.200"
+                              borderRadius="md"
+                              cursor="pointer"
+                              _hover={{ bg: "gray.50" }}
+                              onClick={() => navigate(`/resources/${similar.id}`)}
+                            >
+                              <Text fontSize="sm" fontWeight="semibold" noOfLines={2}>
+                                {similar.title}
+                              </Text>
+                              <Text fontSize="xs" color="gray.600" mt={1}>
+                                by {similar.user?.full_name || "Faculty Member"} • {similar.discipline}
+                              </Text>
+                            </Box>
+                          ))}
+                        </VStack>
+                      )}
                     </Box>
                   </VStack>
                 </TabPanel>
@@ -401,47 +403,51 @@ export default function ResourceDetailPage() {
                 <HStack justify="space-between">
                   <Text fontSize="sm">Views</Text>
                   <Text fontSize="sm" fontWeight="bold">
-                    {stats.views}
+                    {engagementStats.views}
                   </Text>
                 </HStack>
                 <HStack justify="space-between">
                   <Text fontSize="sm">Tried It</Text>
                   <Text fontSize="sm" fontWeight="bold">
-                    {stats.tried}
+                    {engagementStats.tried}
                   </Text>
                 </HStack>
                 <HStack justify="space-between">
                   <Text fontSize="sm">Saved</Text>
                   <Text fontSize="sm" fontWeight="bold">
-                    {stats.saves}
+                    {engagementStats.saves}
                   </Text>
                 </HStack>
               </VStack>
             </Box>
 
-            {/* Author card */}
-            <Box bg="white" p={4} borderRadius="lg" boxShadow="sm">
-              <Text fontSize="xs" fontWeight="bold" color="gray.600" mb={3}>
-                AUTHOR
-              </Text>
-              <VStack align="stretch" spacing={2}>
-                <Text fontSize="sm" fontWeight="semibold">
-                  Dr. Sarah Chen
+            {/* Author card - only show to logged-in users */}
+            {user && (
+              <Box bg="white" p={4} borderRadius="lg" boxShadow="sm">
+                <Text fontSize="xs" fontWeight="bold" color="gray.600" mb={3}>
+                  AUTHOR
                 </Text>
-                <Text fontSize="xs" color="gray.600">
-                  Marketing Department
-                </Text>
-                <Button
-                  size="xs"
-                  variant="outline"
-                  colorScheme="blue"
-                  width="full"
-                  onClick={onOpen}
-                >
-                  Contact
-                </Button>
-              </VStack>
-            </Box>
+                <VStack align="stretch" spacing={2}>
+                  <Text fontSize="sm" fontWeight="semibold">
+                    {resource?.user?.full_name || "Faculty Member"}
+                  </Text>
+                  {resource?.department && (
+                    <Text fontSize="xs" color="gray.600">
+                      {resource.department}
+                    </Text>
+                  )}
+                  <Button
+                    size="xs"
+                    variant="outline"
+                    colorScheme="blue"
+                    width="full"
+                    onClick={onOpen}
+                  >
+                    Contact
+                  </Button>
+                </VStack>
+              </Box>
+            )}
           </VStack>
         </GridItem>
       </Grid>
