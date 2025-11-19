@@ -31,6 +31,7 @@ MOCK_USERS = [
         "password": "TestPassword123!",
         "role": "STAFF",
         "is_active": True,
+        "disciplines": ["MARKETING"],
     },
     {
         "email": "mike.torres@curtin.edu.au",
@@ -38,6 +39,7 @@ MOCK_USERS = [
         "password": "TestPassword123!",
         "role": "STAFF",
         "is_active": True,
+        "disciplines": ["BUSINESS"],
     },
     {
         "email": "kumar.prof@curtin.edu.au",
@@ -45,6 +47,7 @@ MOCK_USERS = [
         "password": "TestPassword123!",
         "role": "STAFF",
         "is_active": True,
+        "disciplines": ["ACCOUNTING"],
     },
     {
         "email": "jennifer.lee@curtin.edu.au",
@@ -52,6 +55,7 @@ MOCK_USERS = [
         "password": "TestPassword123!",
         "role": "STAFF",
         "is_active": True,
+        "disciplines": ["HR"],
     },
     {
         "email": "alex.patel@curtin.edu.au",
@@ -59,6 +63,7 @@ MOCK_USERS = [
         "password": "TestPassword123!",
         "role": "STAFF",
         "is_active": True,
+        "disciplines": ["SUPPLY_CHAIN"],
     },
 ]
 
@@ -226,6 +231,7 @@ def load_mock_data():
                 hashed_password=hash_password(user_data["password"]),
                 role=user_data["role"],
                 is_active=user_data["is_active"],
+                disciplines=user_data.get("disciplines", []),
             )
             session.add(user)
             mock_users_map[user_data["email"]] = user

@@ -187,41 +187,22 @@ export default function ProfilePage() {
               <Text color="gray.600" fontSize="sm">
                 {user?.role === "ADMIN" ? "Administrator" : "Educator & Facilitator"}
               </Text>
-              {user?.department && (
-                <Text color="gray.600" fontSize="sm">
-                  {user.department}
-                </Text>
-              )}
             </VStack>
           </HStack>
 
           {/* Disciplines/Focus Areas */}
-          {(user?.disciplines && user.disciplines.length > 0 || user?.department) && (
+          {user?.disciplines && user.disciplines.length > 0 && (
             <Box mt={4}>
               <Text fontSize="sm" fontWeight="bold" color="gray.700" mb={2}>
                 Disciplines & Focus
               </Text>
-              <VStack align="flex-start" spacing={2}>
-                {user?.department && (
-                  <Text fontSize="sm" color="gray.700">
-                    <strong>Affiliation:</strong> {user.department}
-                  </Text>
-                )}
-                {user?.disciplines && user.disciplines.length > 0 && (
-                  <Box>
-                    <Text fontSize="xs" fontWeight="semibold" color="gray.600" mb={1}>
-                      Areas of Focus:
-                    </Text>
-                    <HStack spacing={2} flexWrap="wrap">
-                      {user.disciplines.map((discipline) => (
-                        <Badge key={discipline} colorScheme="blue" variant="subtle">
-                          {discipline}
-                        </Badge>
-                      ))}
-                    </HStack>
-                  </Box>
-                )}
-              </VStack>
+              <HStack spacing={2} flexWrap="wrap">
+                {user.disciplines.map((discipline) => (
+                  <Badge key={discipline} colorScheme="blue" variant="subtle">
+                    {discipline}
+                  </Badge>
+                ))}
+              </HStack>
             </Box>
           )}
         </Box>

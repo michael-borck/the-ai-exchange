@@ -17,11 +17,15 @@ class UserRole(str, Enum):
 
 
 class Discipline(str, Enum):
-    """Disciplines/areas of focus for users."""
+    """Business disciplines/schools for users."""
 
-    TEACHING = "TEACHING"
-    RESEARCH = "RESEARCH"
-    PROFESSIONAL = "PROFESSIONAL"  # Professional staff (admin, support, etc.)
+    MARKETING = "MARKETING"
+    BUSINESS = "BUSINESS"
+    SUPPLY_CHAIN = "SUPPLY_CHAIN"
+    HR = "HR"
+    TOURISM = "TOURISM"
+    ACCOUNTING = "ACCOUNTING"
+    LAW = "LAW"
 
 
 class ResourceType(str, Enum):
@@ -86,12 +90,8 @@ class User(SQLModel, table=True):
     is_approved: bool = Field(default=True)
     disciplines: list[str] = Field(
         default=[],
-        description="User's disciplines/areas of focus (TEACHING, RESEARCH, PROFESSIONAL)",
+        description="User's business disciplines/schools (MARKETING, BUSINESS, SUPPLY_CHAIN, HR, TOURISM, ACCOUNTING, LAW)",
         sa_column=Column(JSON),
-    )
-    department: str | None = Field(
-        default=None,
-        description="User's department or school affiliation",
     )
     notification_prefs: dict[str, Any] = Field(
         default={
@@ -156,11 +156,7 @@ class Resource(SQLModel, table=True):
     # New collaboration and metadata fields
     discipline: str | None = Field(
         default=None,
-        description="e.g., Marketing, Management, HR, Finance",
-    )
-    department: str | None = Field(
-        default=None,
-        description="e.g., School of Marketing & Management",
+        description="e.g., Marketing, Business, Supply Chain, HR, Tourism, Accounting, Law",
     )
     author_title: str | None = Field(
         default=None,

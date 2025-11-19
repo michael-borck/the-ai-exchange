@@ -25,7 +25,7 @@ import {
 import { useCreateResource } from "@/hooks/useResources";
 import { ResourceType } from "@/types/index";
 
-const DISCIPLINES = ["TEACHING", "RESEARCH", "PROFESSIONAL"];
+const DISCIPLINES = ["MARKETING", "BUSINESS", "SUPPLY_CHAIN", "HR", "TOURISM", "ACCOUNTING", "LAW"];
 const COLLABORATION_STATUSES = ["SEEKING", "PROVEN", "HAS_MATERIALS"];
 const TOOL_CATEGORIES = ["LLM", "CUSTOM_APP", "VISION", "SPEECH", "WORKFLOW", "DEVELOPMENT", "OTHER"];
 
@@ -164,7 +164,7 @@ export default function CreateResourcePage() {
               >
                 {DISCIPLINES.map((d) => (
                   <option key={d} value={d}>
-                    {d === "PROFESSIONAL" ? "Professional Staff" : d}
+                    {d.replace(/_/g, " ")}
                   </option>
                 ))}
               </Select>

@@ -10,7 +10,6 @@ export interface User {
   is_active: boolean;
   is_approved: boolean;
   disciplines: string[];
-  department?: string;
   notification_prefs: {
     notify_requests: boolean;
     notify_solutions: boolean;
@@ -38,7 +37,6 @@ export interface RegisterRequest {
 export interface UserUpdateRequest {
   full_name?: string;
   disciplines?: string[];
-  department?: string;
   notification_prefs?: {
     notify_requests?: boolean;
     notify_solutions?: boolean;
@@ -69,7 +67,6 @@ export interface Resource {
   updated_at: string;
   // New collaboration and metadata fields
   discipline?: string;
-  department?: string;
   author_title?: string;
   tools_used?: Record<string, string[]>; // Categorized tools, e.g., { "LLM": ["Claude"], "CUSTOM_APP": ["Talk-Buddy"] }
   tools_used_flat?: string[]; // Flattened list of all tools
