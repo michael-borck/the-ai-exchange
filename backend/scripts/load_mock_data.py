@@ -22,15 +22,9 @@ from app.models import User, Resource, ResourceAnalytics
 from app.core.security import hash_password
 from datetime import datetime, timedelta
 
-# Mock data
+# Mock data - only STAFF users for beta testing
+# ADMIN accounts should be created manually as needed, not hardcoded in mock data
 MOCK_USERS = [
-    {
-        "email": "admin@curtin.edu.au",
-        "full_name": "System Administrator",
-        "password": "AdminPassword123!",
-        "role": "ADMIN",
-        "is_active": True,
-    },
     {
         "email": "sarah.chen@curtin.edu.au",
         "full_name": "Dr. Sarah Chen",
