@@ -21,6 +21,7 @@ import {
 } from "@chakra-ui/react";
 import { SearchIcon, ArrowForwardIcon } from "@chakra-ui/icons";
 import { Layout } from "@/components/Layout";
+import { useAuth } from "@/hooks/useAuth";
 
 interface DisciplineCard {
   name: string;
@@ -124,7 +125,9 @@ const trendingThisWeek: ResourcePreview[] = [
   },
 ];
 
-function ResourceCard({ resource }: { resource: ResourcePreview }) {
+function ResourceCard({ resource, isLoggedIn }: { resource: ResourcePreview; isLoggedIn: boolean }) {
+  const displayAuthor = isLoggedIn ? resource.author : "Faculty Member";
+
   return (
     <Box
       bg="white"
@@ -149,7 +152,7 @@ function ResourceCard({ resource }: { resource: ResourcePreview }) {
         </Heading>
 
         <Text fontSize="xs" color="gray.600">
-          {resource.author} • {resource.timeSaved || 2} hrs/week saved
+          {displayAuthor} • {resource.timeSaved || 2} hrs/week saved
         </Text>
 
         <Text fontSize="sm" color="gray.700" lineHeight="1.4">
@@ -209,6 +212,8 @@ function DisciplineGridItem({ discipline }: { discipline: DisciplineCard }) {
 
 export default function HomePage() {
   const navigate = useNavigate();
+  const { user } = useAuth();
+  const isLoggedIn = !!user;
 
   return (
     <Layout>
@@ -289,7 +294,7 @@ export default function HomePage() {
           </HStack>
           <SimpleGrid columns={{ base: 1, md: 3 }} spacing={4}>
             {recentContributions.map((r) => (
-              <ResourceCard key={r.id} resource={r} />
+              <ResourceCard key={r.id} resource={r} isLoggedIn={isLoggedIn} />
             ))}
           </SimpleGrid>
         </VStack>
@@ -304,7 +309,7 @@ export default function HomePage() {
           </HStack>
           <SimpleGrid columns={{ base: 1, md: 3 }} spacing={4}>
             {trendingThisWeek.map((r) => (
-              <ResourceCard key={r.id} resource={r} />
+              <ResourceCard key={r.id} resource={r} isLoggedIn={isLoggedIn} />
             ))}
           </SimpleGrid>
         </VStack>

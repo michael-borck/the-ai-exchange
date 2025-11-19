@@ -40,23 +40,12 @@ function App() {
               <Route path="/login" element={<LoginPage />} />
               <Route path="/register" element={<RegisterPage />} />
 
-              {/* Protected routes */}
-              <Route
-                path="/"
-                element={
-                  <ProtectedRoute>
-                    <HomePage />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/resources"
-                element={
-                  <ProtectedRoute>
-                    <ResourcesPage />
-                  </ProtectedRoute>
-                }
-              />
+              {/* Public routes - No authentication required */}
+              <Route path="/" element={<HomePage />} />
+              <Route path="/resources" element={<ResourcesPage />} />
+              <Route path="/resources/:id" element={<ResourceDetailPage />} />
+
+              {/* Protected routes - Authentication required */}
               <Route
                 path="/resources/new"
                 element={
@@ -70,14 +59,6 @@ function App() {
                 element={
                   <ProtectedRoute>
                     <EditResourcePage />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/resources/:id"
-                element={
-                  <ProtectedRoute>
-                    <ResourceDetailPage />
                   </ProtectedRoute>
                 }
               />
