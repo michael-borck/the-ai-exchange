@@ -5,11 +5,9 @@
 import { useNavigate } from "react-router-dom";
 import {
   Box,
-  Container,
   Heading,
   Text,
   VStack,
-  HStack,
   Button,
   Tabs,
   TabList,
@@ -17,15 +15,10 @@ import {
   Tab,
   TabPanel,
   Divider,
-  List,
-  ListItem,
-  ListIcon,
   UnorderedList,
   OrderedList,
-  Link,
-  Icon,
+  ListItem,
 } from "@chakra-ui/react";
-import { CheckCircleIcon, ExternalLinkIcon, WarningIcon } from "@chakra-ui/icons";
 import { Layout } from "@/components/Layout";
 
 export default function GettingStartedPage() {

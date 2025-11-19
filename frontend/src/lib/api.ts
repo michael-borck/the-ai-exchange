@@ -181,6 +181,23 @@ class ApiClient {
   async unsubscribe(tag: string): Promise<void> {
     await this.axiosInstance.post("/subscriptions/unsubscribe", { tag });
   }
+
+  // Generic HTTP methods for other endpoints
+  async get<T>(url: string): Promise<{ data: T }> {
+    return this.axiosInstance.get<T>(url);
+  }
+
+  async post<T>(url: string, data?: any): Promise<{ data: T }> {
+    return this.axiosInstance.post<T>(url, data);
+  }
+
+  async patch<T>(url: string, data?: any): Promise<{ data: T }> {
+    return this.axiosInstance.patch<T>(url, data);
+  }
+
+  async delete<T>(url: string): Promise<{ data: T }> {
+    return this.axiosInstance.delete<T>(url);
+  }
 }
 
 export const apiClient = new ApiClient();

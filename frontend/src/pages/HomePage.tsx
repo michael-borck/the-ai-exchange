@@ -6,9 +6,6 @@ import { useNavigate } from "react-router-dom";
 import {
   Box,
   Button,
-  Container,
-  Grid,
-  GridItem,
   Heading,
   HStack,
   Input,
@@ -17,7 +14,6 @@ import {
   VStack,
   InputGroup,
   InputLeftElement,
-  Icon,
   Spinner,
   Center,
 } from "@chakra-ui/react";
@@ -34,20 +30,7 @@ interface DisciplineCard {
   icon?: string;
 }
 
-interface ResourcePreview {
-  id: string;
-  title: string;
-  author: string;
-  discipline: string;
-  tools: string[];
-  quickSummary: string;
-  timeSaved?: number;
-  views: number;
-  tried: number;
-}
-
-
-function ResourceCard({ resource, isLoggedIn }: { resource: ResourcePreview; isLoggedIn: boolean }) {
+function ResourceCard({ resource, isLoggedIn }: { resource: any; isLoggedIn: boolean }) {
   const navigate = useNavigate();
 
   const handleLoginClick = (e: React.MouseEvent) => {
@@ -92,7 +75,7 @@ function ResourceCard({ resource, isLoggedIn }: { resource: ResourcePreview; isL
         </Text>
 
         <HStack spacing={2} fontSize="xs">
-          {resource.tools.map((tool) => (
+          {resource.tools.map((tool: string) => (
             <Text key={tool} bg="gray.100" px={2} py={1} borderRadius="full">
               {tool}
             </Text>

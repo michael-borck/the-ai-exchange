@@ -1,6 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { apiClient } from "@/lib/api";
-import type { UUID } from "crypto";
 
 interface SaveResponse {
   resource_id: string;

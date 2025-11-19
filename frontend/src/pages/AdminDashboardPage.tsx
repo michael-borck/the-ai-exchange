@@ -187,7 +187,7 @@ export default function AdminDashboardPage() {
                     </Center>
                   ) : analyticsData?.top_resources && analyticsData.top_resources.length > 0 ? (
                     <VStack align="stretch" spacing={3}>
-                      {analyticsData.top_resources.map((resource, idx) => (
+                      {analyticsData.top_resources.map((resource: any, idx: number) => (
                         <Box key={resource.resource_id} bg="white" p={4} borderRadius="lg" boxShadow="sm">
                           <HStack justify="space-between" mb={2}>
                             <HStack>
@@ -224,7 +224,7 @@ export default function AdminDashboardPage() {
                     </Center>
                   ) : disciplineData?.by_discipline ? (
                     <SimpleGrid columns={{ base: 1, md: 2 }} gap={4}>
-                      {Object.entries(disciplineData.by_discipline).map(([discipline, stats]) => (
+                      {Object.entries(disciplineData.by_discipline).map(([discipline, stats]: [string, any]) => (
                         <Box key={discipline} bg="white" p={4} borderRadius="lg" boxShadow="sm">
                           <Text fontWeight="semibold" mb={3}>{discipline}</Text>
                           <SimpleGrid columns={{ base: 3 }} gap={3}>

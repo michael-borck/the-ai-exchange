@@ -20,12 +20,10 @@ import {
   Center,
   InputGroup,
   InputLeftElement,
-  Icon,
   SimpleGrid,
 } from "@chakra-ui/react";
 import { SearchIcon } from "@chakra-ui/icons";
 import { useResources } from "@/hooks/useResources";
-import { ResourceType, ResourceStatus } from "@/types/index";
 import { FilterSidebar, FilterState } from "@/components/FilterSidebar";
 import { flattenTools } from "@/lib/tools";
 
@@ -33,17 +31,17 @@ interface ResourceCard {
   id: string;
   title: string;
   author: string;
-  discipline: string;
+  discipline?: string;
   tools: string[];
   quickSummary: string;
   timeSaved?: number;
   views: number;
   tried: number;
-  collaborationStatus: string;
+  collaborationStatus?: string;
 }
 
 
-function BrowseResourceCard({ resource, isLoggedIn }: { resource: ResourceCard; isLoggedIn: boolean }) {
+function BrowseResourceCard({ resource, isLoggedIn }: { resource: any; isLoggedIn: boolean }) {
   const navigate = useNavigate();
 
   const handleLoginClick = (e: React.MouseEvent) => {
@@ -123,7 +121,7 @@ function BrowseResourceCard({ resource, isLoggedIn }: { resource: ResourceCard; 
 
         {/* Tools */}
         <HStack spacing={2} fontSize="xs" flexWrap="wrap">
-          {resource.tools.map((tool) => (
+          {resource.tools.map((tool: string) => (
             <Text key={tool} bg="gray.100" px={2} py={1} borderRadius="full">
               {tool}
             </Text>
@@ -247,7 +245,7 @@ export default function ResourcesPage() {
         <Grid
           templateColumns={{ base: "1fr", lg: "250px 1fr" }}
           gap={6}
-          align="start"
+          alignItems="start"
         >
           {/* Sidebar */}
           <GridItem>

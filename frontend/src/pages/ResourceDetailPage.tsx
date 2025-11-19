@@ -29,7 +29,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { useResource, useDeleteResource, useResources } from "@/hooks/useResources";
 import { useSaveResource, useTriedResource, useIsResourceSaved } from "@/hooks/useEngagement";
 import { CollaborationModal } from "@/components/CollaborationModal";
-import { useState, useMemo } from "react";
+import { useMemo } from "react";
 
 export default function ResourceDetailPage() {
   const navigate = useNavigate();
@@ -161,7 +161,7 @@ export default function ResourceDetailPage() {
 
   return (
     <Layout>
-      <Grid templateColumns={{ base: "1fr", lg: "1fr 300px" }} gap={6} align="start">
+      <Grid templateColumns={{ base: "1fr", lg: "1fr 300px" }} gap={6} alignItems="start">
         {/* Main content */}
         <GridItem>
           <VStack align="stretch" spacing={6}>

@@ -32,10 +32,9 @@ import { useAuth, useLogout } from "@/hooks/useAuth";
 
 interface LayoutProps {
   children: React.ReactNode;
-  isPublic?: boolean; // If true, shows public header with login
 }
 
-export function Layout({ children, isPublic = false }: LayoutProps) {
+export function Layout({ children }: LayoutProps) {
   const navigate = useNavigate();
   const location = useLocation();
   const { user } = useAuth();

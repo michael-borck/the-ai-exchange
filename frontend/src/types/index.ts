@@ -128,3 +128,28 @@ export interface PaginatedResponse<T> {
 export interface ApiError {
   detail: string;
 }
+
+export interface ResourceCard {
+  id: string;
+  title: string;
+  author: string;
+  discipline?: string;
+  tools: string[];
+  quickSummary: string;
+  timeSaved?: number;
+  views: number;
+  tried: number;
+  collaborationStatus?: CollaborationStatus;
+}
+
+export interface ResourcePreview {
+  id: string;
+  title: string;
+  author: string;
+  discipline?: string;
+  tools: string[];
+  quickSummary: string;
+  timeSaved?: number;
+  views: number;
+  tried: number;
+}
