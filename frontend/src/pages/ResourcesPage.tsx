@@ -38,6 +38,8 @@ interface ResourceCard {
   views: number;
   tried: number;
   collaborationStatus?: string;
+  created_at: string;
+  isSaved?: boolean;
 }
 
 
@@ -128,27 +130,59 @@ function BrowseResourceCard({ resource, isLoggedIn }: { resource: any; isLoggedI
           ))}
         </HStack>
 
+        {/* Created date and stats */}
+        <HStack
+          spacing={2}
+          fontSize="xs"
+          color="gray.500"
+          width="full"
+          justify="space-between"
+          pt={1}
+          pb={2}
+        >
+          <Text>
+            {new Date(resource.created_at || new Date()).toLocaleDateString('en-US', {
+              year: 'numeric',
+              month: 'short',
+              day: 'numeric',
+            })}
+          </Text>
+          <HStack spacing={2}>
+            <Text title="Views">👍 {resource.views}</Text>
+            <Text title="Tried It">✓ {resource.tried}</Text>
+          </HStack>
+        </HStack>
+
         {/* Stats */}
         <HStack
           spacing={3}
           fontSize="sm"
           width="full"
-          justify="space-between"
+          justify="flex-end"
           pt={2}
           borderTop="1px"
           borderColor="gray.100"
         >
-          <HStack spacing={1}>
-            <Text color="gray.600">👍 {resource.views}</Text>
-            <Text color="gray.600">✓ {resource.tried}</Text>
-          </HStack>
           {isLoggedIn ? (
             <HStack spacing={1}>
-              <Button size="xs" variant="ghost" onClick={(e) => e.stopPropagation()}>
-                Similar
+              <Button
+                size="xs"
+                variant="ghost"
+                colorScheme="blue"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  navigate(`/resources?discipline=${resource.discipline}`);
+                }}
+              >
+                Similar Ideas
               </Button>
-              <Button size="xs" variant="ghost" onClick={(e) => e.stopPropagation()}>
-                Save
+              <Button
+                size="xs"
+                variant="ghost"
+                colorScheme="blue"
+                onClick={(e) => e.stopPropagation()}
+              >
+                {resource.isSaved ? "Saved ✓" : "Save"}
               </Button>
             </HStack>
           ) : (
@@ -206,6 +240,7 @@ export default function ResourcesPage() {
       views: resource.analytics?.view_count || 0,
       tried: resource.analytics?.tried_count || 0,
       collaborationStatus: resource.collaboration_status,
+      created_at: resource.created_at,
     }));
   }, [resources]);
 

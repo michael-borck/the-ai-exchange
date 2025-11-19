@@ -82,17 +82,48 @@ function ResourceCard({ resource, isLoggedIn }: { resource: any; isLoggedIn: boo
           ))}
         </HStack>
 
-        <HStack spacing={3} fontSize="sm" width="full" justify="space-between" pt={2} borderTop="1px" borderColor="gray.100">
-          <HStack spacing={1}>
-            <Text color="gray.600">👍 {resource.views}</Text>
-            <Text color="gray.600">✓ {resource.tried}</Text>
+        {/* Created date and stats */}
+        <HStack
+          spacing={2}
+          fontSize="xs"
+          color="gray.500"
+          width="full"
+          justify="space-between"
+          pt={1}
+          pb={2}
+        >
+          <Text>
+            {new Date(resource.created_at || new Date()).toLocaleDateString('en-US', {
+              year: 'numeric',
+              month: 'short',
+              day: 'numeric',
+            })}
+          </Text>
+          <HStack spacing={2}>
+            <Text title="Views">👍 {resource.views}</Text>
+            <Text title="Tried It">✓ {resource.tried}</Text>
           </HStack>
+        </HStack>
+
+        {/* Action buttons */}
+        <HStack spacing={3} fontSize="sm" width="full" justify="flex-end" pt={2} borderTop="1px" borderColor="gray.100">
           {isLoggedIn ? (
             <HStack spacing={1}>
-              <Button size="xs" variant="ghost">
-                Similar
+              <Button
+                size="xs"
+                variant="ghost"
+                colorScheme="blue"
+                onClick={() => {
+                  // Find discipline from the full resource data
+                  const fullResource = allResources.find(r => r.id === resource.id);
+                  if (fullResource?.discipline) {
+                    navigate(`/resources?discipline=${fullResource.discipline}`);
+                  }
+                }}
+              >
+                Similar Ideas
               </Button>
-              <Button size="xs" variant="ghost">
+              <Button size="xs" variant="ghost" colorScheme="blue">
                 Save
               </Button>
             </HStack>
@@ -174,6 +205,7 @@ export default function HomePage() {
         timeSaved: resource.time_saved_value,
         views: resource.analytics?.view_count || 0,
         tried: resource.analytics?.tried_count || 0,
+        created_at: resource.created_at,
       }));
   }, [allResources]);
 
@@ -192,6 +224,7 @@ export default function HomePage() {
         timeSaved: resource.time_saved_value,
         views: resource.analytics?.view_count || 0,
         tried: resource.analytics?.tried_count || 0,
+        created_at: resource.created_at,
       }));
   }, [allResources]);
 
