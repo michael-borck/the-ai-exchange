@@ -109,13 +109,17 @@ def list_resources(
         # Parse comma-separated tool categories (e.g., "LLM,CUSTOM_APP")
         # tools_used is a JSON dict: {"LLM": ["Claude"], "CUSTOM_APP": ["Talk-Buddy"]}
         # Filter resources that have any of the specified categories
+        from sqlalchemy import func, or_
         tool_categories = [t.strip() for t in tools.split(",")]
-        # For each category, check if it exists as a key in the tools_used JSON
-        # SQLite JSON support: check if the key exists in the JSON dict
+        # Build OR condition: check if any of the specified categories exist as keys
+        # Using json_extract to check if the key exists in the JSON object
+        conditions = []
         for category in tool_categories:
-            # Check if the category key exists in tools_used dict
-            # In SQLite: json_extract(tools_used, '$.' || category) is not null
-            query = query.where(Resource.tools_used[category].astext.isnot(None))
+            # Check if the category key exists in tools_used dict using json_extract
+            # json_extract returns NULL if the key doesn't exist, not NULL if it does
+            conditions.append(func.json_extract(Resource.tools_used, f'$.{category}').isnot(None))
+        if conditions:
+            query = query.where(or_(*conditions))
 
     if collaboration_status:
         query = query.where(Resource.collaboration_status == collaboration_status)
