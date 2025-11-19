@@ -41,7 +41,7 @@ class TagSuggestion:
         self.user_tags = user_tags or []
 
 
-@router.get("", response_model=list[ResourceResponse])
+@router.get("", response_model=list[dict])
 def list_resources(
     type_filter: ResourceType | None = Query(None, alias="type"),
     tag: str | None = Query(None),
@@ -56,8 +56,8 @@ def list_resources(
     skip: int = Query(0, ge=0),
     limit: int = Query(10, ge=1, le=100),
     session: Session = Depends(get_session),
-) -> list[ResourceResponse]:
-    """Get list of resources with advanced filtering.
+) -> list[dict]:
+    """Get list of resources with advanced filtering and author information.
 
     Args:
         type_filter: Filter by resource type
@@ -74,7 +74,7 @@ def list_resources(
         session: Database session
 
     Returns:
-        List of resources matching filters
+        List of resources with author info matching filters
     """
     query = select(Resource).where(Resource.is_hidden.is_(False))
 
@@ -138,22 +138,37 @@ def list_resources(
         query = query.order_by(Resource.created_at.desc())
 
     resources = session.exec(query.offset(skip).limit(limit)).all()
-    return resources
+
+    # Include user information for each resource
+    result = []
+    for resource in resources:
+        user = session.get(User, resource.user_id)
+        resource_dict = {
+            **ResourceResponse.model_validate(resource).model_dump(),
+            "user": {
+                "id": str(user.id),
+                "full_name": user.full_name,
+                "email": user.email,
+            } if user else None,
+        }
+        result.append(resource_dict)
+
+    return result
 
 
-@router.get("/{resource_id}", response_model=ResourceResponse)
+@router.get("/{resource_id}", response_model=dict)
 def get_resource(
     resource_id: UUID,
     session: Session = Depends(get_session),
-) -> ResourceResponse:
-    """Get a specific resource.
+) -> dict:
+    """Get a specific resource with author information.
 
     Args:
         resource_id: Resource ID
         session: Database session
 
     Returns:
-        Resource details
+        Resource details with user information
 
     Raises:
         HTTPException: If resource not found
@@ -166,7 +181,20 @@ def get_resource(
             detail="Resource not found",
         )
 
-    return resource
+    # Get the user information
+    user = session.get(User, resource.user_id)
+
+    # Build response with user information
+    resource_dict = {
+        **ResourceResponse.model_validate(resource).model_dump(),
+        "user": {
+            "id": str(user.id),
+            "full_name": user.full_name,
+            "email": user.email,
+        } if user else None,
+    }
+
+    return resource_dict
 
 
 @router.get("/{resource_id}/solutions", response_model=list[ResourceResponse])

@@ -168,7 +168,7 @@ export default function ResourceDetailPage() {
                 <HStack spacing={3} width="full" justify="space-between">
                   <VStack align="flex-start" spacing={1}>
                     <Text fontSize="sm" fontWeight="semibold">
-                      Shared by {resource.user_id}
+                      Shared by {resource.user?.full_name || "Faculty Member"}
                     </Text>
                     <Text fontSize="xs" color="gray.600">
                       {new Date(resource.created_at).toLocaleDateString()}
@@ -197,7 +197,7 @@ export default function ResourceDetailPage() {
                 </HStack>
               )}
 
-              {/* Shared date for guests */}
+              {/* For guests - only show date, hide author info */}
               {!user && (
                 <Text fontSize="xs" color="gray.600">
                   Shared on {new Date(resource.created_at).toLocaleDateString()}
