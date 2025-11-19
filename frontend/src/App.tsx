@@ -11,6 +11,7 @@ import { ProtectedRoute } from "@/components/ProtectedRoute";
 // Pages
 import LoginPage from "@/pages/LoginPage";
 import RegisterPage from "@/pages/RegisterPage";
+import HomePage from "@/pages/HomePage";
 import DashboardPage from "@/pages/DashboardPage";
 import ResourcesPage from "@/pages/ResourcesPage";
 import ResourceDetailPage from "@/pages/ResourceDetailPage";
@@ -44,7 +45,7 @@ function App() {
                 path="/"
                 element={
                   <ProtectedRoute>
-                    <DashboardPage />
+                    <HomePage />
                   </ProtectedRoute>
                 }
               />
