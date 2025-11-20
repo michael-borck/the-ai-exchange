@@ -30,6 +30,7 @@ from app.models import (
     User,
     UserCreate,
     UserResponse,
+    UserRole,
 )
 from app.services.database import get_session
 from app.services.password_reset import (
@@ -180,7 +181,7 @@ def register(
         email=user_create.email,
         full_name=user_create.full_name,
         hashed_password=hash_password(user_create.password),
-        role="ADMIN" if is_first_user else "STAFF",
+        role=UserRole.ADMIN if is_first_user else UserRole.STAFF,
         is_active=True,
         is_approved=is_curtin,  # Auto-approve if curtin domain
         disciplines=user_create.disciplines or [],
