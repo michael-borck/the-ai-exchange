@@ -32,8 +32,9 @@ interface DisciplineCard {
 
 function ResourceCard({ resource, isLoggedIn }: { resource: any; isLoggedIn: boolean }) {
   const navigate = useNavigate();
-  const { useSaveResource, useIsResourceSaved } = require("@/hooks/useEngagement");
+  const { useSaveResource, useIsResourceSaved, useTriedResource } = require("@/hooks/useEngagement");
   const saveResourceMutation = useSaveResource();
+  const triedResourceMutation = useTriedResource();
   const { data: isSavedData } = useIsResourceSaved(resource.id);
   const hasSaved = isSavedData ?? false;
 
@@ -48,6 +49,15 @@ function ResourceCard({ resource, isLoggedIn }: { resource: any; isLoggedIn: boo
       await saveResourceMutation.mutateAsync(resource.id);
     } catch (error) {
       console.error("Failed to save resource:", error);
+    }
+  };
+
+  const handleTried = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    try {
+      await triedResourceMutation.mutateAsync(resource.id);
+    } catch (error) {
+      console.error("Failed to mark as tried:", error);
     }
   };
 
@@ -95,41 +105,51 @@ function ResourceCard({ resource, isLoggedIn }: { resource: any; isLoggedIn: boo
           ))}
         </HStack>
 
-        {/* Created date and stats */}
-        <HStack
-          spacing={2}
-          fontSize="xs"
-          color="gray.500"
-          width="full"
-          justify="space-between"
-          pt={1}
-          pb={2}
-        >
-          <Text>
-            {new Date(resource.created_at || new Date()).toLocaleDateString('en-US', {
-              year: 'numeric',
-              month: 'short',
-              day: 'numeric',
-            })}
-          </Text>
-          <HStack spacing={2}>
+        {/* Created date */}
+        <Text fontSize="xs" color="gray.500">
+          {new Date(resource.created_at || new Date()).toLocaleDateString('en-US', {
+            year: 'numeric',
+            month: 'short',
+            day: 'numeric',
+          })}
+        </Text>
+
+        {/* Engagement stats */}
+        <HStack spacing={4} fontSize="xs" color="gray.600" width="full" pt={1}>
+          <HStack spacing={1}>
             <Text title="Views">👁️ {resource.views}</Text>
+          </HStack>
+          <HStack spacing={1}>
             <Text title="People who tried it">🧪 {resource.tried}</Text>
+          </HStack>
+          <HStack spacing={1}>
+            <Text title="People who saved it">📌 {resource.saves || 0}</Text>
           </HStack>
         </HStack>
 
         {/* Action buttons */}
-        <HStack spacing={3} fontSize="sm" width="full" justify="flex-end" pt={2} borderTop="1px" borderColor="gray.100">
+        <HStack spacing={2} fontSize="sm" width="full" justify="flex-end" pt={2} borderTop="1px" borderColor="gray.100">
           {isLoggedIn ? (
-            <Button
-              size="xs"
-              variant={hasSaved ? "solid" : "ghost"}
-              colorScheme="blue"
-              onClick={handleSave}
-              isLoading={saveResourceMutation.isPending}
-            >
-              {hasSaved ? "✓ Saved" : "Save"}
-            </Button>
+            <>
+              <Button
+                size="xs"
+                variant="ghost"
+                colorScheme="green"
+                onClick={handleTried}
+                isLoading={triedResourceMutation.isPending}
+              >
+                🧪 Tried
+              </Button>
+              <Button
+                size="xs"
+                variant={hasSaved ? "solid" : "ghost"}
+                colorScheme="blue"
+                onClick={handleSave}
+                isLoading={saveResourceMutation.isPending}
+              >
+                {hasSaved ? "✓ Saved" : "📌 Save"}
+              </Button>
+            </>
           ) : (
             <Button size="xs" variant="ghost" colorScheme="blue" onClick={handleLoginClick}>
               Login to collaborate
@@ -208,6 +228,7 @@ export default function HomePage() {
         timeSaved: resource.time_saved_value,
         views: resource.analytics?.view_count || 0,
         tried: resource.analytics?.tried_count || 0,
+        saves: resource.analytics?.save_count || 0,
         created_at: resource.created_at,
       }));
   }, [allResources]);
@@ -227,6 +248,7 @@ export default function HomePage() {
         timeSaved: resource.time_saved_value,
         views: resource.analytics?.view_count || 0,
         tried: resource.analytics?.tried_count || 0,
+        saves: resource.analytics?.save_count || 0,
         created_at: resource.created_at,
       }));
   }, [allResources]);
