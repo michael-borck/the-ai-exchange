@@ -269,6 +269,7 @@ def get_me(
         role=current_user.role,
         is_active=current_user.is_active,
         is_approved=current_user.is_approved,
+        disciplines=current_user.disciplines,
         notification_prefs=current_user.notification_prefs,
         created_at=current_user.created_at,
     )
@@ -314,6 +315,7 @@ def update_me(
         role=current_user.role,
         is_active=current_user.is_active,
         is_approved=current_user.is_approved,
+        disciplines=current_user.disciplines,
         notification_prefs=current_user.notification_prefs,
         created_at=current_user.created_at,
     )
