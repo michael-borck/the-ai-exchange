@@ -1,6 +1,5 @@
 """Prompt library endpoints."""
 
-from typing import Any
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException, status
@@ -12,6 +11,7 @@ from app.models import (
     PromptCreate,
     PromptResponse,
     PromptUpdate,
+    PromptUsageResponse,
     SharingLevel,
     User,
 )
@@ -269,12 +269,12 @@ def fork_prompt(
     return PromptResponse.model_validate(forked_prompt)
 
 
-@router.get("/{prompt_id}/usage", response_model=dict[str, Any])
+@router.get("/{prompt_id}/usage", response_model=PromptUsageResponse)
 def get_prompt_usage(
     prompt_id: UUID,
     current_user: User = Depends(get_current_user),
     session: Session = Depends(get_session),
-) -> dict[str, Any]:
+) -> PromptUsageResponse:
     """Get usage analytics for a prompt (author only).
 
     Args:
@@ -302,12 +302,12 @@ def get_prompt_usage(
             detail="Not authorized to view analytics",
         )
 
-    return {
-        "id": prompt.id,
-        "title": prompt.title,
-        "usage_count": prompt.usage_count,
-        "fork_count": prompt.fork_count,
-        "sharing_level": prompt.sharing_level.value,
-        "created_at": prompt.created_at,
-        "updated_at": prompt.updated_at,
-    }
+    return PromptUsageResponse(
+        id=prompt.id,
+        title=prompt.title,
+        usage_count=prompt.usage_count,
+        fork_count=prompt.fork_count,
+        sharing_level=prompt.sharing_level.value,
+        created_at=prompt.created_at,
+        updated_at=prompt.updated_at,
+    )

@@ -6,7 +6,7 @@ from sqlmodel import Session, select
 
 from app.api.auth import get_current_user
 from app.core.config import settings
-from app.models import Subscription, SubscriptionResponse, User
+from app.models import NotificationPreferences, Subscription, SubscriptionResponse, User
 from app.services.database import get_session
 
 router = APIRouter(
@@ -128,12 +128,12 @@ def get_subscriptions(
     return subscriptions
 
 
-@router.patch("/notify-prefs", response_model=dict[str, bool])
+@router.patch("/notify-prefs", response_model=NotificationPreferences)
 def update_notification_prefs(
     prefs: NotificationPrefs,
     current_user: User = Depends(get_current_user),
     session: Session = Depends(get_session),
-) -> dict[str, bool]:
+) -> NotificationPreferences:
     """Update notification preferences.
 
     Args:
@@ -153,4 +153,7 @@ def update_notification_prefs(
     session.commit()
     session.refresh(current_user)
 
-    return current_user.notification_prefs
+    return NotificationPreferences(
+        notify_requests=prefs.notify_requests,
+        notify_solutions=prefs.notify_solutions,
+    )

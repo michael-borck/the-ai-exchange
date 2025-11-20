@@ -712,3 +712,151 @@ class ResourceAnalyticsResponse(SQLModel):
         """Pydantic config."""
 
         from_attributes = True
+
+
+class ResourceViewTracked(SQLModel):
+    """Response when resource view is tracked."""
+
+    resource_id: UUID
+    view_count: int
+    status: str
+
+
+class ResourceTriedTracked(SQLModel):
+    """Response when resource is marked as tried."""
+
+    resource_id: UUID
+    tried_count: int
+    status: str
+
+
+class ResourceSaveToggled(SQLModel):
+    """Response when resource save status is toggled."""
+
+    resource_id: UUID
+    is_saved: bool
+    save_count: int
+    status: str
+
+
+class ResourceSaveStatus(SQLModel):
+    """Response checking if user saved a resource."""
+
+    resource_id: UUID
+    is_saved: bool
+
+
+class SavedResourceItem(SQLModel):
+    """Saved resource in user's collection."""
+
+    id: UUID
+    title: str
+    content_text: str
+    type: str
+    discipline: str | None
+    user: dict[str, str | None] | None = None
+    saved_at: datetime
+
+
+class UserTriedInfo(SQLModel):
+    """User who tried a resource."""
+
+    id: UUID
+    full_name: str
+    email: str
+    tried_at: datetime
+
+
+class PlatformStats(SQLModel):
+    """Platform-wide statistics."""
+
+    total_resources: int
+    total_views: int
+    total_saves: int
+    total_tried: int
+    total_forks: int
+    total_comments: int
+    avg_views_per_resource: float
+    avg_saves_per_resource: float
+
+
+class TopResource(SQLModel):
+    """Top performing resource."""
+
+    resource_id: UUID
+    view_count: int
+    save_count: int
+    tried_count: int
+    title: str | None = None
+
+
+class PlatformAnalyticsResponse(SQLModel):
+    """Platform analytics response."""
+
+    platform_stats: PlatformStats
+    top_resources: list[TopResource]
+
+
+class DisciplineStats(SQLModel):
+    """Statistics for a discipline."""
+
+    count: int
+    total_views: int
+    total_saves: int
+
+
+class AnalyticsByDisciplineResponse(SQLModel):
+    """Analytics by discipline response."""
+
+    by_discipline: dict[str, DisciplineStats]
+
+
+class NotificationPreferences(SQLModel):
+    """User notification preferences."""
+
+    notify_requests: bool
+    notify_solutions: bool
+
+
+class PromptUsageResponse(SQLModel):
+    """Prompt usage statistics."""
+
+    id: UUID
+    title: str
+    usage_count: int
+    fork_count: int
+    sharing_level: str
+    created_at: datetime
+    updated_at: datetime
+
+
+class CollaborationRequestResponse(SQLModel):
+    """Response when collaboration request is created."""
+
+    status: str
+    resource_id: UUID
+    to_user_id: UUID
+    from_user_id: UUID
+    message: str | None = None
+
+
+class CollaborationOptionsResponse(SQLModel):
+    """Collaboration options for a resource."""
+
+    resource_id: UUID
+    author_id: UUID
+    collaboration_status: str | None
+    open_to: list[str]
+    contact_options: dict[str, bool]
+
+
+class SimilarResourceResponse(SQLModel):
+    """Similar resource for recommendations."""
+
+    id: UUID
+    title: str
+    author_id: UUID
+    discipline: str | None
+    tools_used: dict[str, list[str]]
+    collaboration_status: str | None
+    open_to_collaborate: list[str]

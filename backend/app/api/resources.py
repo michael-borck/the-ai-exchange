@@ -1,6 +1,5 @@
 """Resource CRUD endpoints for requests, use cases, prompts, and policies."""
 
-from typing import Any
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException, Query, status
@@ -15,6 +14,7 @@ from app.models import (
     ResourceStatus,
     ResourceType,
     ResourceUpdate,
+    ResourceWithAuthor,
     User,
 )
 from app.services.auto_tagger import extract_keywords
@@ -42,7 +42,7 @@ class TagSuggestion:
         self.user_tags = user_tags or []
 
 
-@router.get("", response_model=list[dict[str, Any]])
+@router.get("", response_model=list[ResourceWithAuthor])
 def list_resources(
     type_filter: ResourceType | None = Query(None, alias="type"),
     tag: str | None = Query(None),
@@ -57,7 +57,7 @@ def list_resources(
     skip: int = Query(0, ge=0),
     limit: int = Query(10, ge=1, le=100),
     session: Session = Depends(get_session),
-) -> list[dict[str, Any]]:
+) -> list[ResourceWithAuthor]:
     """Get list of resources with advanced filtering and author information.
 
     Args:
@@ -144,24 +144,23 @@ def list_resources(
     result = []
     for resource in resources:
         user = session.get(User, resource.user_id)
-        resource_dict = {
-            **ResourceResponse.model_validate(resource).model_dump(),
-            "user": {
-                "id": str(user.id),
-                "full_name": user.full_name,
-                "email": user.email,
-            } if user else None,
-        }
-        result.append(resource_dict)
+        if user:
+            resource_with_author = ResourceWithAuthor(
+                **ResourceResponse.model_validate(resource).model_dump(),
+                author_name=user.full_name,
+                author_email=user.email,
+                author_id=user.id,
+            )
+            result.append(resource_with_author)
 
     return result
 
 
-@router.get("/{resource_id}", response_model=dict[str, Any])
+@router.get("/{resource_id}", response_model=ResourceWithAuthor)
 def get_resource(
     resource_id: UUID,
     session: Session = Depends(get_session),
-) -> dict[str, Any]:
+) -> ResourceWithAuthor:
     """Get a specific resource with author information.
 
     Args:
@@ -186,16 +185,21 @@ def get_resource(
     user = session.get(User, resource.user_id)
 
     # Build response with user information
-    resource_dict = {
-        **ResourceResponse.model_validate(resource).model_dump(),
-        "user": {
-            "id": str(user.id),
-            "full_name": user.full_name,
-            "email": user.email,
-        } if user else None,
-    }
+    if user:
+        return ResourceWithAuthor(
+            **ResourceResponse.model_validate(resource).model_dump(),
+            author_name=user.full_name,
+            author_email=user.email,
+            author_id=user.id,
+        )
 
-    return resource_dict
+    # Fallback if no user found (shouldn't happen)
+    return ResourceWithAuthor(
+        **ResourceResponse.model_validate(resource).model_dump(),
+        author_name="Unknown",
+        author_email=None,
+        author_id=resource.user_id,
+    )
 
 
 @router.get("/{resource_id}/solutions", response_model=list[ResourceResponse])
