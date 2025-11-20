@@ -1,8 +1,10 @@
 """Collaboration endpoints for connecting users working on similar ideas."""
 
+from typing import Any
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException, status
+from sqlalchemy import func
 from sqlmodel import Session, select
 
 from app.api.auth import get_current_user
@@ -56,7 +58,7 @@ def create_collaboration_request(
     current_user: User = Depends(get_current_user),
     session: Session = Depends(get_session),
     message: str | None = None,
-) -> dict:
+) -> dict[str, Any]:
     """Create a collaboration request - "I'm working on something similar".
 
     This endpoint allows users to indicate they're working on something similar
@@ -100,12 +102,11 @@ def create_collaboration_request(
     }
 
 
-@router.get("/{resource_id}/collaboration-options", response_model=dict)
+@router.get("/{resource_id}/collaboration-options", response_model=dict[str, Any])
 def get_collaboration_options(
     resource_id: UUID,
     session: Session = Depends(get_session),
-    current_user: User | None = Depends(get_current_user),
-) -> dict:
+) -> dict[str, Any]:
     """Get collaboration options for a resource.
 
     Returns what types of collaboration the author is open to.
@@ -113,7 +114,6 @@ def get_collaboration_options(
     Args:
         resource_id: Resource ID
         session: Database session
-        current_user: Current user (optional)
 
     Returns:
         Collaboration options
@@ -141,14 +141,14 @@ def get_collaboration_options(
     }
 
 
-@router.get("/similar", response_model=list[dict])
+@router.get("/similar", response_model=list[dict[str, Any]])
 def find_similar_resources(
     current_user: User = Depends(get_current_user),
     discipline: str | None = None,
     tools: str | None = None,
     limit: int = 5,
     session: Session = Depends(get_session),
-) -> list[dict]:
+) -> list[dict[str, Any]]:
     """Find other users working on similar ideas for collaboration.
 
     Args:
@@ -162,7 +162,7 @@ def find_similar_resources(
         List of resources from other users working on similar things
     """
     query = select(Resource).where(
-        (Resource.is_hidden.is_(False))
+        (Resource.is_hidden == False)  # noqa: E712
         & (Resource.user_id != current_user.id)
         & (Resource.collaboration_status == CollaborationStatus.SEEKING)
     )
@@ -173,7 +173,7 @@ def find_similar_resources(
     if tools:
         tool_list = [t.strip() for t in tools.split(",")]
         for tool in tool_list:
-            query = query.where(Resource.tools_used.contains([tool]))
+            query = query.where(func.json_extract(Resource.tools_used, f'$."{tool}"').isnot(None))
 
     resources = session.exec(query.limit(limit)).all()
 

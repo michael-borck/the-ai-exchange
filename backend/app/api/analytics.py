@@ -1,5 +1,6 @@
 """Analytics endpoints for tracking engagement and platform metrics."""
 
+from typing import Any
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException, status
@@ -49,11 +50,11 @@ def get_or_create_analytics(
 # Resource Analytics Endpoints
 
 
-@router.post("/resources/{resource_id}/view", response_model=dict, status_code=status.HTTP_200_OK)
+@router.post("/resources/{resource_id}/view", response_model=dict[str, Any], status_code=status.HTTP_200_OK)
 def track_resource_view(
     resource_id: UUID,
     session: Session = Depends(get_session),
-) -> dict:
+) -> dict[str, Any]:
     """Track a view of a resource.
 
     Args:
@@ -93,12 +94,12 @@ def track_resource_view(
     }
 
 
-@router.post("/resources/{resource_id}/tried", response_model=dict)
+@router.post("/resources/{resource_id}/tried", response_model=dict[str, Any])
 def track_resource_tried(
     resource_id: UUID,
     current_user: User = Depends(get_current_user),
     session: Session = Depends(get_session),
-) -> dict:
+) -> dict[str, Any]:
     """Mark that a user tried implementing a resource.
 
     Args:
@@ -153,12 +154,12 @@ def track_resource_tried(
     }
 
 
-@router.post("/resources/{resource_id}/save", response_model=dict)
+@router.post("/resources/{resource_id}/save", response_model=dict[str, Any])
 def toggle_resource_save(
     resource_id: UUID,
     current_user: User = Depends(get_current_user),
     session: Session = Depends(get_session),
-) -> dict:
+) -> dict[str, Any]:
     """Toggle save status for a resource (save/unsave).
 
     Args:
@@ -221,14 +222,12 @@ def toggle_resource_save(
 @router.get("/resources/{resource_id}/analytics", response_model=ResourceAnalyticsResponse)
 def get_resource_analytics(
     resource_id: UUID,
-    current_user: User | None = Depends(get_current_user),
     session: Session = Depends(get_session),
 ) -> ResourceAnalyticsResponse:
     """Get analytics for a resource (author can see all details).
 
     Args:
         resource_id: Resource ID
-        current_user: Current user (for authorization)
         session: Database session
 
     Returns:
@@ -248,15 +247,15 @@ def get_resource_analytics(
     # Get or create analytics
     analytics = get_or_create_analytics(resource_id, session)
 
-    return analytics
+    return ResourceAnalyticsResponse.model_validate(analytics)
 
 
-@router.get("/resources/{resource_id}/is-saved", response_model=dict)
+@router.get("/resources/{resource_id}/is-saved", response_model=dict[str, Any])
 def check_resource_saved(
     resource_id: UUID,
     current_user: User = Depends(get_current_user),
     session: Session = Depends(get_session),
-) -> dict:
+) -> dict[str, Any]:
     """Check if current user has saved a resource.
 
     Args:
@@ -292,13 +291,13 @@ def check_resource_saved(
     }
 
 
-@router.get("/users/me/saved-resources", response_model=list[dict])
+@router.get("/users/me/saved-resources", response_model=list[dict[str, Any]])
 def get_user_saved_resources(
     current_user: User = Depends(get_current_user),
     skip: int = 0,
     limit: int = 100,
     session: Session = Depends(get_session),
-) -> list[dict]:
+) -> list[dict[str, Any]]:
     """Get all resources saved by the current user.
 
     Args:
@@ -314,7 +313,7 @@ def get_user_saved_resources(
     saved = session.exec(
         select(UserSavedResource)
         .where(UserSavedResource.user_id == current_user.id)
-        .order_by(UserSavedResource.saved_at.desc())
+        .order_by(UserSavedResource.saved_at.desc())  # type: ignore[attr-defined]
         .offset(skip)
         .limit(limit)
     ).all()
@@ -345,11 +344,11 @@ def get_user_saved_resources(
 # Platform Analytics Endpoints
 
 
-@router.get("/admin/analytics", response_model=dict)
+@router.get("/admin/analytics", response_model=dict[str, Any])
 def get_platform_analytics(
     current_user: User = Depends(get_current_user),
     session: Session = Depends(get_session),
-) -> dict:
+) -> dict[str, Any]:
     """Get platform-wide analytics (admin only).
 
     Args:
@@ -406,11 +405,11 @@ def get_platform_analytics(
     }
 
 
-@router.get("/admin/analytics/by-discipline", response_model=dict)
+@router.get("/admin/analytics/by-discipline", response_model=dict[str, Any])
 def get_analytics_by_discipline(
     current_user: User = Depends(get_current_user),
     session: Session = Depends(get_session),
-) -> dict:
+) -> dict[str, Any]:
     """Get analytics broken down by discipline (admin only).
 
     Args:
@@ -433,7 +432,7 @@ def get_analytics_by_discipline(
     # Get all resources grouped by discipline
     resources = session.exec(select(Resource)).all()
 
-    discipline_stats: dict = {}
+    discipline_stats: dict[str, Any] = {}
     for resource in resources:
         if resource.discipline:
             if resource.discipline not in discipline_stats:
@@ -456,11 +455,11 @@ def get_analytics_by_discipline(
     return {"by_discipline": discipline_stats}
 
 
-@router.get("/resources/{resource_id}/users-tried-it", response_model=list[dict])
+@router.get("/resources/{resource_id}/users-tried-it", response_model=list[dict[str, Any]])
 def get_users_who_tried_resource(
     resource_id: UUID,
     session: Session = Depends(get_session),
-) -> list[dict]:
+) -> list[dict[str, Any]]:
     """Get list of users who marked a resource as tried.
 
     This enables peer discovery - users can connect with others who have
@@ -488,7 +487,7 @@ def get_users_who_tried_resource(
     tried_records = session.exec(
         select(UserTriedResource)
         .where(UserTriedResource.resource_id == resource_id)
-        .order_by(UserTriedResource.tried_at.desc())
+        .order_by(UserTriedResource.tried_at.desc())  # type: ignore[attr-defined]
     ).all()
 
     # Get user details

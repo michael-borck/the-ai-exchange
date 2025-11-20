@@ -35,10 +35,10 @@ def list_collections(
         List of collections
     """
     collections = session.exec(
-        select(Collection).offset(skip).limit(limit).order_by(Collection.created_at.desc())
+        select(Collection).offset(skip).limit(limit).order_by(Collection.created_at.desc())  # type: ignore[attr-defined]
     ).all()
 
-    return collections
+    return [CollectionResponse.model_validate(c) for c in collections]
 
 
 @router.get("/{collection_id}", response_model=CollectionResponse)
@@ -67,7 +67,7 @@ def get_collection(
             detail="Collection not found",
         )
 
-    return collection
+    return CollectionResponse.model_validate(collection)
 
 
 @router.post("", response_model=CollectionResponse, status_code=status.HTTP_201_CREATED)
@@ -98,7 +98,7 @@ def create_collection(
     session.commit()
     session.refresh(collection)
 
-    return collection
+    return CollectionResponse.model_validate(collection)
 
 
 @router.patch("/{collection_id}", response_model=CollectionResponse)
@@ -152,7 +152,7 @@ def update_collection(
     session.commit()
     session.refresh(collection)
 
-    return collection
+    return CollectionResponse.model_validate(collection)
 
 
 @router.delete("/{collection_id}", status_code=status.HTTP_204_NO_CONTENT)
@@ -222,7 +222,7 @@ def subscribe_to_collection(
     session.commit()
     session.refresh(collection)
 
-    return collection
+    return CollectionResponse.model_validate(collection)
 
 
 @router.get("/{collection_id}/prompts", response_model=list[UUID])

@@ -39,10 +39,10 @@ def get_resource_comments(
 
     # Get all comments for this resource
     comments = session.exec(
-        select(Comment).where(Comment.resource_id == resource_id).order_by(Comment.created_at)
+        select(Comment).where(Comment.resource_id == resource_id).order_by(Comment.created_at.asc())  # type: ignore[attr-defined]
     ).all()
 
-    return comments
+    return [CommentResponse.model_validate(c) for c in comments]
 
 
 @router.post("/{resource_id}/comments", response_model=CommentResponse, status_code=status.HTTP_201_CREATED)
@@ -97,7 +97,7 @@ def create_comment(
     session.commit()
     session.refresh(comment)
 
-    return comment
+    return CommentResponse.model_validate(comment)
 
 
 @router.patch("/comments/{comment_id}", response_model=CommentResponse)
@@ -141,7 +141,7 @@ def update_comment(
     session.commit()
     session.refresh(comment)
 
-    return comment
+    return CommentResponse.model_validate(comment)
 
 
 @router.delete("/comments/{comment_id}", status_code=status.HTTP_204_NO_CONTENT)
@@ -207,4 +207,4 @@ def mark_comment_helpful(
     session.commit()
     session.refresh(comment)
 
-    return comment
+    return CommentResponse.model_validate(comment)

@@ -1,5 +1,6 @@
 """Prompt library endpoints."""
 
+from typing import Any
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException, status
@@ -56,10 +57,10 @@ def list_prompts(
             pass
 
     # Apply pagination
-    query = query.offset(skip).limit(limit).order_by(Prompt.created_at.desc())
+    query = query.offset(skip).limit(limit).order_by(Prompt.created_at.desc())  # type: ignore[attr-defined]
 
     prompts = session.exec(query).all()
-    return prompts
+    return [PromptResponse.model_validate(p) for p in prompts]
 
 
 @router.get("/{prompt_id}", response_model=PromptResponse)
@@ -89,14 +90,13 @@ def get_prompt(
         )
 
     # Check access permissions
-    if prompt.sharing_level == SharingLevel.PRIVATE:
-        if not current_user or prompt.user_id != current_user.id:
-            raise HTTPException(
-                status_code=status.HTTP_403_FORBIDDEN,
-                detail="Not authorized to access this prompt",
-            )
+    if prompt.sharing_level == SharingLevel.PRIVATE and (not current_user or prompt.user_id != current_user.id):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Not authorized to access this prompt",
+        )
 
-    return prompt
+    return PromptResponse.model_validate(prompt)
 
 
 @router.post("", response_model=PromptResponse, status_code=status.HTTP_201_CREATED)
@@ -128,7 +128,7 @@ def create_prompt(
     session.commit()
     session.refresh(prompt)
 
-    return prompt
+    return PromptResponse.model_validate(prompt)
 
 
 @router.patch("/{prompt_id}", response_model=PromptResponse)
@@ -182,7 +182,7 @@ def update_prompt(
     session.commit()
     session.refresh(prompt)
 
-    return prompt
+    return PromptResponse.model_validate(prompt)
 
 
 @router.delete("/{prompt_id}", status_code=status.HTTP_204_NO_CONTENT)
@@ -266,15 +266,15 @@ def fork_prompt(
     session.commit()
     session.refresh(forked_prompt)
 
-    return forked_prompt
+    return PromptResponse.model_validate(forked_prompt)
 
 
-@router.get("/{prompt_id}/usage", response_model=dict)
+@router.get("/{prompt_id}/usage", response_model=dict[str, Any])
 def get_prompt_usage(
     prompt_id: UUID,
     current_user: User = Depends(get_current_user),
     session: Session = Depends(get_session),
-) -> dict:
+) -> dict[str, Any]:
     """Get usage analytics for a prompt (author only).
 
     Args:

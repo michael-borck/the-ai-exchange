@@ -9,7 +9,17 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.trustedhost import TrustedHostMiddleware
 from sqlmodel import SQLModel
 
-from app.api import admin, analytics, auth, collaboration, collections, comments, prompts, resources, subscriptions
+from app.api import (
+    admin,
+    analytics,
+    auth,
+    collaboration,
+    collections,
+    comments,
+    prompts,
+    resources,
+    subscriptions,
+)
 from app.core.config import settings
 from app.services.database import engine
 

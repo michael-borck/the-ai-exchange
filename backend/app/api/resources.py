@@ -1,5 +1,6 @@
 """Resource CRUD endpoints for requests, use cases, prompts, and policies."""
 
+from typing import Any
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException, Query, status
@@ -41,7 +42,7 @@ class TagSuggestion:
         self.user_tags = user_tags or []
 
 
-@router.get("", response_model=list[dict])
+@router.get("", response_model=list[dict[str, Any]])
 def list_resources(
     type_filter: ResourceType | None = Query(None, alias="type"),
     tag: str | None = Query(None),
@@ -56,7 +57,7 @@ def list_resources(
     skip: int = Query(0, ge=0),
     limit: int = Query(10, ge=1, le=100),
     session: Session = Depends(get_session),
-) -> list[dict]:
+) -> list[dict[str, Any]]:
     """Get list of resources with advanced filtering and author information.
 
     Args:
@@ -98,7 +99,7 @@ def list_resources(
         query = query.where(
             (Resource.title.ilike(search_term))
             | (Resource.content_text.ilike(search_term))
-            | (Resource.quick_summary.ilike(search_term))
+            | (Resource.quick_summary.ilike(search_term))  # type: ignore[union-attr]
         )
 
     # New collaboration and metadata filters
@@ -125,7 +126,7 @@ def list_resources(
         query = query.where(Resource.collaboration_status == collaboration_status)
 
     if min_time_saved is not None:
-        query = query.where(Resource.time_saved_value >= min_time_saved)
+        query = query.where(Resource.time_saved_value >= min_time_saved)  # type: ignore[operator]
 
     # Sorting
     if sort_by == "newest":
@@ -156,11 +157,11 @@ def list_resources(
     return result
 
 
-@router.get("/{resource_id}", response_model=dict)
+@router.get("/{resource_id}", response_model=dict[str, Any])
 def get_resource(
     resource_id: UUID,
     session: Session = Depends(get_session),
-) -> dict:
+) -> dict[str, Any]:
     """Get a specific resource with author information.
 
     Args:

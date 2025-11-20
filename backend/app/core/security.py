@@ -10,7 +10,7 @@ from pydantic import ValidationError
 from app.core.config import settings
 
 # Password hashing context
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+pwd_context = CryptContext(schemes=["argon2"], deprecated="auto")
 
 # JWT configuration
 ALGORITHM = "HS256"
