@@ -9,6 +9,8 @@ from app.api.auth import get_current_user
 from app.core.config import settings
 from app.models import (
     Resource,
+    ResourceAnalytics,
+    ResourceAnalyticsResponse,
     ResourceCreate,
     ResourceResponse,
     ResourceStatus,
@@ -184,10 +186,19 @@ def get_resource(
     # Get the user information
     user = session.get(User, resource.user_id)
 
+    # Get analytics for the resource
+    analytics = session.exec(
+        select(ResourceAnalytics).where(ResourceAnalytics.resource_id == resource_id)
+    ).first()
+
+    # Build response data
+    response_data = ResourceResponse.model_validate(resource).model_dump()
+    response_data["analytics"] = ResourceAnalyticsResponse.model_validate(analytics).model_dump() if analytics else None
+
     # Build response with user information
     if user:
         return ResourceWithAuthor(
-            **ResourceResponse.model_validate(resource).model_dump(),
+            **response_data,
             author_name=user.full_name,
             author_email=user.email,
             author_id=user.id,
@@ -195,7 +206,7 @@ def get_resource(
 
     # Fallback if no user found (shouldn't happen)
     return ResourceWithAuthor(
-        **ResourceResponse.model_validate(resource).model_dump(),
+        **response_data,
         author_name="Unknown",
         author_email=None,
         author_id=resource.user_id,

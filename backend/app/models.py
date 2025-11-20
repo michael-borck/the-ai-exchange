@@ -577,6 +577,8 @@ class ResourceResponse(ResourceBase):
     ethics_limitations: str | None
     created_at: datetime
     updated_at: datetime
+    # Analytics data for engagement stats
+    analytics: "ResourceAnalyticsResponse | None" = None
 
     class Config:
         """Pydantic config."""
