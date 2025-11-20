@@ -199,3 +199,40 @@ def clear_email_log() -> None:
     """
     global _email_log
     _email_log = []
+
+
+def send_password_reset_email(user: User, reset_code: str) -> bool:
+    """Send password reset code to user via email.
+
+    Args:
+        user: User requesting password reset
+        reset_code: 6-digit reset code
+
+    Returns:
+        True if email sent successfully
+    """
+    subject = "Password Reset Code for The AI Exchange"
+    body = f"""Hi {user.full_name},
+
+You requested a password reset for your The AI Exchange account.
+
+Your password reset code is: {reset_code}
+
+This code will expire in 30 minutes.
+
+If you did not request a password reset, please ignore this email and your password will remain unchanged.
+
+Do not share this code with anyone. The AI Exchange team will never ask you for your reset code.
+
+Best regards,
+The AI Exchange Team
+"""
+
+    notification = EmailNotification(
+        recipient_email=user.email,
+        subject=subject,
+        body=body,
+        notification_type="password_reset",
+    )
+
+    return send_email(notification)

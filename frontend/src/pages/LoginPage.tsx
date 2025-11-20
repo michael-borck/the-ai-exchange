@@ -16,16 +16,23 @@ import {
   Alert,
   AlertIcon,
   useToast,
+  useDisclosure,
 } from "@chakra-ui/react";
 import { useLogin } from "@/hooks/useAuth";
 import { useAuth } from "@/context/AuthContext";
 import { getErrorMessage } from "@/lib/api";
+import PasswordResetFlow from "@/components/PasswordResetFlow";
 
 export default function LoginPage() {
   const navigate = useNavigate();
   const toast = useToast();
   const { isAuthenticated } = useAuth();
   const loginMutation = useLogin();
+  const {
+    isOpen: isPasswordResetOpen,
+    onOpen: onPasswordResetOpen,
+    onClose: onPasswordResetClose,
+  } = useDisclosure();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -125,6 +132,18 @@ export default function LoginPage() {
           </VStack>
         </Box>
 
+        <VStack spacing={2} width="full">
+          <Button
+            width="full"
+            variant="ghost"
+            size="sm"
+            colorScheme="blue"
+            onClick={onPasswordResetOpen}
+          >
+            Forgot password?
+          </Button>
+        </VStack>
+
         <HStack spacing={1} justify="center">
           <Text fontSize="sm" color="gray.600">
             Don't have an account?
@@ -136,6 +155,20 @@ export default function LoginPage() {
           </RouterLink>
         </HStack>
       </VStack>
+
+      <PasswordResetFlow
+        isOpen={isPasswordResetOpen}
+        onClose={onPasswordResetClose}
+        onSuccess={() => {
+          toast({
+            title: "Password reset successful",
+            description: "Please log in with your new password",
+            status: "success",
+            duration: 3000,
+            isClosable: true,
+          });
+        }}
+      />
     </Container>
   );
 }

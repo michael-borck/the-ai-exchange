@@ -27,6 +27,7 @@ dependencies = [
     "email-validator>=2.1.0",
     "yake>=0.3.2",
     "httpx>=0.25.2",
+    "slowapi>=0.1.9",
 ]
 
 [project.optional-dependencies]
@@ -125,7 +126,7 @@ module = [
     "app.main",
     "tests.conftest",
 ]
-disable_error_code = ["no-untyped-def"]
+disable_error_code = ["no-untyped-def", "arg-type"]
 
 # Model dict type annotations for Pydantic
 [[tool.mypy.overrides]]

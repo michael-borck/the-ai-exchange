@@ -6,6 +6,7 @@ import pytest
 from sqlmodel import Session, SQLModel, create_engine
 from sqlmodel.pool import StaticPool
 
+from app.core.rate_limiter import disable_rate_limiter
 from app.main import app
 from app.services.database import get_session
 
@@ -37,6 +38,9 @@ def client_fixture(session: Session) -> Generator:  # type: ignore[type-arg]
     Yields:
         FastAPI test client
     """
+    # Disable rate limiting for tests
+    disable_rate_limiter()
+
     def get_session_override() -> Session:
         return session
 

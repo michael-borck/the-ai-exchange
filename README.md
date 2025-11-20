@@ -27,21 +27,23 @@ This is a **complete full-stack web application** built with modern technologies
 * **Subscription System:** Users can subscribe to tags and receive notifications when matching resources are posted
 * **Request-Solution Workflow:** Link solutions to requests and track resolution status
 * **Email Notifications:** Automatic notifications for subscribed tags and posted solutions (mocked for MVP, ready for production SMTP)
+* **Password Reset:** Secure 6-digit code-based password reset with email delivery (mocked for MVP)
+* **Rate Limiting:** IP-based request throttling on auth endpoints to prevent brute force attacks and abuse
 * **Role-Based Access:** Admin and Staff roles with different capabilities
 * **Notification Preferences:** Users can customize when they receive notifications
 
 ## ✅ Implementation Status
 
 ### Backend (Complete - Phase 5)
-- ✅ **27 API Endpoints** - Full CRUD operations for all resources
-  - Authentication (register, login, profile management)
+- ✅ **29 API Endpoints** - Full CRUD operations for all resources
+  - Authentication (register, login, password reset, profile management)
   - Resources (create, read, update, delete, list with filtering)
   - Admin (user management, resource moderation)
   - Subscriptions (subscribe, unsubscribe, list)
-- ✅ **59/59 Tests Passing** - Comprehensive test coverage
+- ✅ **63/63 Tests Passing** - Comprehensive test coverage
 - ✅ **0 Type Errors** - Strict mypy type checking
 - ✅ **0 Linting Errors** - Code quality standards maintained
-- ✅ **Production Ready** - Database, authentication, error handling
+- ✅ **Production Ready** - Database, authentication, password reset, rate limiting, error handling
 
 ### Frontend (In Progress - Phase 3)
 - ✅ **Collaborative Discovery Redesign** - New UX for sharing & discovery

@@ -3,11 +3,18 @@
 from datetime import timedelta
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, Header, HTTPException, status
+from fastapi import APIRouter, Depends, Header, HTTPException, Request, status
 from pydantic import BaseModel
 from sqlmodel import Session, select
 
 from app.core.config import settings
+from app.core.rate_limiter import (
+    LIMIT_FORGOT_PASSWORD,
+    LIMIT_LOGIN,
+    LIMIT_REGISTER,
+    LIMIT_RESET_PASSWORD,
+    limiter,
+)
 from app.core.security import (
     create_access_token,
     create_refresh_token,
@@ -15,8 +22,21 @@ from app.core.security import (
     hash_password,
     verify_password,
 )
-from app.models import User, UserCreate, UserResponse
+from app.models import (
+    ForgotPasswordRequest,
+    ForgotPasswordResponse,
+    ResetPasswordRequest,
+    ResetPasswordResponse,
+    User,
+    UserCreate,
+    UserResponse,
+)
 from app.services.database import get_session
+from app.services.password_reset import (
+    create_and_send_password_reset,
+    mark_reset_code_used,
+    verify_reset_code,
+)
 
 router = APIRouter(prefix=f"{settings.api_v1_str}/auth", tags=["auth"])
 
@@ -112,7 +132,9 @@ def get_current_user(
 
 
 @router.post("/register", response_model=TokenResponse, status_code=status.HTTP_201_CREATED)
+@limiter.limit(LIMIT_REGISTER)
 def register(
+    request: Request,  # noqa: ARG001 - required by slowapi for rate limiting
     user_create: UserCreate,
     session: Session = Depends(get_session),
 ) -> TokenResponse:
@@ -191,7 +213,9 @@ def register(
 
 
 @router.post("/login", response_model=TokenResponse)
+@limiter.limit(LIMIT_LOGIN)
 def login(
+    request: Request,  # noqa: ARG001 - required by slowapi for rate limiting
     login_data: LoginRequest,
     session: Session = Depends(get_session),
 ) -> TokenResponse:
@@ -319,3 +343,103 @@ def update_me(
         notification_prefs=current_user.notification_prefs,
         created_at=current_user.created_at,
     )
+
+
+# Password reset endpoints
+
+
+@router.post("/forgot-password", response_model=ForgotPasswordResponse)
+@limiter.limit(LIMIT_FORGOT_PASSWORD)
+def forgot_password(
+    request: Request,  # noqa: ARG001 - required by slowapi for rate limiting
+    forgot_request: ForgotPasswordRequest,
+    session: Session = Depends(get_session),
+) -> ForgotPasswordResponse:
+    """Request a password reset code via email.
+
+    Sends a 6-digit reset code to the user's email address if the account exists.
+    Always returns a success message to prevent email enumeration attacks.
+
+    Args:
+        forgot_request: Forgot password request with email
+        session: Database session
+
+    Returns:
+        Success message (generic to prevent email enumeration)
+
+    Raises:
+        HTTPException: If email sending fails (rare)
+    """
+    # Find user by email (but don't reveal if they exist)
+    user = session.exec(
+        select(User).where(User.email == forgot_request.email.lower())
+    ).first()
+
+    if user and user.is_active and user.is_approved:
+        # Create and send password reset code
+        success, _ = create_and_send_password_reset(session, user)
+
+        if not success:
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail="Failed to send reset code. Please try again later.",
+            )
+
+    # Always return success message (don't reveal if email exists)
+    return ForgotPasswordResponse(
+        message="If an account with this email exists, a password reset code has been sent to your email."
+    )
+
+
+@router.post("/reset-password", response_model=ResetPasswordResponse)
+@limiter.limit(LIMIT_RESET_PASSWORD)
+def reset_password(
+    request: Request,  # noqa: ARG001 - required by slowapi for rate limiting
+    reset_request: ResetPasswordRequest,
+    session: Session = Depends(get_session),
+) -> ResetPasswordResponse:
+    """Reset user password with verification code.
+
+    Args:
+        reset_request: Reset password request with email, code, and new password
+        session: Database session
+
+    Returns:
+        Success message
+
+    Raises:
+        HTTPException: If code is invalid, expired, or password reset fails
+    """
+    # Verify the reset code
+    is_valid, user, error_message = verify_reset_code(
+        session,
+        reset_request.email,
+        reset_request.code,
+    )
+
+    if not is_valid or not user:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=error_message or "Invalid or expired reset code",
+        )
+
+    try:
+        # Update password
+        user.hashed_password = hash_password(reset_request.new_password)
+
+        # Mark reset code as used
+        mark_reset_code_used(session, reset_request.email, reset_request.code)
+
+        session.add(user)
+        session.commit()
+
+        return ResetPasswordResponse(
+            message="Password reset successfully. You can now log in with your new password."
+        )
+
+    except Exception as e:
+        session.rollback()
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Failed to reset password. Please try again.",
+        ) from e

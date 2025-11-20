@@ -4,9 +4,12 @@ import logging
 from collections.abc import AsyncGenerator
 from contextlib import asynccontextmanager
 
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.trustedhost import TrustedHostMiddleware
+from fastapi.responses import JSONResponse
+from slowapi.errors import RateLimitExceeded
+from slowapi.middleware import SlowAPIMiddleware
 from sqlmodel import SQLModel
 
 from app.api import (
@@ -21,6 +24,7 @@ from app.api import (
     subscriptions,
 )
 from app.core.config import settings
+from app.core.rate_limiter import limiter
 from app.services.database import engine
 
 # Configure logging
@@ -49,6 +53,26 @@ app = FastAPI(
     openapi_url=f"{settings.api_v1_str}/openapi.json",
     lifespan=lifespan,
 )
+
+# Add rate limiter to app
+app.state.limiter = limiter
+
+
+def rate_limit_handler(_request: Request, _exc: Exception) -> JSONResponse:
+    """Handle rate limit exceeded errors."""
+    return JSONResponse(
+        status_code=429,
+        content={
+            "detail": "Rate limit exceeded. Please try again later.",
+            "error": "rate_limit_exceeded",
+        },
+    )
+
+
+app.add_exception_handler(RateLimitExceeded, rate_limit_handler)
+
+# Add middleware for rate limiting
+app.add_middleware(SlowAPIMiddleware)
 
 # Add middleware for security
 app.add_middleware(

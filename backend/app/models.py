@@ -111,6 +111,37 @@ class User(SQLModel, table=True):
         return f"User(id={self.id}, email={self.email}, role={self.role})"
 
 
+class PasswordReset(SQLModel, table=True):
+    """Password reset model for secure password recovery."""
+
+    id: UUID = Field(default_factory=uuid4, primary_key=True)
+    user_id: UUID = Field(foreign_key="user.id", index=True)
+    token: str = Field(max_length=6, index=True)  # 6-digit reset code
+    expires_at: datetime = Field(
+        sa_column=Column(DateTime(timezone=True)),
+        description="Token expiration time",
+    )
+    used: bool = Field(default=False)
+    created_at: datetime = Field(
+        default_factory=lambda: datetime.now(UTC),
+        sa_column=Column(DateTime(timezone=True)),
+    )
+
+    def __repr__(self) -> str:
+        """String representation."""
+        return f"PasswordReset(id={self.id}, user_id={self.user_id}, used={self.used})"
+
+    @property
+    def is_expired(self) -> bool:
+        """Check if reset token has expired."""
+        return datetime.now(UTC) > self.expires_at
+
+    @property
+    def is_valid(self) -> bool:
+        """Check if reset token is valid (not used and not expired)."""
+        return not self.used and not self.is_expired
+
+
 class Resource(SQLModel, table=True):
     """Resource model for requests, use cases, prompts, and policies."""
 
@@ -860,3 +891,30 @@ class SimilarResourceResponse(SQLModel):
     tools_used: dict[str, list[str]]
     collaboration_status: str | None
     open_to_collaborate: list[str]
+
+
+# Password reset schemas
+class ForgotPasswordRequest(SQLModel):
+    """Request schema for forgot password endpoint."""
+
+    email: str
+
+
+class ForgotPasswordResponse(SQLModel):
+    """Response schema for forgot password endpoint."""
+
+    message: str
+
+
+class ResetPasswordRequest(SQLModel):
+    """Request schema for password reset."""
+
+    email: str
+    code: str
+    new_password: str
+
+
+class ResetPasswordResponse(SQLModel):
+    """Response schema for password reset."""
+
+    message: str
