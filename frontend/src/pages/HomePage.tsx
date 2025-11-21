@@ -21,6 +21,7 @@ import { SearchIcon, ArrowForwardIcon } from "@chakra-ui/icons";
 import { Layout } from "@/components/Layout";
 import { useAuth } from "@/hooks/useAuth";
 import { useResources } from "@/hooks/useResources";
+import { useSaveResource, useIsResourceSaved, useTriedResource } from "@/hooks/useEngagement";
 import { flattenTools } from "@/lib/tools";
 import { useMemo } from "react";
 
@@ -32,7 +33,6 @@ interface DisciplineCard {
 
 function ResourceCard({ resource, isLoggedIn }: { resource: any; isLoggedIn: boolean }) {
   const navigate = useNavigate();
-  const { useSaveResource, useIsResourceSaved, useTriedResource } = require("@/hooks/useEngagement");
   const saveResourceMutation = useSaveResource();
   const triedResourceMutation = useTriedResource();
   const { data: isSavedData } = useIsResourceSaved(resource.id);
