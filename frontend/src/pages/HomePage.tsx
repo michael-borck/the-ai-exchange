@@ -35,7 +35,7 @@ function ResourceCard({ resource, isLoggedIn }: { resource: any; isLoggedIn: boo
   const navigate = useNavigate();
   const saveResourceMutation = useSaveResource();
   const triedResourceMutation = useTriedResource();
-  const { data: isSavedData } = useIsResourceSaved(resource.id);
+  const { data: isSavedData } = useIsResourceSaved(resource.id, isLoggedIn);
   const hasSaved = isSavedData ?? false;
 
   const handleLoginClick = (e: React.MouseEvent) => {

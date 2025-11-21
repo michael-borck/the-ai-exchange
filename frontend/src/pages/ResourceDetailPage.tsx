@@ -43,7 +43,7 @@ export default function ResourceDetailPage() {
   // Engagement hooks
   const saveResourceMutation = useSaveResource();
   const triedResourceMutation = useTriedResource();
-  const { data: isSavedData } = useIsResourceSaved(id || "");
+  const { data: isSavedData } = useIsResourceSaved(id || "", !!user);
   const { data: usersTried = [] } = useResourceUsersTried(id || "");
   const hasSaved = isSavedData ?? false;
 

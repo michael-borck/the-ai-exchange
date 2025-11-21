@@ -66,7 +66,7 @@ export const useSaveResource = () => {
 /**
  * Check if current user has saved a resource
  */
-export const useIsResourceSaved = (resourceId: string) => {
+export const useIsResourceSaved = (resourceId: string, isAuthenticated: boolean = false) => {
   return useQuery({
     queryKey: ["isResourceSaved", resourceId],
     queryFn: async () => {
@@ -75,7 +75,7 @@ export const useIsResourceSaved = (resourceId: string) => {
       );
       return response.data.is_saved;
     },
-    enabled: !!resourceId,
+    enabled: !!resourceId && isAuthenticated,
   });
 };
 
