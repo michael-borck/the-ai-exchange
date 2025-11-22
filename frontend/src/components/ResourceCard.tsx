@@ -40,7 +40,7 @@ export const ResourceCard: React.FC<ResourceCardProps> = ({
   timeSaved,
   views,
   tried,
-  saves = 0
+  saves = 0,
   created_at,
   variant = "home",
 }) => {
