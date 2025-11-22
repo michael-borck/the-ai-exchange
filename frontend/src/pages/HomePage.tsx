@@ -142,7 +142,7 @@ export default function HomePage() {
               <SearchIcon color="gray.400" />
             </InputLeftElement>
             <Input
-              placeholder="Search ideas, tools, or disciplines..."
+              placeholder="Search ideas, tools, area, or faculty"
               size="lg"
               borderRadius="md"
               onKeyDown={(e) => {

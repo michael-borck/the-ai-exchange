@@ -83,7 +83,9 @@ export default function ResourcesPage() {
         const matchesSearch =
           resource.title.toLowerCase().includes(searchLower) ||
           resource.content_text?.toLowerCase().includes(searchLower) ||
-          resource.discipline?.toLowerCase().includes(searchLower);
+          resource.discipline?.toLowerCase().includes(searchLower) ||
+          // Only allow logged-in users to search by author name (privacy consideration)
+          (isLoggedIn && resource.author_name?.toLowerCase().includes(searchLower));
         if (!matchesSearch) return false;
       }
 
@@ -166,7 +168,7 @@ export default function ResourcesPage() {
             <SearchIcon color="gray.400" />
           </InputLeftElement>
           <Input
-            placeholder="Search ideas, tools, or disciplines..."
+            placeholder="Search ideas, tools, area, or faculty"
             value={search}
             onChange={(e) => handleSearchChange(e.target.value)}
             borderRadius="md"
