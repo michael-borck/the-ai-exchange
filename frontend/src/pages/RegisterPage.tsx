@@ -16,10 +16,13 @@ import {
   Alert,
   AlertIcon,
   useToast,
+  Select,
+  FormLabel,
 } from "@chakra-ui/react";
 import { useRegister } from "@/hooks/useAuth";
 import { useAuth } from "@/context/AuthContext";
 import { getErrorMessage } from "@/lib/api";
+import { ProfessionalRole, PROFESSIONAL_ROLES } from "@/types/index";
 
 export default function RegisterPage() {
   const navigate = useNavigate();
@@ -31,6 +34,7 @@ export default function RegisterPage() {
   const [fullName, setFullName] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [professionalRole, setProfessionalRole] = useState<ProfessionalRole>("Educator");
   const [passwordError, setPasswordError] = useState("");
   const [apiError, setApiError] = useState("");
 
@@ -61,6 +65,7 @@ export default function RegisterPage() {
         email,
         full_name: fullName,
         password,
+        professional_role: professionalRole,
       });
 
       toast({
@@ -124,6 +129,21 @@ export default function RegisterPage() {
               <Text fontSize="xs" color="gray.600" mt={1}>
                 Only Curtin University email addresses are allowed
               </Text>
+            </Box>
+
+            <Box width="full">
+              <FormLabel fontSize="sm" fontWeight="medium" mb={2}>
+                Professional Role
+              </FormLabel>
+              <Select
+                value={professionalRole}
+                onChange={(e) => setProfessionalRole(e.target.value as ProfessionalRole)}
+                required
+              >
+                <option value="Educator">Educator</option>
+                <option value="Researcher">Researcher</option>
+                <option value="Professional">Professional</option>
+              </Select>
             </Box>
 
             <Box width="full">
