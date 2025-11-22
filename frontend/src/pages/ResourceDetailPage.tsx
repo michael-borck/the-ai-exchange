@@ -232,15 +232,6 @@ export default function ResourceDetailPage() {
             {/* Engagement Actions */}
             {user && !isOwner && (
               <HStack spacing={2} width="full">
-                {!resource.is_anonymous && (
-                  <Button
-                    size="sm"
-                    colorScheme="blue"
-                    onClick={onOpen}
-                  >
-                    Working on Similar?
-                  </Button>
-                )}
                 <Button
                   size="sm"
                   variant={hasSaved ? "solid" : "outline"}

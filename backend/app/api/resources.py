@@ -157,10 +157,14 @@ def list_resources(
             response_data = ResourceResponse.model_validate(resource).model_dump()
             response_data["analytics"] = ResourceAnalyticsResponse.model_validate(analytics).model_dump() if analytics else None
 
+            # Respect anonymity: show author name only if not anonymous
+            author_name = "Faculty Member" if resource.is_anonymous else user.full_name
+            author_email = None if resource.is_anonymous else user.email
+
             resource_with_author = ResourceWithAuthor(
                 **response_data,
-                author_name=user.full_name,
-                author_email=user.email,
+                author_name=author_name,
+                author_email=author_email,
                 author_id=user.id,
             )
             result.append(resource_with_author)
@@ -207,10 +211,14 @@ def get_resource(
 
     # Build response with user information
     if user:
+        # Respect anonymity: show author name only if not anonymous
+        author_name = "Faculty Member" if resource.is_anonymous else user.full_name
+        author_email = None if resource.is_anonymous else user.email
+
         return ResourceWithAuthor(
             **response_data,
-            author_name=user.full_name,
-            author_email=user.email,
+            author_name=author_name,
+            author_email=author_email,
             author_id=user.id,
         )
 
