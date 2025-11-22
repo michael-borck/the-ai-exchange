@@ -33,6 +33,7 @@ interface ExportRow {
   id: string;
   title: string;
   author_email: string;
+  creator_role: string;
   time_saved: number | null;
   tools: string;
   views: number;
@@ -53,6 +54,7 @@ export default function ExportPage() {
       id: resource.id,
       title: resource.title,
       author_email: resource.author_email || "Anonymous",
+      creator_role: resource.user?.professional_role || "Educator",
       time_saved: resource.time_saved_value ?? null,
       tools: flattenTools(resource.tools_used).join(", "),
       views: resource.analytics?.view_count ?? 0,
@@ -157,6 +159,7 @@ export default function ExportPage() {
                 <Tr>
                   <SortableHeader field="title" label="Title" />
                   <Th>Author Email</Th>
+                  <Th>Creator Role</Th>
                   <SortableHeader field="time_saved" label="Time Saved (hrs)" />
                   <Th>Tools</Th>
                   <SortableHeader field="views" label="Views" />
@@ -173,6 +176,7 @@ export default function ExportPage() {
                       </Box>
                     </Td>
                     <Td fontSize="sm">{row.author_email}</Td>
+                    <Td fontSize="sm">{row.creator_role}</Td>
                     <Td fontSize="sm" isNumeric>
                       {row.time_saved !== null ? row.time_saved.toFixed(1) : "—"}
                     </Td>
