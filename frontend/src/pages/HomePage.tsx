@@ -21,7 +21,7 @@ import { SearchIcon, ArrowForwardIcon } from "@chakra-ui/icons";
 import { Layout } from "@/components/Layout";
 import { useAuth } from "@/hooks/useAuth";
 import { useResources } from "@/hooks/useResources";
-import { useSaveResource, useIsResourceSaved, useTriedResource } from "@/hooks/useEngagement";
+import { ResourceCard } from "@/components/ResourceCard";
 import { flattenTools } from "@/lib/tools";
 import { useMemo } from "react";
 
@@ -29,136 +29,6 @@ interface DisciplineCard {
   name: string;
   count: number;
   icon?: string;
-}
-
-function ResourceCard({ resource, isLoggedIn }: { resource: any; isLoggedIn: boolean }) {
-  const navigate = useNavigate();
-  const saveResourceMutation = useSaveResource();
-  const triedResourceMutation = useTriedResource();
-  const { data: isSavedData } = useIsResourceSaved(resource.id, isLoggedIn);
-  const hasSaved = isSavedData ?? false;
-
-  const handleLoginClick = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    navigate("/login");
-  };
-
-  const handleSave = async (e: React.MouseEvent) => {
-    e.stopPropagation();
-    try {
-      await saveResourceMutation.mutateAsync(resource.id);
-    } catch (error) {
-      console.error("Failed to save resource:", error);
-    }
-  };
-
-  const handleTried = async (e: React.MouseEvent) => {
-    e.stopPropagation();
-    try {
-      await triedResourceMutation.mutateAsync(resource.id);
-    } catch (error) {
-      console.error("Failed to mark as tried:", error);
-    }
-  };
-
-  return (
-    <Box
-      bg="white"
-      border="1px"
-      borderColor="gray.200"
-      borderRadius="md"
-      p={4}
-      cursor="pointer"
-      _hover={{ boxShadow: "md", transform: "translateY(-2px)" }}
-      transition="all 0.2s"
-      onClick={() => navigate(`/resources/${resource.id}`)}
-    >
-      <VStack align="flex-start" spacing={2}>
-        <HStack spacing={2} width="full" justify="space-between">
-          <HStack spacing={1}>
-            <Text fontSize="xs" fontWeight="bold" color="blue.600" bg="blue.50" px={2} py={1} borderRadius="full">
-              {resource.discipline}
-            </Text>
-          </HStack>
-        </HStack>
-
-        <Heading size="sm" lineHeight="tight">
-          {resource.title}
-        </Heading>
-
-        {/* Only show author and time saved for logged-in users */}
-        {isLoggedIn && (
-          <Text fontSize="xs" color="gray.600">
-            {resource.author} • {resource.timeSaved || 2} hrs/week saved
-          </Text>
-        )}
-
-        <Text fontSize="sm" color="gray.700" lineHeight="1.4">
-          {resource.quickSummary}
-        </Text>
-
-        <HStack spacing={2} fontSize="xs">
-          {resource.tools.map((tool: string) => (
-            <Text key={tool} bg="gray.100" px={2} py={1} borderRadius="full">
-              {tool}
-            </Text>
-          ))}
-        </HStack>
-
-        {/* Created date */}
-        <Text fontSize="xs" color="gray.500">
-          {new Date(resource.created_at || new Date()).toLocaleDateString('en-US', {
-            year: 'numeric',
-            month: 'short',
-            day: 'numeric',
-          })}
-        </Text>
-
-        {/* Engagement stats */}
-        <HStack spacing={4} fontSize="xs" color="gray.600" width="full" pt={1}>
-          <HStack spacing={1}>
-            <Text title="Views">👁️ {resource.views}</Text>
-          </HStack>
-          <HStack spacing={1}>
-            <Text title="People who tried it">🧪 {resource.tried}</Text>
-          </HStack>
-          <HStack spacing={1}>
-            <Text title="People who saved it">📌 {resource.saves || 0}</Text>
-          </HStack>
-        </HStack>
-
-        {/* Action buttons */}
-        <HStack spacing={2} fontSize="sm" width="full" justify="flex-end" pt={2} borderTop="1px" borderColor="gray.100">
-          {isLoggedIn ? (
-            <>
-              <Button
-                size="xs"
-                variant="ghost"
-                colorScheme="green"
-                onClick={handleTried}
-                isLoading={triedResourceMutation.isPending}
-              >
-                🧪 Tried
-              </Button>
-              <Button
-                size="xs"
-                variant={hasSaved ? "solid" : "ghost"}
-                colorScheme="blue"
-                onClick={handleSave}
-                isLoading={saveResourceMutation.isPending}
-              >
-                {hasSaved ? "✓ Saved" : "📌 Save"}
-              </Button>
-            </>
-          ) : (
-            <Button size="xs" variant="ghost" colorScheme="blue" onClick={handleLoginClick}>
-              Login to collaborate
-            </Button>
-          )}
-        </HStack>
-      </VStack>
-    </Box>
-  );
 }
 
 function DisciplineGridItem({ discipline }: { discipline: DisciplineCard }) {
@@ -342,7 +212,20 @@ export default function HomePage() {
           ) : (
             <SimpleGrid columns={{ base: 1, md: 3 }} spacing={4}>
               {recentResources.map((r) => (
-                <ResourceCard key={r.id} resource={r} isLoggedIn={isLoggedIn} />
+                <ResourceCard
+                  key={r.id}
+                  id={r.id}
+                  title={r.title}
+                  author={r.author}
+                  discipline={r.discipline}
+                  tools={r.tools}
+                  quickSummary={r.quickSummary}
+                  timeSaved={r.timeSaved}
+                  views={r.views}
+                  tried={r.tried}
+                  saves={r.saves}
+                  created_at={r.created_at}
+                />
               ))}
             </SimpleGrid>
           )}
@@ -367,7 +250,20 @@ export default function HomePage() {
           ) : (
             <SimpleGrid columns={{ base: 1, md: 3 }} spacing={4}>
               {mostPopularResources.map((r) => (
-                <ResourceCard key={r.id} resource={r} isLoggedIn={isLoggedIn} />
+                <ResourceCard
+                  key={r.id}
+                  id={r.id}
+                  title={r.title}
+                  author={r.author}
+                  discipline={r.discipline}
+                  tools={r.tools}
+                  quickSummary={r.quickSummary}
+                  timeSaved={r.timeSaved}
+                  views={r.views}
+                  tried={r.tried}
+                  saves={r.saves}
+                  created_at={r.created_at}
+                />
               ))}
             </SimpleGrid>
           )}

@@ -24,10 +24,11 @@ import {
 } from "@chakra-ui/react";
 import { SearchIcon } from "@chakra-ui/icons";
 import { useResources } from "@/hooks/useResources";
+import { ResourceCard } from "@/components/ResourceCard";
 import { FilterSidebar, FilterState } from "@/components/FilterSidebar";
 import { flattenTools } from "@/lib/tools";
 
-interface ResourceCard {
+interface ResourceCardData {
   id: string;
   title: string;
   author: string;
@@ -37,163 +38,9 @@ interface ResourceCard {
   timeSaved?: number;
   views: number;
   tried: number;
+  saves?: number;
   collaborationStatus?: string;
   created_at: string;
-  isSaved?: boolean;
-}
-
-
-function BrowseResourceCard({ resource, isLoggedIn }: { resource: any; isLoggedIn: boolean }) {
-  const navigate = useNavigate();
-
-  const handleLoginClick = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    navigate("/login");
-  };
-
-  const statusColor = {
-    SEEKING: "blue",
-    PROVEN: "green",
-    HAS_MATERIALS: "purple",
-  };
-
-  return (
-    <Box
-      bg="white"
-      border="1px"
-      borderColor="gray.200"
-      borderRadius="md"
-      p={4}
-      cursor="pointer"
-      _hover={{ boxShadow: "md", transform: "translateY(-2px)" }}
-      transition="all 0.2s"
-      onClick={() => navigate(`/resources/${resource.id}`)}
-    >
-      <VStack align="flex-start" spacing={3}>
-        {/* Header with badges */}
-        <HStack spacing={2} width="full" justify="space-between">
-          <HStack spacing={2}>
-            <Text
-              fontSize="xs"
-              fontWeight="bold"
-              color="blue.600"
-              bg="blue.50"
-              px={2}
-              py={1}
-              borderRadius="full"
-            >
-              {resource.discipline}
-            </Text>
-            {isLoggedIn && (
-              <Text
-                fontSize="xs"
-                fontWeight="semibold"
-                color={`${statusColor[resource.collaborationStatus as keyof typeof statusColor]}.600`}
-                bg={`${statusColor[resource.collaborationStatus as keyof typeof statusColor]}.50`}
-                px={2}
-                py={1}
-                borderRadius="full"
-              >
-                {resource.collaborationStatus === "SEEKING"
-                  ? "Seeking"
-                  : resource.collaborationStatus === "PROVEN"
-                  ? "Proven"
-                  : "Materials"}
-              </Text>
-            )}
-          </HStack>
-        </HStack>
-
-        {/* Title */}
-        <Heading size="sm" lineHeight="tight">
-          {resource.title}
-        </Heading>
-
-        {/* Author info - only for logged-in users */}
-        {isLoggedIn && (
-          <Text fontSize="xs" color="gray.600">
-            {resource.author} • {resource.timeSaved || 2} hrs/week saved
-          </Text>
-        )}
-
-        {/* Summary */}
-        <Text fontSize="sm" color="gray.700" lineHeight="1.4">
-          {resource.quickSummary}
-        </Text>
-
-        {/* Tools */}
-        <HStack spacing={2} fontSize="xs" flexWrap="wrap">
-          {resource.tools.map((tool: string) => (
-            <Text key={tool} bg="gray.100" px={2} py={1} borderRadius="full">
-              {tool}
-            </Text>
-          ))}
-        </HStack>
-
-        {/* Created date and stats */}
-        <HStack
-          spacing={2}
-          fontSize="xs"
-          color="gray.500"
-          width="full"
-          justify="space-between"
-          pt={1}
-          pb={2}
-        >
-          <Text>
-            {new Date(resource.created_at || new Date()).toLocaleDateString('en-US', {
-              year: 'numeric',
-              month: 'short',
-              day: 'numeric',
-            })}
-          </Text>
-          <HStack spacing={2}>
-            <Text title="Views">👍 {resource.views}</Text>
-            <Text title="Tried It">✓ {resource.tried}</Text>
-          </HStack>
-        </HStack>
-
-        {/* Stats */}
-        <HStack
-          spacing={3}
-          fontSize="sm"
-          width="full"
-          justify="flex-end"
-          pt={2}
-          borderTop="1px"
-          borderColor="gray.100"
-        >
-          {isLoggedIn ? (
-            <HStack spacing={1}>
-              <Button
-                size="xs"
-                variant="ghost"
-                colorScheme="blue"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  navigate(`/resources?discipline=${resource.discipline}`);
-                }}
-              >
-                Similar Ideas
-              </Button>
-              <Button
-                size="xs"
-                variant="ghost"
-                colorScheme="blue"
-                onClick={(e) => e.stopPropagation()}
-              >
-                {resource.isSaved ? "Saved ✓" : "Save"}
-              </Button>
-            </HStack>
-          ) : (
-            <Button size="xs" variant="ghost" colorScheme="blue" onClick={handleLoginClick}>
-              Login to collaborate
-            </Button>
-          )}
-        </HStack>
-      </VStack>
-    </Box>
-  );
 }
 
 export default function ResourcesPage() {
@@ -286,7 +133,7 @@ export default function ResourcesPage() {
   }, [filteredResources, filters.sortBy]);
 
   // Transform API resources to card format
-  const mappedResources: ResourceCard[] = useMemo(() => {
+  const mappedResources: ResourceCardData[] = useMemo(() => {
     return sortedResources.map(resource => ({
       id: resource.id,
       title: resource.title,
@@ -297,6 +144,7 @@ export default function ResourcesPage() {
       timeSaved: resource.time_saved_value,
       views: resource.analytics?.view_count || 0,
       tried: resource.analytics?.tried_count || 0,
+      saves: resource.analytics?.save_count || 0,
       collaborationStatus: resource.collaboration_status,
       created_at: resource.created_at,
     }));
@@ -369,10 +217,21 @@ export default function ResourcesPage() {
                 </Text>
                 <SimpleGrid columns={{ base: 1, md: 2 }} spacing={4}>
                   {mappedResources.map((resource) => (
-                    <BrowseResourceCard
+                    <ResourceCard
                       key={resource.id}
-                      resource={resource}
-                      isLoggedIn={isLoggedIn}
+                      id={resource.id}
+                      title={resource.title}
+                      author={resource.author}
+                      discipline={resource.discipline}
+                      tools={resource.tools}
+                      quickSummary={resource.quickSummary}
+                      timeSaved={resource.timeSaved}
+                      views={resource.views}
+                      tried={resource.tried}
+                      saves={resource.saves}
+                      collaborationStatus={resource.collaborationStatus}
+                      created_at={resource.created_at}
+                      variant="browse"
                     />
                   ))}
                 </SimpleGrid>
