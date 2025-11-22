@@ -25,6 +25,8 @@ export const AREAS = [
   "Library and Learning Services",
   "Student Services",
   "Facilities and Operations",
+  "Property Development",
+  "Supply Chain and Logistics",
 ];
 
 /**
