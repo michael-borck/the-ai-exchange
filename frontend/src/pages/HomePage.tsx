@@ -183,9 +183,9 @@ export default function HomePage() {
           </HStack>
         </VStack>
 
-        {/* Discipline Grid */}
+        {/* Area Grid */}
         <VStack align="stretch" spacing={4}>
-          <Heading size="lg">Explore by Discipline</Heading>
+          <Heading size="lg">Explore by Area</Heading>
           <SimpleGrid columns={{ base: 2, md: 4 }} spacing={4}>
             {disciplines.map((d) => (
               <DisciplineGridItem key={d.name} discipline={d} />
@@ -217,7 +217,7 @@ export default function HomePage() {
                   id={r.id}
                   title={r.title}
                   author={r.author}
-                  discipline={r.discipline}
+                  area={r.discipline}
                   tools={r.tools}
                   quickSummary={r.quickSummary}
                   timeSaved={r.timeSaved}

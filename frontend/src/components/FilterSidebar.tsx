@@ -231,16 +231,16 @@ export function FilterSidebar({
 
         <Divider />
 
-        {/* Discipline */}
+        {/* Area */}
         <VStack align="stretch" spacing={3}>
           <Text fontSize="sm" fontWeight="semibold" color="gray.700">
-            Discipline
+            Area
           </Text>
           {isLoading ? (
             <Spinner size="sm" />
           ) : disciplines.length === 0 ? (
             <Text fontSize="sm" color="gray.500">
-              No disciplines available
+              No areas available
             </Text>
           ) : (
             <VStack align="stretch" spacing={2}>

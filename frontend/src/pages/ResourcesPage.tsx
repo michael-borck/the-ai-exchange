@@ -32,7 +32,7 @@ interface ResourceCardData {
   id: string;
   title: string;
   author: string;
-  discipline?: string;
+  area?: string;
   tools: string[];
   quickSummary: string;
   timeSaved?: number;
@@ -138,7 +138,7 @@ export default function ResourcesPage() {
       id: resource.id,
       title: resource.title,
       author: resource.user?.full_name || "Faculty Member",
-      discipline: resource.discipline,
+      area: resource.discipline,
       tools: flattenTools(resource.tools_used),
       quickSummary: resource.quick_summary || resource.content_text?.substring(0, 100),
       timeSaved: resource.time_saved_value,
@@ -222,7 +222,7 @@ export default function ResourcesPage() {
                       id={resource.id}
                       title={resource.title}
                       author={resource.author}
-                      discipline={resource.discipline}
+                      area={resource.area}
                       tools={resource.tools}
                       quickSummary={resource.quickSummary}
                       timeSaved={resource.timeSaved}

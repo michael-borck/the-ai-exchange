@@ -19,7 +19,7 @@ export interface ResourceCardProps {
   id: string;
   title: string;
   author: string;
-  discipline?: string;
+  area?: string;
   tools: string[];
   quickSummary: string;
   timeSaved?: number;
@@ -41,7 +41,7 @@ export const ResourceCard: React.FC<ResourceCardProps> = ({
   id,
   title,
   author,
-  discipline,
+  area,
   tools,
   quickSummary,
   timeSaved,
@@ -101,17 +101,19 @@ export const ResourceCard: React.FC<ResourceCardProps> = ({
           {/* Header with badges */}
           <HStack spacing={2} width="full" justify="space-between">
             <HStack spacing={2}>
-              <Text
-                fontSize="xs"
-                fontWeight="bold"
-                color="blue.600"
-                bg="blue.50"
-                px={2}
-                py={1}
-                borderRadius="full"
-              >
-                {discipline}
-              </Text>
+              {area && (
+                <Text
+                  fontSize="xs"
+                  fontWeight="bold"
+                  color="blue.600"
+                  bg="blue.50"
+                  px={2}
+                  py={1}
+                  borderRadius="full"
+                >
+                  {area}
+                </Text>
+              )}
               {collaborationStatus && (
                 <Text
                   fontSize="xs"
@@ -240,9 +242,11 @@ export const ResourceCard: React.FC<ResourceCardProps> = ({
       <VStack align="flex-start" spacing={2}>
         <HStack spacing={2} width="full" justify="space-between">
           <HStack spacing={1}>
-            <Text fontSize="xs" fontWeight="bold" color="blue.600" bg="blue.50" px={2} py={1} borderRadius="full">
-              {discipline}
-            </Text>
+            {area && (
+              <Text fontSize="xs" fontWeight="bold" color="blue.600" bg="blue.50" px={2} py={1} borderRadius="full">
+                {area}
+              </Text>
+            )}
           </HStack>
         </HStack>
 
