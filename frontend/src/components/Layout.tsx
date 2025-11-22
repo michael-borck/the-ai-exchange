@@ -57,7 +57,6 @@ export function Layout({ children }: LayoutProps) {
     : [
         { label: "Home", href: "/" },
         { label: "Browse", href: "/resources" },
-        { label: "Export", href: "/resources/export" },
         { label: "Getting Started", href: "/getting-started" },
         { label: "About", href: "/about" },
       ];

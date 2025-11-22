@@ -46,11 +46,18 @@ function App() {
               <Route path="/" element={<HomePage />} />
               <Route path="/resources" element={<ResourcesPage />} />
               <Route path="/resources/:id" element={<ResourceDetailPage />} />
-              <Route path="/resources/export" element={<ExportPage />} />
               <Route path="/getting-started" element={<GettingStartedPage />} />
               <Route path="/about" element={<AboutPage />} />
 
               {/* Protected routes - Authentication required */}
+              <Route
+                path="/resources/export"
+                element={
+                  <ProtectedRoute>
+                    <ExportPage />
+                  </ProtectedRoute>
+                }
+              />
               <Route
                 path="/resources/new"
                 element={
