@@ -233,6 +233,10 @@ def load_mock_data():
                 role=user_data["role"],
                 is_active=user_data["is_active"],
                 disciplines=user_data.get("disciplines", []),
+                notification_prefs={
+                    "notify_requests": True,
+                    "notify_solutions": False,
+                },
             )
             session.add(user)
             mock_users_map[user_data["email"]] = user
