@@ -2,11 +2,20 @@
  * API Type Definitions for The AI Exchange
  */
 
+export type ProfessionalRole = "Educator" | "Researcher" | "Professional";
+
+export const PROFESSIONAL_ROLES: Record<ProfessionalRole, string> = {
+  "Educator": "Educator",
+  "Researcher": "Researcher",
+  "Professional": "Professional",
+};
+
 export interface User {
   id: string;
   email: string;
   full_name: string;
   role: "ADMIN" | "STAFF";
+  professional_role: ProfessionalRole;
   is_active: boolean;
   is_approved: boolean;
   disciplines: string[];
@@ -32,10 +41,13 @@ export interface RegisterRequest {
   email: string;
   full_name: string;
   password: string;
+  professional_role?: ProfessionalRole;
+  disciplines?: string[];
 }
 
 export interface UserUpdateRequest {
   full_name?: string;
+  professional_role?: ProfessionalRole;
   disciplines?: string[];
   notification_prefs?: {
     notify_requests?: boolean;

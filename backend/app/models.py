@@ -10,10 +10,18 @@ from sqlmodel import Column, DateTime, Field, SQLModel, Text
 
 
 class UserRole(str, Enum):
-    """User roles."""
+    """User system roles."""
 
     STAFF = "STAFF"
     ADMIN = "ADMIN"
+
+
+class ProfessionalRole(str, Enum):
+    """User professional roles."""
+
+    EDUCATOR = "Educator"
+    RESEARCHER = "Researcher"
+    PROFESSIONAL = "Professional"
 
 
 class Discipline(str, Enum):
@@ -99,6 +107,10 @@ class User(SQLModel, table=True):
     hashed_password: str
     full_name: str
     role: UserRole = Field(default=UserRole.STAFF)
+    professional_role: ProfessionalRole = Field(
+        default=ProfessionalRole.EDUCATOR,
+        description="Professional role: Educator, Researcher, or Professional",
+    )
     is_active: bool = Field(default=True)
     is_approved: bool = Field(default=True)
     disciplines: list[str] = Field(
