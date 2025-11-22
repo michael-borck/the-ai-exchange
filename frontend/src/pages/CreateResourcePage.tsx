@@ -24,7 +24,17 @@ import {
 import { useCreateResource } from "@/hooks/useResources";
 import { ResourceType } from "@/types/index";
 
-const DISCIPLINES = ["ALL", "MARKETING", "BUSINESS", "SUPPLY_CHAIN", "HR", "TOURISM", "ACCOUNTING", "LAW"];
+// Disciplines match the backend Discipline enum in models.py
+const DISCIPLINES = [
+  { value: "ALL", label: "All Disciplines" },
+  { value: "MARKETING", label: "Marketing" },
+  { value: "BUSINESS", label: "Business" },
+  { value: "SUPPLY_CHAIN", label: "Supply Chain" },
+  { value: "HR", label: "HR" },
+  { value: "TOURISM", label: "Tourism" },
+  { value: "ACCOUNTING", label: "Accounting" },
+  { value: "LAW", label: "Law" },
+];
 const TOOL_CATEGORIES = ["LLM", "CUSTOM_APP", "VISION", "SPEECH", "WORKFLOW", "DEVELOPMENT", "OTHER"];
 
 export default function CreateResourcePage() {
@@ -161,17 +171,17 @@ export default function CreateResourcePage() {
               />
             </FormControl>
 
-            {/* Discipline */}
+            {/* Area / Discipline */}
             <FormControl>
-              <FormLabel fontWeight="bold">Your Discipline</FormLabel>
+              <FormLabel fontWeight="bold">Your Area</FormLabel>
               <Select
                 value={defaultDiscipline}
                 onChange={(e) => setDiscipline(e.target.value)}
-                placeholder="Select your primary discipline"
+                placeholder="Select your primary area"
               >
                 {DISCIPLINES.map((d) => (
-                  <option key={d} value={d}>
-                    {d.replace(/_/g, " ")}
+                  <option key={d.value} value={d.value}>
+                    {d.label}
                   </option>
                 ))}
               </Select>
