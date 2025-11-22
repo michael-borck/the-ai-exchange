@@ -50,10 +50,9 @@ def list_resources(
     tag: str | None = Query(None),
     search: str | None = Query(None),
     status_filter: ResourceStatus | None = Query(None, alias="status"),
-    # New collaboration and metadata filters
+    # Metadata filters
     discipline: str | None = Query(None, description="e.g., Marketing, Management"),
     tools: str | None = Query(None, description="Comma-separated list of tools"),
-    collaboration_status: str | None = Query(None, description="SEEKING, PROVEN, HAS_MATERIALS"),
     min_time_saved: float | None = Query(None, description="Minimum hours saved"),
     sort_by: str = Query("newest", pattern="^(newest|popular|most_tried)$"),
     skip: int = Query(0, ge=0),
@@ -69,7 +68,6 @@ def list_resources(
         status_filter: Filter by status (for requests)
         discipline: Filter by discipline (e.g., Marketing, Management)
         tools: Filter by tools (comma-separated: ChatGPT,Claude)
-        collaboration_status: Filter by collaboration status
         min_time_saved: Filter for quick wins (minimum hours saved)
         sort_by: Sort order (newest, popular, most_tried)
         skip: Number of resources to skip
@@ -104,7 +102,7 @@ def list_resources(
             | (Resource.quick_summary.ilike(search_term))  # type: ignore[union-attr]
         )
 
-    # New collaboration and metadata filters
+    # Metadata filters
     if discipline:
         query = query.where(Resource.discipline == discipline)
 
@@ -123,9 +121,6 @@ def list_resources(
             conditions.append(func.json_extract(Resource.tools_used, f'$.{category}').isnot(None))
         if conditions:
             query = query.where(or_(*conditions))
-
-    if collaboration_status:
-        query = query.where(Resource.collaboration_status == collaboration_status)
 
     if min_time_saved is not None:
         query = query.where(Resource.time_saved_value >= min_time_saved)  # type: ignore[operator]

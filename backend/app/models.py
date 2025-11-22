@@ -177,7 +177,7 @@ class Resource(SQLModel, table=True):
         description="Admin-provided tags",
         sa_column=Column(JSON),
     )
-    # New collaboration and metadata fields
+    # Metadata fields
     discipline: str | None = Field(
         default=None,
         description="e.g., Marketing, Business, Supply Chain, HR, Tourism, Accounting, Law",
@@ -852,26 +852,6 @@ class PromptUsageResponse(SQLModel):
     updated_at: datetime
 
 
-class CollaborationRequestResponse(SQLModel):
-    """Response when collaboration request is created."""
-
-    status: str
-    resource_id: UUID
-    to_user_id: UUID
-    from_user_id: UUID
-    message: str | None = None
-
-
-class CollaborationOptionsResponse(SQLModel):
-    """Collaboration options for a resource."""
-
-    resource_id: UUID
-    author_id: UUID
-    collaboration_status: str | None
-    open_to: list[str]
-    contact_options: dict[str, bool]
-
-
 class SimilarResourceResponse(SQLModel):
     """Similar resource for recommendations."""
 
@@ -880,8 +860,6 @@ class SimilarResourceResponse(SQLModel):
     author_id: UUID
     discipline: str | None
     tools_used: dict[str, list[str]]
-    collaboration_status: str | None
-    open_to_collaborate: list[str]
 
 
 # Password reset schemas
