@@ -26,16 +26,9 @@ export interface ResourceCardProps {
   views: number;
   tried: number;
   saves?: number;
-  collaborationStatus?: string;
   created_at: string;
   variant?: "home" | "browse"; // Layout variant
 }
-
-const statusColor = {
-  SEEKING: "blue",
-  PROVEN: "green",
-  HAS_MATERIALS: "purple",
-};
 
 export const ResourceCard: React.FC<ResourceCardProps> = ({
   id,
@@ -47,8 +40,7 @@ export const ResourceCard: React.FC<ResourceCardProps> = ({
   timeSaved,
   views,
   tried,
-  saves = 0,
-  collaborationStatus,
+  saves = 0
   created_at,
   variant = "home",
 }) => {
@@ -114,24 +106,7 @@ export const ResourceCard: React.FC<ResourceCardProps> = ({
                   {area}
                 </Text>
               )}
-              {collaborationStatus && (
-                <Text
-                  fontSize="xs"
-                  fontWeight="semibold"
-                  color={`${statusColor[collaborationStatus as keyof typeof statusColor]}.600`}
-                  bg={`${statusColor[collaborationStatus as keyof typeof statusColor]}.50`}
-                  px={2}
-                  py={1}
-                  borderRadius="full"
-                >
-                  {collaborationStatus === "SEEKING"
-                    ? "Seeking"
-                    : collaborationStatus === "PROVEN"
-                    ? "Proven"
-                    : "Materials"}
-                </Text>
-              )}
-            </HStack>
+</HStack>
           </HStack>
 
           {/* Title */}

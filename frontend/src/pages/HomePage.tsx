@@ -17,7 +17,7 @@ import {
   Spinner,
   Center,
 } from "@chakra-ui/react";
-import { SearchIcon, ArrowForwardIcon } from "@chakra-ui/icons";
+import { SearchIcon } from "@chakra-ui/icons";
 import { Layout } from "@/components/Layout";
 import { useAuth } from "@/hooks/useAuth";
 import { useResources } from "@/hooks/useResources";
@@ -171,15 +171,7 @@ export default function HomePage() {
             >
               Browse All
             </Button>
-            <Button
-              size="lg"
-              variant="ghost"
-              colorScheme="blue"
-              rightIcon={<ArrowForwardIcon />}
-              onClick={() => navigate("/resources?collaboration_status=SEEKING")}
-            >
-              Find Collaborators
-            </Button>
+
           </HStack>
         </VStack>
 

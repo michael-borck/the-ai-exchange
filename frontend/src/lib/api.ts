@@ -113,7 +113,6 @@ class ApiClient {
     status?: string;
     discipline?: string;
     tools?: string;
-    collaboration_status?: string;
     min_time_saved?: number;
     sort_by?: string;
     skip?: number;

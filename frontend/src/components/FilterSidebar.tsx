@@ -1,6 +1,6 @@
 /**
  * Filter Sidebar Component for Browse Page
- * Provides advanced filtering by discipline, tools, collaboration status, and quick wins
+ * Provides advanced filtering by discipline, tools, and quick wins
  */
 
 import {
@@ -33,12 +33,9 @@ interface FilterSidebarProps {
 export interface FilterState {
   disciplines: string[];
   tools: string[];
-  collaborationStatus: string[];
   minTimeSaved: number;
   sortBy: "newest" | "popular" | "most_tried";
 }
-
-const COLLABORATION_STATUS = ["SEEKING", "PROVEN", "HAS_MATERIALS"];
 
 /**
  * Extract unique disciplines from resources
@@ -104,7 +101,6 @@ export function FilterSidebar({
     initialFilters || {
       disciplines: [],
       tools: [],
-      collaborationStatus: [],
       minTimeSaved: 0,
       sortBy: "newest",
     }
@@ -130,16 +126,6 @@ export function FilterSidebar({
     onFiltersChange(newFilters);
   };
 
-  const handleCollaborationChange = (status: string) => {
-    const updated = filters.collaborationStatus.includes(status)
-      ? filters.collaborationStatus.filter((s) => s !== status)
-      : [...filters.collaborationStatus, status];
-
-    const newFilters = { ...filters, collaborationStatus: updated };
-    setFilters(newFilters);
-    onFiltersChange(newFilters);
-  };
-
   const handleTimeSavedChange = (values: number[]) => {
     const newFilters = { ...filters, minTimeSaved: values[0] };
     setFilters(newFilters);
@@ -158,7 +144,6 @@ export function FilterSidebar({
     const resetFilters: FilterState = {
       disciplines: [],
       tools: [],
-      collaborationStatus: [],
       minTimeSaved: 0,
       sortBy: "newest",
     };
@@ -169,7 +154,6 @@ export function FilterSidebar({
   const activeFilterCount =
     filters.disciplines.length +
     filters.tools.length +
-    filters.collaborationStatus.length +
     (filters.minTimeSaved > 0 ? 1 : 0);
 
   return (
@@ -283,30 +267,6 @@ export function FilterSidebar({
               ))}
             </VStack>
           )}
-        </VStack>
-
-        <Divider />
-
-        {/* Collaboration Status */}
-        <VStack align="stretch" spacing={3}>
-          <Text fontSize="sm" fontWeight="semibold" color="gray.700">
-            Collaboration Status
-          </Text>
-          <VStack align="stretch" spacing={2}>
-            {COLLABORATION_STATUS.map((status) => (
-              <Checkbox
-                key={status}
-                isChecked={filters.collaborationStatus.includes(status)}
-                onChange={() => handleCollaborationChange(status)}
-              >
-                {status === "SEEKING"
-                  ? "Seeking Collaborators"
-                  : status === "PROVEN"
-                  ? "Proven & Tested"
-                  : "Has Materials"}
-              </Checkbox>
-            ))}
-          </VStack>
         </VStack>
 
         <Divider />

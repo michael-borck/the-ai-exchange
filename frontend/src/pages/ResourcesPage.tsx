@@ -39,7 +39,6 @@ interface ResourceCardData {
   views: number;
   tried: number;
   saves?: number;
-  collaborationStatus?: string;
   created_at: string;
 }
 
@@ -54,9 +53,6 @@ export default function ResourcesPage() {
       ? [searchParams.get("discipline")!]
       : [],
     tools: [],
-    collaborationStatus: searchParams.get("collaboration_status")
-      ? [searchParams.get("collaboration_status")!]
-      : [],
     minTimeSaved: 0,
     sortBy: "newest",
   });
@@ -104,10 +100,6 @@ export default function ResourcesPage() {
         if (!hasMatchingTool) return false;
       }
 
-      // Collaboration status filter
-      if (filters.collaborationStatus.length > 0 && resource.collaboration_status && !filters.collaborationStatus.includes(resource.collaboration_status)) {
-        return false;
-      }
 
       // Time saved filter
       if (filters.minTimeSaved > 0 && (resource.time_saved_value ?? 0) < filters.minTimeSaved) {
@@ -144,8 +136,7 @@ export default function ResourcesPage() {
       timeSaved: resource.time_saved_value,
       views: resource.analytics?.view_count || 0,
       tried: resource.analytics?.tried_count || 0,
-      saves: resource.analytics?.save_count || 0,
-      collaborationStatus: resource.collaboration_status,
+saves: resource.analytics?.save_count || 0,
       created_at: resource.created_at,
     }));
   }, [sortedResources]);
@@ -229,7 +220,6 @@ export default function ResourcesPage() {
                       views={resource.views}
                       tried={resource.tried}
                       saves={resource.saves}
-                      collaborationStatus={resource.collaborationStatus}
                       created_at={resource.created_at}
                       variant="browse"
                     />
