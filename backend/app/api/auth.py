@@ -170,14 +170,23 @@ def register(
             detail="Email already registered",
         )
 
-    # Check domain whitelist (lowercase email for comparison)
-    email_domain = user_create.email.lower().split("@")[1]
-    is_curtin = email_domain in settings.allowed_domains
+    # Check access - using email whitelist or domain whitelist (lowercase for consistency)
+    email_lower = user_create.email.lower()
+    email_domain = email_lower.split("@")[1]
 
-    if not is_curtin:
+    # Check if email is whitelisted specifically
+    is_whitelisted = email_lower in settings.email_whitelist
+    # Check if domain is allowed
+    is_domain_allowed = email_domain in settings.allowed_domains
+
+    # Access granted if either whitelist or domain matches
+    is_approved = is_whitelisted or is_domain_allowed
+
+    if not is_approved:
+        whitelisted_str = f" or {settings.email_whitelist}" if settings.email_whitelist else ""
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
-            detail=f"Only {settings.allowed_domains} domain emails are allowed. Contact admin to request access.",
+            detail=f"Access denied. Allowed domains: {settings.allowed_domains}{whitelisted_str}. Contact admin for access.",
         )
 
     # Check if this is the first user
@@ -186,13 +195,13 @@ def register(
 
     # Create new user (store email as lowercase for consistency)
     new_user = User(
-        email=user_create.email.lower(),
+        email=email_lower,
         full_name=user_create.full_name,
         hashed_password=hash_password(user_create.password),
         role=UserRole.ADMIN if is_first_user else UserRole.STAFF,
         is_active=True,
         is_verified=is_first_user,  # First user auto-verified
-        is_approved=is_curtin,  # Auto-approve if curtin domain
+        is_approved=is_approved,  # Auto-approve if whitelisted or from allowed domain
         disciplines=user_create.disciplines or [],
     )
 

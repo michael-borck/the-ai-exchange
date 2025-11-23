@@ -24,6 +24,7 @@ class Settings(BaseSettings):
 
     # Authentication
     allowed_domains: list[str] = ["curtin.edu.au"]
+    email_whitelist: list[str] = []  # Specific emails allowed (comma-separated, overwrites domain check)
     algorithm: str = "HS256"  # JWT algorithm (HS256, HS512, RS256, etc.)
     access_token_expire_minutes: int = 30
     refresh_token_expire_days: int = 7
