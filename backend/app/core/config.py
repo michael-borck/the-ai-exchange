@@ -15,6 +15,7 @@ class Settings(BaseSettings):
     api_v1_str: str = "/api/v1"
     secret_key: str = "change-me-to-secure-random-string"
     debug: bool = False
+    testing: bool = False  # Testing mode (dev only): disables rate limiting, uses mocked services
 
     # Database - uses absolute path relative to this config file location
     # This ensures the database is created in the backend directory,
@@ -23,6 +24,7 @@ class Settings(BaseSettings):
 
     # Authentication
     allowed_domains: list[str] = ["curtin.edu.au"]
+    algorithm: str = "HS256"  # JWT algorithm (HS256, HS512, RS256, etc.)
     access_token_expire_minutes: int = 30
     refresh_token_expire_days: int = 7
 

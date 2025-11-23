@@ -12,8 +12,8 @@ from app.core.config import settings
 # Password hashing context
 pwd_context = CryptContext(schemes=["argon2"], deprecated="auto")
 
-# JWT configuration
-ALGORITHM = "HS256"
+# JWT configuration (algorithm comes from settings)
+ALGORITHM = settings.algorithm
 
 
 def hash_password(password: str) -> str:

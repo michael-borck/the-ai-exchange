@@ -3,16 +3,18 @@
 from slowapi import Limiter
 from slowapi.util import get_remote_address
 
-# Create limiter instance using IP address as key
-limiter = Limiter(key_func=get_remote_address)
+from app.core.config import settings
 
-# Named rate limit strategies for common operations
-LIMIT_LOGIN = "5/minute"
-LIMIT_REGISTER = "3/minute"
-LIMIT_FORGOT_PASSWORD = "3/minute"
-LIMIT_RESET_PASSWORD = "5/minute"
-LIMIT_READ = "60/minute"
-LIMIT_WRITE = "30/minute"
+# Create limiter instance using IP address as key
+limiter = Limiter(key_func=get_remote_address, enabled=not settings.testing)
+
+# Named rate limit strategies for common operations (from config)
+LIMIT_LOGIN = settings.rate_limit_login
+LIMIT_REGISTER = settings.rate_limit_register
+LIMIT_FORGOT_PASSWORD = settings.rate_limit_forgot_password
+LIMIT_RESET_PASSWORD = settings.rate_limit_reset_password
+LIMIT_READ = settings.rate_limit_read
+LIMIT_WRITE = settings.rate_limit_write
 
 
 def disable_rate_limiter() -> None:
