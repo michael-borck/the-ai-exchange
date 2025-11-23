@@ -33,6 +33,7 @@ MOCK_USERS = [
         "password": "TestPassword123!",
         "role": "STAFF",
         "is_active": True,
+        "professional_role": "Educator",
         "disciplines": ["Marketing"],
     },
     {
@@ -41,6 +42,7 @@ MOCK_USERS = [
         "password": "TestPassword123!",
         "role": "STAFF",
         "is_active": True,
+        "professional_role": "Researcher",
         "disciplines": ["Business Information Systems"],
     },
     {
@@ -49,6 +51,7 @@ MOCK_USERS = [
         "password": "TestPassword123!",
         "role": "STAFF",
         "is_active": True,
+        "professional_role": "Professional",
         "disciplines": ["Future of Work Institute"],
     },
     {
@@ -57,6 +60,7 @@ MOCK_USERS = [
         "password": "TestPassword123!",
         "role": "STAFF",
         "is_active": True,
+        "professional_role": "Educator",
         "disciplines": ["People, Culture and Organisations"],
     },
     {
@@ -65,6 +69,7 @@ MOCK_USERS = [
         "password": "TestPassword123!",
         "role": "STAFF",
         "is_active": True,
+        "professional_role": "Researcher",
         "disciplines": ["Human Resources"],
     },
     {
@@ -73,6 +78,7 @@ MOCK_USERS = [
         "password": "TestPassword123!",
         "role": "STAFF",
         "is_active": True,
+        "professional_role": "Professional",
         "disciplines": ["Information Technology"],
     },
 ]
@@ -233,6 +239,7 @@ def load_mock_data():
                 hashed_password=hash_password(user_data["password"]),
                 role=user_data["role"],
                 is_active=user_data["is_active"],
+                professional_role=user_data.get("professional_role", "Educator"),
                 disciplines=user_data.get("disciplines", []),
                 notification_prefs={
                     "notify_requests": True,
