@@ -2,11 +2,10 @@
  * Create Resource Page
  */
 
-import React, { useState, useMemo } from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Layout } from "@/components/Layout";
 import { useAuth } from "@/hooks/useAuth";
-import { AreaSelect } from "@/components/AreaSelect";
 import {
   VStack,
   Heading,
@@ -35,21 +34,11 @@ export default function CreateResourcePage() {
   const [type, setType] = useState<ResourceType>("REQUEST");
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
-  const [discipline, setDiscipline] = useState("");
   const [collaborators, setCollaborators] = useState("");
   const [timeSavedValue, setTimeSavedValue] = useState("");
   const [selectedTools, setSelectedTools] = useState<string[]>([]);
   const [userTags, setUserTags] = useState("");
   const [isAnonymous, setIsAnonymous] = useState(false);
-
-  // Pre-populate discipline from user's disciplines if available
-  const defaultDiscipline = useMemo(() => {
-    if (discipline) return discipline;
-    if (user?.disciplines && user.disciplines.length > 0) {
-      return user.disciplines[0];
-    }
-    return "";
-  }, [user?.disciplines, discipline]);
 
   const handleToolToggle = (tool: string) => {
     setSelectedTools((prev) =>
@@ -73,7 +62,6 @@ export default function CreateResourcePage() {
     try {
       const contentMeta: Record<string, unknown> = {};
 
-      if (discipline) contentMeta.discipline = discipline;
       if (timeSavedValue) contentMeta.time_saved_value = parseInt(timeSavedValue);
       if (selectedTools.length > 0) contentMeta.tools_used = selectedTools;
       if (userTags) contentMeta.user_tags = userTags.split(",").map((t) => t.trim());
@@ -159,14 +147,6 @@ export default function CreateResourcePage() {
                 minHeight="200px"
               />
             </FormControl>
-
-            {/* Area / Discipline */}
-            <AreaSelect
-              value={defaultDiscipline}
-              onChange={setDiscipline}
-              label="Your Area"
-              placeholder="Search or type your research area..."
-            />
 
             {/* Collaborators */}
             <FormControl>

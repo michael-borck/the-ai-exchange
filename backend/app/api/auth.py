@@ -440,6 +440,7 @@ class UserUpdateRequest(BaseModel):
     """User profile update request."""
 
     full_name: str | None = None
+    professional_roles: list[str] | None = None
     notification_prefs: dict[str, bool] | None = None
 
 
@@ -462,6 +463,14 @@ def update_me(
     if user_update.full_name is not None:
         current_user.full_name = user_update.full_name
 
+    if user_update.professional_roles is not None:
+        # Validate roles are from enum
+        from app.models import ProfessionalRole
+        valid_roles = [ProfessionalRole.EDUCATOR, ProfessionalRole.RESEARCHER, ProfessionalRole.PROFESSIONAL]
+        professional_roles = [r for r in user_update.professional_roles if r in [v.value for v in valid_roles]]
+        if professional_roles:
+            current_user.professional_roles = professional_roles
+
     if user_update.notification_prefs is not None:
         current_user.notification_prefs = user_update.notification_prefs
 
@@ -474,8 +483,10 @@ def update_me(
         email=current_user.email,
         full_name=current_user.full_name,
         role=current_user.role,
-        professional_role=current_user.professional_role,
+        professional_roles=current_user.professional_roles,
+        area=current_user.area,
         is_active=current_user.is_active,
+        is_verified=current_user.is_verified,
         is_approved=current_user.is_approved,
         disciplines=current_user.disciplines,
         notification_prefs=current_user.notification_prefs,

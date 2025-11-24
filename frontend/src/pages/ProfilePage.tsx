@@ -34,7 +34,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { useUpdateProfile } from "@/hooks/useAuth";
 import { useResources } from "@/hooks/useResources";
 import { useUserSavedResources, useUserTriedResources } from "@/hooks/useEngagement";
-import { ProfessionalRole, PROFESSIONAL_ROLES } from "@/types/index";
+import { ProfessionalRole, PROFESSIONAL_ROLES, DISCIPLINES } from "@/types/index";
 
 function SavedIdeasSection() {
   const navigate = useNavigate();
@@ -182,9 +182,10 @@ export default function ProfilePage() {
 
   // Profile edit state
   const [fullName, setFullName] = useState(user?.full_name || "");
-  const [professionalRole, setProfessionalRole] = useState<ProfessionalRole>(
-    user?.professional_role || "Educator"
+  const [selectedRoles, setSelectedRoles] = useState<string[]>(
+    user?.professional_roles || ["Educator"]
   );
+  const [area, setArea] = useState(user?.area || "");
   const [isEditing, setIsEditing] = useState(false);
 
   // Notification preferences
@@ -206,13 +207,29 @@ export default function ProfilePage() {
     return allResources.filter(resource => resource.user_id === user.id);
   }, [allResources, user?.id]);
 
+  const handleRoleToggle = (role: string) => {
+    setSelectedRoles((prev) =>
+      prev.includes(role) ? prev.filter((r) => r !== role) : [...prev, role]
+    );
+  };
+
   const handleSaveProfile = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (selectedRoles.length === 0) {
+      toast({
+        title: "Please select at least one role",
+        status: "error",
+        duration: 3000,
+        isClosable: true,
+      });
+      return;
+    }
 
     try {
       await updateMutation.mutateAsync({
         full_name: fullName,
-        professional_role: professionalRole,
+        professional_roles: selectedRoles,
         notification_prefs: {
           notify_requests: notifyRequests,
           notify_solutions: notifySolutions,
@@ -261,12 +278,16 @@ export default function ProfilePage() {
               </HStack>
               <HStack spacing={2} mt={2}>
                 <Text color="gray.600" fontSize="sm">
-                  {user?.professional_role || "Educator"}
+                  {user?.area || "General"}
                 </Text>
-                {user?.professional_role && (
-                  <Badge colorScheme="teal" variant="subtle" fontSize="xs">
-                    {user.professional_role}
-                  </Badge>
+                {user?.professional_roles && user.professional_roles.length > 0 && (
+                  <HStack spacing={1}>
+                    {user.professional_roles.map((role) => (
+                      <Badge key={role} colorScheme="teal" variant="subtle" fontSize="xs">
+                        {role}
+                      </Badge>
+                    ))}
+                  </HStack>
                 )}
               </HStack>
             </VStack>
@@ -422,21 +443,41 @@ export default function ProfilePage() {
                         />
                       </FormControl>
 
-                      {/* Professional Role */}
+                      {/* Area / Department */}
                       <FormControl>
                         <FormLabel fontSize="sm" fontWeight="semibold">
-                          Professional Role
+                          Area / Department
                         </FormLabel>
-                        <Select
-                          value={professionalRole}
-                          onChange={(e) => setProfessionalRole(e.target.value as ProfessionalRole)}
-                          isDisabled={!isEditing}
-                          bg={isEditing ? "white" : "gray.50"}
-                        >
-                          <option value="Educator">Educator</option>
-                          <option value="Researcher">Researcher</option>
-                          <option value="Professional">Professional</option>
-                        </Select>
+                        <Input
+                          value={area}
+                          disabled
+                          bg="gray.50"
+                        />
+                        <Text fontSize="xs" color="gray.600" mt={1}>
+                          Contact your administrator to change your area
+                        </Text>
+                      </FormControl>
+
+                      {/* Professional Roles */}
+                      <FormControl>
+                        <FormLabel fontSize="sm" fontWeight="semibold" mb={3}>
+                          Professional Roles (select all that apply)
+                        </FormLabel>
+                        <VStack align="flex-start" spacing={2}>
+                          {PROFESSIONAL_ROLES.map((role) => (
+                            <Checkbox
+                              key={role}
+                              isChecked={selectedRoles.includes(role)}
+                              onChange={() => handleRoleToggle(role)}
+                              isDisabled={!isEditing}
+                            >
+                              <Text fontSize="sm">{role}</Text>
+                            </Checkbox>
+                          ))}
+                        </VStack>
+                        <Text fontSize="xs" color="gray.600" mt={2}>
+                          Select all roles that apply to you. This helps others find the right expertise.
+                        </Text>
                       </FormControl>
 
                       <Divider />
@@ -495,7 +536,8 @@ export default function ProfilePage() {
                               onClick={() => {
                                 setIsEditing(false);
                                 setFullName(user?.full_name || "");
-                                setProfessionalRole(user?.professional_role || "Educator");
+                                setSelectedRoles(user?.professional_roles || ["Educator"]);
+                                setArea(user?.area || "");
                               }}
                             >
                               Cancel

@@ -15,9 +15,12 @@ export interface User {
   email: string;
   full_name: string;
   role: "ADMIN" | "STAFF";
-  professional_role: ProfessionalRole;
+  professional_role?: ProfessionalRole; // Legacy single role field
+  professional_roles?: ProfessionalRole[]; // New multiple roles field
+  area?: string;
   is_active: boolean;
   is_approved: boolean;
+  is_verified?: boolean;
   disciplines: string[];
   notification_prefs: {
     notify_requests: boolean;
@@ -41,14 +44,14 @@ export interface RegisterRequest {
   email: string;
   full_name: string;
   password: string;
-  professional_role?: ProfessionalRole;
+  professional_roles?: ProfessionalRole[];
+  area?: string;
   disciplines?: string[];
 }
 
 export interface UserUpdateRequest {
   full_name?: string;
-  professional_role?: ProfessionalRole;
-  disciplines?: string[];
+  professional_roles?: ProfessionalRole[];
   notification_prefs?: {
     notify_requests?: boolean;
     notify_solutions?: boolean;
