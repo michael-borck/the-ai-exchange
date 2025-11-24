@@ -389,6 +389,7 @@ def login(
         role=user.role,
         professional_role=user.professional_role,
         is_active=user.is_active,
+        is_verified=user.is_verified,
         is_approved=user.is_approved,
         disciplines=user.disciplines,
         notification_prefs=user.notification_prefs,
