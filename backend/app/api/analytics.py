@@ -7,8 +7,8 @@ from sqlmodel import Session, select
 
 from app.api.auth import get_current_user
 from app.models import (
-    AnalyticsByDisciplineResponse,
-    DisciplineStats,
+    AnalyticsBySpecialtyResponse,
+    SpecialtyStats,
     PlatformAnalyticsResponse,
     PlatformStats,
     Resource,
@@ -340,7 +340,7 @@ def get_user_saved_resources(
                 title=resource.title,
                 content_text=resource.content_text,
                 type=resource.type.value,
-                discipline=resource.discipline,
+                specialty=resource.specialty,
                 user={
                     "id": str(user.id),
                     "full_name": user.full_name,
@@ -392,7 +392,7 @@ def get_user_tried_resources(
                 title=resource.title,
                 content_text=resource.content_text,
                 type=resource.type.value,
-                discipline=resource.discipline,
+                specialty=resource.specialty,
                 user={
                     "id": str(user.id),
                     "full_name": user.full_name,
@@ -469,19 +469,19 @@ def get_platform_analytics(
     )
 
 
-@router.get("/admin/analytics/by-discipline", response_model=AnalyticsByDisciplineResponse)
-def get_analytics_by_discipline(
+@router.get("/admin/analytics/by-specialty", response_model=AnalyticsBySpecialtyResponse)
+def get_analytics_by_specialty(
     current_user: User = Depends(get_current_user),
     session: Session = Depends(get_session),
-) -> AnalyticsByDisciplineResponse:
-    """Get analytics broken down by discipline (admin only).
+) -> AnalyticsBySpecialtyResponse:
+    """Get analytics broken down by specialty (admin only).
 
     Args:
         current_user: Current authenticated user (must be admin)
         session: Database session
 
     Returns:
-        Analytics by discipline
+        Analytics by specialty
 
     Raises:
         HTTPException: If not authorized
@@ -493,30 +493,30 @@ def get_analytics_by_discipline(
             detail="Only admins can view analytics",
         )
 
-    # Get all resources grouped by discipline
+    # Get all resources grouped by specialty
     resources = session.exec(select(Resource)).all()
 
-    discipline_stats: dict[str, DisciplineStats] = {}
+    specialty_stats: dict[str, SpecialtyStats] = {}
     for resource in resources:
-        if resource.discipline:
-            if resource.discipline not in discipline_stats:
-                discipline_stats[resource.discipline] = DisciplineStats(
+        if resource.specialty:
+            if resource.specialty not in specialty_stats:
+                specialty_stats[resource.specialty] = SpecialtyStats(
                     count=0,
                     total_views=0,
                     total_saves=0,
                 )
 
-            discipline_stats[resource.discipline].count += 1
+            specialty_stats[resource.specialty].count += 1
 
             # Get analytics
             analytics = session.exec(
                 select(ResourceAnalytics).where(ResourceAnalytics.resource_id == resource.id)
             ).first()
             if analytics:
-                discipline_stats[resource.discipline].total_views += analytics.view_count
-                discipline_stats[resource.discipline].total_saves += analytics.save_count
+                specialty_stats[resource.specialty].total_views += analytics.view_count
+                specialty_stats[resource.specialty].total_saves += analytics.save_count
 
-    return AnalyticsByDisciplineResponse(by_discipline=discipline_stats)
+    return AnalyticsBySpecialtyResponse(by_specialty=specialty_stats)
 
 
 @router.get("/resources/{resource_id}/users-tried-it", response_model=list[UserTriedInfo])

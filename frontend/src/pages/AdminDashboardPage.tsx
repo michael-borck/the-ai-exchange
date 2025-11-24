@@ -27,13 +27,13 @@ import {
 } from "@chakra-ui/react";
 import { useAdminUsers } from "@/hooks/useAdminUsers";
 import { useResources } from "@/hooks/useResources";
-import { usePlatformAnalytics, useAnalyticsByDiscipline } from "@/hooks/useAdminAnalytics";
+import { usePlatformAnalytics, useAnalyticsBySpecialty } from "@/hooks/useAdminAnalytics";
 
 export default function AdminDashboardPage() {
   const { data: users = [], isLoading: usersLoading } = useAdminUsers({ limit: 100 });
   const { data: resources = [], isLoading: resourcesLoading } = useResources({ limit: 100 });
   const { data: analyticsData, isLoading: analyticsLoading } = usePlatformAnalytics();
-  const { data: disciplineData, isLoading: disciplineLoading } = useAnalyticsByDiscipline();
+  const { data: specialtyData, isLoading: specialtyLoading } = useAnalyticsBySpecialty();
 
   const totalUsers = users.length;
   const activeUsers = users.filter((u: { is_active: boolean }) => u.is_active).length;
@@ -217,16 +217,16 @@ export default function AdminDashboardPage() {
                   ) : null}
                 </Box>
 
-                {/* By Discipline */}
+                {/* By Specialty */}
                 <Box>
-                  <Heading size="md" mb={4}>Resources by Discipline</Heading>
-                  {disciplineLoading ? (
+                  <Heading size="md" mb={4}>Resources by Specialty</Heading>
+                  {specialtyLoading ? (
                     <Center py={8}>
                       <Spinner />
                     </Center>
-                  ) : disciplineData?.by_discipline ? (
+                  ) : specialtyData?.by_specialty ? (
                     <SimpleGrid columns={{ base: 1, md: 2 }} gap={4}>
-                      {Object.entries(disciplineData.by_discipline).map(([specialty, stats]: [string, any]) => (
+                      {Object.entries(specialtyData.by_specialty).map(([specialty, stats]: [string, any]) => (
                         <Box key={specialty} bg="white" p={4} borderRadius="lg" boxShadow="sm">
                           <Text fontWeight="semibold" mb={3}>{specialty}</Text>
                           <SimpleGrid columns={{ base: 3 }} gap={3}>

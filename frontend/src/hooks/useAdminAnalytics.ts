@@ -23,14 +23,14 @@ interface PlatformAnalytics {
   top_resources: TopResource[];
 }
 
-interface DisciplineStats {
+interface SpecialtyStats {
   count: number;
   total_views: number;
   total_saves: number;
 }
 
-interface AnalyticsByDiscipline {
-  by_discipline: Record<string, DisciplineStats>;
+interface AnalyticsBySpecialty {
+  by_specialty: Record<string, SpecialtyStats>;
 }
 
 /**
@@ -52,11 +52,11 @@ export const usePlatformAnalytics = () => {
 /**
  * Fetch analytics breakdown by specialty
  */
-export const useAnalyticsByDiscipline = () => {
+export const useAnalyticsBySpecialty = () => {
   return useQuery({
-    queryKey: ["adminAnalyticsByDiscipline"],
+    queryKey: ["adminAnalyticsBySpecialty"],
     queryFn: async () => {
-      const response = await apiClient.get<AnalyticsByDiscipline>(
+      const response = await apiClient.get<AnalyticsBySpecialty>(
         "/admin/analytics/by-specialty"
       );
       return response.data;

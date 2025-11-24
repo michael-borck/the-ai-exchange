@@ -51,7 +51,7 @@ def list_resources(
     search: str | None = Query(None),
     status_filter: ResourceStatus | None = Query(None, alias="status"),
     # Metadata filters
-    discipline: str | None = Query(None, description="e.g., Marketing, Management"),
+    specialty: str | None = Query(None, description="e.g., Marketing, Management"),
     tools: str | None = Query(None, description="Comma-separated list of tools"),
     professional_roles: str | None = Query(None, description="Comma-separated professional roles: Educator,Researcher,Professional"),
     min_time_saved: float | None = Query(None, description="Minimum hours saved"),
@@ -105,8 +105,8 @@ def list_resources(
         )
 
     # Metadata filters
-    if discipline:
-        query = query.where(Resource.discipline == discipline)
+    if specialty:
+        query = query.where(Resource.specialty == specialty)
 
     if tools:
         # Parse comma-separated tool categories (e.g., "LLM,CUSTOM_APP")
