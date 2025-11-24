@@ -1,11 +1,14 @@
 """Configuration service for managing configurable values."""
 
+import logging
 import yaml
 from pathlib import Path
 from uuid import UUID
 from sqlmodel import Session, select
 
 from app.models import ConfigurableValue, ConfigValueType
+
+logger = logging.getLogger(__name__)
 
 
 class ConfigService:
@@ -25,51 +28,110 @@ class ConfigService:
     @staticmethod
     def seed_database(session: Session) -> None:
         """Seed database with default values from YAML if tables are empty."""
+        logger.info("Starting database seeding process...")
+
         # Check if database already has values
-        existing_count = session.query(ConfigurableValue).count()
-        if existing_count > 0:
-            # Already seeded, skip
+        try:
+            existing_count = session.query(ConfigurableValue).count()
+            logger.info(f"Existing config values in database: {existing_count}")
+        except Exception as e:
+            logger.error(f"Failed to query existing config values: {e}")
             return
 
-        config = ConfigService.load_defaults_yaml()
+        if existing_count > 0:
+            # Already seeded, skip
+            logger.info("Database already seeded, skipping seeding")
+            return
+
+        logger.info("Loading defaults from YAML...")
+        try:
+            config = ConfigService.load_defaults_yaml()
+            specialties_count = len(config.get('specialties', []))
+            roles_count = len(config.get('professional_roles', []))
+            types_count = len(config.get('resource_types', []))
+            logger.info(f"Successfully loaded YAML: specialties={specialties_count}, roles={roles_count}, types={types_count}")
+        except FileNotFoundError as e:
+            logger.error(f"defaults.yaml not found: {e}")
+            return
+        except Exception as e:
+            logger.error(f"Failed to load defaults.yaml: {e}")
+            return
 
         # Seed specialties
-        for specialty in config.get("specialties", []):
-            value = ConfigurableValue(
-                type=ConfigValueType.SPECIALTY,
-                key=specialty["key"],
-                label=specialty["label"],
-                description=specialty.get("description"),
-                category=specialty.get("category"),
-                is_active=True,
-            )
-            session.add(value)
+        try:
+            logger.info("Seeding specialties...")
+            specialty_count = 0
+            for specialty in config.get("specialties", []):
+                value = ConfigurableValue(
+                    type=ConfigValueType.SPECIALTY,
+                    key=specialty["key"],
+                    label=specialty["label"],
+                    description=specialty.get("description"),
+                    category=specialty.get("category"),
+                    is_active=True,
+                )
+                session.add(value)
+                specialty_count += 1
+            logger.info(f"Added {specialty_count} specialties to session")
+        except Exception as e:
+            logger.error(f"Failed to seed specialties: {e}")
+            return
 
         # Seed professional roles
-        for role in config.get("professional_roles", []):
-            value = ConfigurableValue(
-                type=ConfigValueType.PROFESSIONAL_ROLE,
-                key=role["key"],
-                label=role["label"],
-                description=role.get("description"),
-                category=role.get("category"),
-                is_active=True,
-            )
-            session.add(value)
+        try:
+            logger.info("Seeding professional roles...")
+            roles_added = 0
+            for role in config.get("professional_roles", []):
+                value = ConfigurableValue(
+                    type=ConfigValueType.PROFESSIONAL_ROLE,
+                    key=role["key"],
+                    label=role["label"],
+                    description=role.get("description"),
+                    category=role.get("category"),
+                    is_active=True,
+                )
+                session.add(value)
+                roles_added += 1
+            logger.info(f"Added {roles_added} professional roles to session")
+        except Exception as e:
+            logger.error(f"Failed to seed professional roles: {e}")
+            return
 
         # Seed resource types
-        for resource_type in config.get("resource_types", []):
-            value = ConfigurableValue(
-                type=ConfigValueType.RESOURCE_TYPE,
-                key=resource_type["key"],
-                label=resource_type["label"],
-                description=resource_type.get("description"),
-                category=resource_type.get("category"),
-                is_active=True,
-            )
-            session.add(value)
+        try:
+            logger.info("Seeding resource types...")
+            types_added = 0
+            for resource_type in config.get("resource_types", []):
+                value = ConfigurableValue(
+                    type=ConfigValueType.RESOURCE_TYPE,
+                    key=resource_type["key"],
+                    label=resource_type["label"],
+                    description=resource_type.get("description"),
+                    category=resource_type.get("category"),
+                    is_active=True,
+                )
+                session.add(value)
+                types_added += 1
+            logger.info(f"Added {types_added} resource types to session")
+        except Exception as e:
+            logger.error(f"Failed to seed resource types: {e}")
+            return
 
-        session.commit()
+        # Commit to database
+        try:
+            logger.info("Committing all values to database...")
+            session.commit()
+            logger.info("Commit successful")
+        except Exception as e:
+            logger.error(f"Failed to commit values to database: {e}")
+            return
+
+        # Verify seeding
+        try:
+            final_count = session.query(ConfigurableValue).count()
+            logger.info(f"Database seeding complete. Total config values: {final_count}")
+        except Exception as e:
+            logger.error(f"Failed to verify final count: {e}")
 
     @staticmethod
     def get_values_by_type(
