@@ -550,7 +550,6 @@ class UserCreate(UserBase):
 
     password: str
     professional_roles: list[str] | None = None  # Multiple roles
-    area: str  # Required: user's area/school/department
     specialties: list[str] | None = None
 
 
