@@ -27,6 +27,7 @@ from app.models import (
     EmailVerificationResponse,
     ForgotPasswordRequest,
     ForgotPasswordResponse,
+    ProfessionalRole,
     ResetPasswordRequest,
     ResetPasswordResponse,
     User,
@@ -194,6 +195,14 @@ def register(
     is_first_user = len(user_count) == 0
 
     # Create new user (store email as lowercase for consistency)
+    # Handle multiple professional roles - validate input
+    professional_roles = user_create.professional_roles or ["Educator"]
+    # Validate roles are from enum
+    valid_roles = [ProfessionalRole.EDUCATOR, ProfessionalRole.RESEARCHER, ProfessionalRole.PROFESSIONAL]
+    professional_roles = [r for r in professional_roles if r in [v.value for v in valid_roles]]
+    if not professional_roles:
+        professional_roles = ["Educator"]
+
     new_user = User(
         email=email_lower,
         full_name=user_create.full_name,
@@ -202,6 +211,8 @@ def register(
         is_active=True,
         is_verified=False,  # All users must verify email
         is_approved=is_approved,  # Auto-approve if whitelisted or from allowed domain
+        professional_roles=professional_roles,
+        area=user_create.area or "General",
         disciplines=user_create.disciplines or [],
     )
 

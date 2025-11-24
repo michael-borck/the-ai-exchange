@@ -328,6 +328,7 @@ def create_resource(
             )
 
     # Create resource
+    # Auto-populate user_area from current user's area
     new_resource = Resource(
         user_id=current_user.id,
         type=resource_data.type,
@@ -336,6 +337,7 @@ def create_resource(
         is_anonymous=resource_data.is_anonymous,
         parent_id=resource_data.parent_id,
         content_meta=resource_data.content_meta,
+        user_area=current_user.area,  # Auto-assign from user's area
     )
 
     session.add(new_resource)

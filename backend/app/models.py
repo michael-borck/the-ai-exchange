@@ -107,9 +107,14 @@ class User(SQLModel, table=True):
     hashed_password: str
     full_name: str
     role: UserRole = Field(default=UserRole.STAFF)
-    professional_role: ProfessionalRole = Field(
-        default=ProfessionalRole.EDUCATOR,
-        description="Professional role: Educator, Researcher, or Professional",
+    professional_roles: list[str] = Field(
+        default=[ProfessionalRole.EDUCATOR],
+        description="Professional roles (Educator, Researcher, Professional)",
+        sa_column=Column(JSON),
+    )
+    area: str = Field(
+        default="General",
+        description="User's area/school/department (auto-assigned at registration)",
     )
     is_active: bool = Field(default=True)
     is_verified: bool = Field(default=False)
@@ -245,6 +250,10 @@ class Resource(SQLModel, table=True):
     discipline: str | None = Field(
         default=None,
         description="e.g., Marketing, Business, Supply Chain, HR, Tourism, Accounting, Law",
+    )
+    user_area: str = Field(
+        default="General",
+        description="Creator's area/school/department (auto-assigned from user profile)",
     )
     author_title: str | None = Field(
         default=None,
@@ -499,6 +508,8 @@ class UserCreate(UserBase):
     """User creation schema."""
 
     password: str
+    professional_roles: list[str] | None = None  # Multiple roles
+    area: str  # Required: user's area/school/department
     disciplines: list[str] | None = None
 
 
@@ -515,7 +526,8 @@ class UserResponse(UserBase):
 
     id: UUID
     role: UserRole
-    professional_role: ProfessionalRole
+    professional_roles: list[str]
+    area: str
     is_active: bool
     is_verified: bool
     is_approved: bool
