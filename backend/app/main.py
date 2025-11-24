@@ -25,7 +25,8 @@ from app.api import (
 )
 from app.core.config import settings
 from app.core.rate_limiter import limiter
-from app.services.database import engine
+from app.services.config import ConfigService
+from app.services.database import engine, get_session
 
 # Configure logging
 logging.basicConfig(level=settings.log_level)
@@ -39,6 +40,17 @@ async def lifespan(_app: FastAPI) -> AsyncGenerator[None, None]:
     logger.info("Starting up The AI Exchange API...")
     SQLModel.metadata.create_all(engine)
     logger.info("Database tables created/verified")
+
+    # Seed configurable values from defaults.yaml
+    logger.info("Seeding configurable values...")
+    session = get_session()
+    try:
+        ConfigService.seed_database(session)
+        logger.info("Configurable values seeded successfully")
+    except Exception as e:
+        logger.warning(f"Could not seed configurable values: {e}")
+    finally:
+        session.close()
 
     yield
 
