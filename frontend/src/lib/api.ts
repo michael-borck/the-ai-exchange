@@ -95,6 +95,15 @@ class ApiClient {
     return response.data;
   }
 
+  async verifyEmail(email: string, code: string): Promise<TokenResponse> {
+    const response = await this.axiosInstance.post<TokenResponse>(
+      "/auth/verify-email",
+      { email, code }
+    );
+    this.setTokens(response.data);
+    return response.data;
+  }
+
   logout(): void {
     localStorage.removeItem("access_token");
     localStorage.removeItem("refresh_token");

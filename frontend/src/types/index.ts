@@ -10,6 +10,21 @@ export const PROFESSIONAL_ROLES: Record<ProfessionalRole, string> = {
   "Professional": "Professional",
 };
 
+export type Discipline = string;
+
+export const DISCIPLINES: Discipline[] = [
+  "Marketing",
+  "Management",
+  "Business",
+  "Education",
+  "Technology",
+  "Healthcare",
+  "Finance",
+  "Operations",
+  "Strategy",
+  "Other"
+];
+
 export interface User {
   id: string;
   email: string;

@@ -47,5 +47,12 @@ export function useLogout() {
   };
 }
 
+export function useVerifyEmail() {
+  return useMutation({
+    mutationFn: (data: { email: string; code: string }) =>
+      apiClient.verifyEmail(data.email, data.code),
+  });
+}
+
 // Re-export useAuth from context
 export { useAuth } from "@/context/AuthContext";
