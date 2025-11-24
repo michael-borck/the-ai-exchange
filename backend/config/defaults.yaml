@@ -1,0 +1,129 @@
+# The AI Exchange - Configuration Defaults
+# Institution: Curtin University, School of Marketing and Management
+# These are the canonical values - edit label/description in admin dashboard
+
+specialties:
+  - key: "marketing"
+    label: "Marketing"
+    description: "Marketing and brand management"
+    category: "Academic"
+
+  - key: "bis"
+    label: "Business Information Systems"
+    description: "Business Information Systems"
+    category: "Academic"
+
+  - key: "innovation_entrepreneurship"
+    label: "Innovation, Entrepreneurship & Strategy"
+    description: "Innovation, entrepreneurship, strategy and international business"
+    category: "Academic"
+
+  - key: "people_culture"
+    label: "People, Culture & Organisations"
+    description: "Organizational behavior and people management"
+    category: "Academic"
+
+  - key: "tourism_hospitality"
+    label: "Tourism, Hospitality & Events"
+    description: "Tourism, hospitality and events management"
+    category: "Academic"
+
+  - key: "future_of_work"
+    label: "Future of Work Institute"
+    description: "Research institute focused on the future of work"
+    category: "Research"
+
+  - key: "john_curtin_institute"
+    label: "John Curtin Institute of Public Policy"
+    description: "Public policy research institute"
+    category: "Research"
+
+  - key: "luxury_branding"
+    label: "Luxury Branding Research Centre"
+    description: "Luxury brand research and insights"
+    category: "Research"
+
+  - key: "tourism_research"
+    label: "Tourism Research Cluster"
+    description: "Tourism research collaboration"
+    category: "Research"
+
+  - key: "acses"
+    label: "ACSES"
+    description: "Australian Centre for Student Equity and Success"
+    category: "Research"
+
+  - key: "management_exec_support"
+    label: "Management & Executive Support"
+    description: "Strategic planning, budgeting, executive support"
+    category: "Professional Support"
+
+  - key: "lt_planning"
+    label: "Learning & Teaching - Planning"
+    description: "Timetabling, accreditation, course coordination"
+    category: "Professional Support"
+
+  - key: "lt_support"
+    label: "Learning & Teaching - Support"
+    description: "LMS support, teaching materials, classroom setup"
+    category: "Professional Support"
+
+  - key: "operations_admin"
+    label: "Operations & General Administration"
+    description: "Facilities, general admin, student enquiries"
+    category: "Professional Support"
+
+  - key: "other"
+    label: "Other"
+    description: "Other specialty (please provide more details)"
+    category: "General"
+
+professional_roles:
+  - key: "educator"
+    label: "Educator"
+    description: "Teaching and education role"
+
+  - key: "researcher"
+    label: "Researcher"
+    description: "Research and academic role"
+
+  - key: "professional"
+    label: "Professional"
+    description: "Administrative and support role"
+
+resource_types:
+  - key: "request"
+    label: "Request"
+    description: "Help request from community"
+
+  - key: "use_case"
+    label: "Use Case"
+    description: "Real-world application example"
+
+  - key: "prompt"
+    label: "Prompt"
+    description: "AI prompt template"
+
+  - key: "tool"
+    label: "Tool"
+    description: "AI tool or software"
+
+  - key: "policy"
+    label: "Policy"
+    description: "Institutional policy or guidance"
+
+  - key: "paper"
+    label: "Paper"
+    description: "Research paper or article"
+
+  - key: "project"
+    label: "Project"
+    description: "Project implementation or case study"
+
+  - key: "conference"
+    label: "Conference"
+    description: "Conference paper or presentation"
+
+  - key: "dataset"
+    label: "Dataset"
+    description: "Research dataset"

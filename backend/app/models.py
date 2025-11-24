@@ -24,37 +24,78 @@ class ProfessionalRole(str, Enum):
     PROFESSIONAL = "Professional"
 
 
-class Discipline(str, Enum):
-    """Research areas/schools at Curtin University."""
+class ConfigValueType(str, Enum):
+    """Types of configurable values."""
 
-    # Academic Schools/Departments
-    MARKETING = "Marketing"
-    BUSINESS_INFORMATION_SYSTEMS = "Business Information Systems"
-    INNOVATION_ENTREPRENEURSHIP = "Innovation, Entrepreneurship, Strategy and International Business"
-    PEOPLE_CULTURE = "People, Culture and Organisations"
-    TOURISM_HOSPITALITY = "Tourism, Hospitality and Events"
-    PROPERTY_DEVELOPMENT = "Property Development"
-    SUPPLY_CHAIN = "Supply Chain and Logistics"
+    SPECIALTY = "SPECIALTY"
+    PROFESSIONAL_ROLE = "PROFESSIONAL_ROLE"
+    RESOURCE_TYPE = "RESOURCE_TYPE"
 
-    # Research Institutes
-    FUTURE_OF_WORK = "Future of Work Institute"
-    JOHN_CURTIN_INSTITUTE = "John Curtin Institute of Public Policy"
-    LUXURY_BRANDING = "Luxury Branding Research Centre"
-    TOURISM_RESEARCH = "Tourism Research Cluster"
-    ACSES = "Australian Centre for Student Equity and Success"
 
-    # Professional Services
-    MANAGEMENT = "Management"
-    EXECUTIVE_SUPPORT = "Executive Support"
-    LEARNING_TEACHING = "Learning and Teaching Planning"
-    OPERATIONS = "Operations"
-    ADMINISTRATION = "Administration"
-    HUMAN_RESOURCES = "Human Resources"
-    INFORMATION_TECHNOLOGY = "Information Technology"
-    FINANCE_ADMINISTRATION = "Finance and Administration"
-    LIBRARY_LEARNING = "Library and Learning Services"
-    STUDENT_SERVICES = "Student Services"
-    FACILITIES_OPERATIONS = "Facilities and Operations"
+class ConfigRequestStatus(str, Enum):
+    """Status of user config requests."""
+
+    PENDING = "PENDING"
+    APPROVED_MERGED = "APPROVED_MERGED"
+    REJECTED = "REJECTED"
+
+
+class ConfigurableValue(SQLModel, table=True):
+    """Configurable values for specialties, roles, and resource types."""
+
+    id: UUID = Field(default_factory=uuid4, primary_key=True)
+    type: ConfigValueType = Field(index=True)
+    key: str = Field(index=True, unique=True)
+    label: str
+    description: str | None = Field(default=None)
+    category: str | None = Field(default=None)
+    is_active: bool = Field(default=True, index=True)
+    created_at: datetime = Field(
+        default_factory=lambda: datetime.now(UTC),
+        sa_column=Column(DateTime(timezone=True)),
+    )
+    updated_at: datetime = Field(
+        default_factory=lambda: datetime.now(UTC),
+        sa_column=Column(DateTime(timezone=True)),
+    )
+
+    def __repr__(self) -> str:
+        """String representation."""
+        return f"ConfigurableValue(type={self.type}, key={self.key}, label={self.label})"
+
+
+class UserConfigRequest(SQLModel, table=True):
+    """User requests for new configurable values."""
+
+    id: UUID = Field(default_factory=uuid4, primary_key=True)
+    user_id: UUID = Field(foreign_key="user.id", index=True)
+    type: ConfigValueType = Field(index=True)
+    requested_value: str
+    context: str | None = Field(default=None, sa_column=Column(Text))
+    status: ConfigRequestStatus = Field(default=ConfigRequestStatus.PENDING, index=True)
+    admin_response_key: UUID | None = Field(
+        default=None,
+        foreign_key="configurablevalue.id",
+        description="ConfigurableValue ID if approved/merged",
+    )
+    admin_notes: str | None = Field(default=None, sa_column=Column(Text))
+    created_at: datetime = Field(
+        default_factory=lambda: datetime.now(UTC),
+        sa_column=Column(DateTime(timezone=True)),
+    )
+    reviewed_at: datetime | None = Field(
+        default=None,
+        sa_column=Column(DateTime(timezone=True)),
+    )
+    reviewed_by: UUID | None = Field(
+        default=None,
+        foreign_key="user.id",
+        description="Admin who reviewed this request",
+    )
+
+    def __repr__(self) -> str:
+        """String representation."""
+        return f"UserConfigRequest(user={self.user_id}, type={self.type}, status={self.status})"
 
 
 class ResourceType(str, Enum):
@@ -119,9 +160,9 @@ class User(SQLModel, table=True):
     is_active: bool = Field(default=True)
     is_verified: bool = Field(default=False)
     is_approved: bool = Field(default=True)
-    disciplines: list[str] = Field(
+    specialties: list[str] = Field(
         default=[],
-        description="User's business disciplines/schools (MARKETING, BUSINESS, SUPPLY_CHAIN, HR, TOURISM, ACCOUNTING, LAW)",
+        description="User's professional specialties (keys from ConfigurableValue)",
         sa_column=Column(JSON),
     )
     notification_prefs: dict[str, Any] = Field(
@@ -247,9 +288,9 @@ class Resource(SQLModel, table=True):
         sa_column=Column(JSON),
     )
     # Metadata fields
-    discipline: str | None = Field(
+    specialty: str | None = Field(
         default=None,
-        description="e.g., Marketing, Business, Supply Chain, HR, Tourism, Accounting, Law",
+        description="Professional specialty (key from ConfigurableValue)",
     )
     user_area: str = Field(
         default="General",
@@ -510,14 +551,14 @@ class UserCreate(UserBase):
     password: str
     professional_roles: list[str] | None = None  # Multiple roles
     area: str  # Required: user's area/school/department
-    disciplines: list[str] | None = None
+    specialties: list[str] | None = None
 
 
 class UserUpdate(SQLModel):
     """User update schema."""
 
     full_name: str | None = None
-    disciplines: list[str] | None = None
+    specialties: list[str] | None = None
     notification_prefs: dict[str, Any] | None = None
 
 
@@ -531,7 +572,7 @@ class UserResponse(UserBase):
     is_active: bool
     is_verified: bool
     is_approved: bool
-    disciplines: list[str]
+    specialties: list[str]
     notification_prefs: dict[str, Any]
     created_at: datetime
 
@@ -565,7 +606,7 @@ class ResourceCreate(ResourceBase):
     # Collaborators
     collaborators: list[str] = Field(default=[])
     # Metadata fields
-    discipline: str | None = None
+    specialty: str | None = None
     author_title: str | None = None
     tools_used: dict[str, list[str]] | list[str] = Field(default={})
     time_saved_value: float | None = None
@@ -586,7 +627,7 @@ class ResourceUpdate(SQLModel):
     # Collaborators
     collaborators: list[str] | None = None
     # Metadata fields
-    discipline: str | None = None
+    specialty: str | None = None
     author_title: str | None = None
     tools_used: dict[str, list[str]] | None = None
     time_saved_value: float | None = None
@@ -629,7 +670,7 @@ class ResourceResponse(ResourceBase):
     # Collaborators
     collaborators: list[str]
     # Metadata fields
-    discipline: str | None
+    specialty: str | None
     author_title: str | None
     tools_used: dict[str, list[str]]
     time_saved_value: float | None
@@ -853,7 +894,7 @@ class SavedResourceItem(SQLModel):
     title: str
     content_text: str
     type: str
-    discipline: str | None
+    specialty: str | None
     user: dict[str, str | None] | None = None
     saved_at: datetime
 
@@ -897,18 +938,18 @@ class PlatformAnalyticsResponse(SQLModel):
     top_resources: list[TopResource]
 
 
-class DisciplineStats(SQLModel):
-    """Statistics for a discipline."""
+class SpecialtyStats(SQLModel):
+    """Statistics for a specialty."""
 
     count: int
     total_views: int
     total_saves: int
 
 
-class AnalyticsByDisciplineResponse(SQLModel):
-    """Analytics by discipline response."""
+class AnalyticsBySpecialtyResponse(SQLModel):
+    """Analytics by specialty response."""
 
-    by_discipline: dict[str, DisciplineStats]
+    by_specialty: dict[str, SpecialtyStats]
 
 
 class NotificationPreferences(SQLModel):
@@ -936,7 +977,7 @@ class SimilarResourceResponse(SQLModel):
     id: UUID
     title: str
     author_id: UUID
-    discipline: str | None
+    specialty: str | None
     tools_used: dict[str, list[str]]
 
 
