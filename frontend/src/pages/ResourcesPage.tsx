@@ -22,11 +22,12 @@ import {
   InputLeftElement,
   SimpleGrid,
 } from "@chakra-ui/react";
-import { SearchIcon } from "@chakra-ui/icons";
+import { SearchIcon, DownloadIcon } from "@chakra-ui/icons";
 import { useResources } from "@/hooks/useResources";
 import { ResourceCard } from "@/components/ResourceCard";
 import { FilterSidebar, FilterState } from "@/components/FilterSidebar";
 import { flattenTools } from "@/lib/tools";
+import { downloadCSV, getExportFilename } from "@/lib/csvExport";
 import { ProfessionalRole } from "@/types/index";
 
 interface ResourceCardData {
@@ -153,6 +154,11 @@ export default function ResourcesPage() {
     }));
   }, [sortedResources]);
 
+  // Handle export of filtered results
+  const handleExportFiltered = () => {
+    downloadCSV(sortedResources, getExportFilename());
+  };
+
   return (
     <Layout>
       <VStack align="stretch" spacing={6}>
@@ -164,12 +170,25 @@ export default function ResourcesPage() {
               Discover AI use cases from colleagues across the school
             </Text>
           </VStack>
-          <Button
-            colorScheme="blue"
-            onClick={() => navigate("/resources/new")}
-          >
-            Share Your Idea
-          </Button>
+          <HStack spacing={3}>
+            {isLoggedIn && (
+              <Button
+                leftIcon={<DownloadIcon />}
+                variant="outline"
+                colorScheme="blue"
+                onClick={handleExportFiltered}
+                isDisabled={mappedResources.length === 0}
+              >
+                Export
+              </Button>
+            )}
+            <Button
+              colorScheme="blue"
+              onClick={() => navigate("/resources/new")}
+            >
+              Share Your Idea
+            </Button>
+          </HStack>
         </HStack>
 
         {/* Search Bar */}
