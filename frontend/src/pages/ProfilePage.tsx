@@ -34,6 +34,8 @@ import { useAuth } from "@/hooks/useAuth";
 import { useUpdateProfile } from "@/hooks/useAuth";
 import { useResources } from "@/hooks/useResources";
 import { useUserSavedResources, useUserTriedResources } from "@/hooks/useEngagement";
+import { useSpecialties } from "@/hooks/useConfig";
+import { ConfigSelect } from "@/components/ConfigSelect";
 import { ProfessionalRole, PROFESSIONAL_ROLES } from "@/types/index";
 
 function SavedIdeasSection() {
@@ -179,11 +181,15 @@ export default function ProfilePage() {
   const { user } = useAuth();
   const toast = useToast();
   const updateMutation = useUpdateProfile();
+  const { data: specialties = [] } = useSpecialties();
 
   // Profile edit state
   const [fullName, setFullName] = useState(user?.full_name || "");
   const [selectedRoles, setSelectedRoles] = useState<ProfessionalRole[]>(
     (user?.professional_roles as ProfessionalRole[]) || ["Educator"]
+  );
+  const [selectedSpecialties, setSelectedSpecialties] = useState<string[]>(
+    (user?.specialties as string[]) || []
   );
   const [isEditing, setIsEditing] = useState(false);
 
@@ -229,6 +235,7 @@ export default function ProfilePage() {
       await updateMutation.mutateAsync({
         full_name: fullName,
         professional_roles: selectedRoles,
+        specialties: selectedSpecialties,
         notification_prefs: {
           notify_requests: notifyRequests,
           notify_solutions: notifySolutions,
@@ -459,6 +466,55 @@ export default function ProfilePage() {
                         </Text>
                       </FormControl>
 
+                      {/* Specialties */}
+                      {isEditing && (
+                        <FormControl>
+                          <FormLabel fontSize="sm" fontWeight="semibold">
+                            Professional Specialties
+                          </FormLabel>
+                          <VStack align="stretch" spacing={3}>
+                            {selectedSpecialties.map((specialty, index) => (
+                              <Box
+                                key={index}
+                                display="flex"
+                                alignItems="center"
+                                justifyContent="space-between"
+                                bg="blue.50"
+                                p={3}
+                                borderRadius="md"
+                              >
+                                <Text fontSize="sm">{specialty}</Text>
+                                <Button
+                                  size="sm"
+                                  colorScheme="red"
+                                  variant="ghost"
+                                  onClick={() => {
+                                    setSelectedSpecialties(
+                                      selectedSpecialties.filter((_, i) => i !== index)
+                                    );
+                                  }}
+                                >
+                                  Remove
+                                </Button>
+                              </Box>
+                            ))}
+                            <ConfigSelect
+                              label="Add Specialty"
+                              value=""
+                              onChange={(value) => {
+                                if (value && !selectedSpecialties.includes(value)) {
+                                  setSelectedSpecialties([...selectedSpecialties, value]);
+                                }
+                              }}
+                              options={specialties}
+                              showOtherOption={true}
+                              configType="specialty"
+                              helpText="Select or request a new specialty"
+                            />
+                          </VStack>
+                        </FormControl>
+                      )}
+
                       <Divider />
 
                       <Heading size="md">Notification Preferences</Heading>
@@ -516,6 +572,7 @@ export default function ProfilePage() {
                                 setIsEditing(false);
                                 setFullName(user?.full_name || "");
                                 setSelectedRoles(user?.professional_roles || ["Educator"]);
+                                setSelectedSpecialties(user?.specialties || []);
                               }}
                             >
                               Cancel
