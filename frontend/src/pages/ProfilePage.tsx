@@ -33,7 +33,7 @@ import {
 import { useAuth } from "@/hooks/useAuth";
 import { useUpdateProfile } from "@/hooks/useAuth";
 import { useResources } from "@/hooks/useResources";
-import { useUserSavedResources } from "@/hooks/useEngagement";
+import { useUserSavedResources, useUserTriedResources } from "@/hooks/useEngagement";
 import { ProfessionalRole, PROFESSIONAL_ROLES } from "@/types/index";
 
 function SavedIdeasSection() {
@@ -96,6 +96,75 @@ function SavedIdeasSection() {
               <Divider />
               <Text fontSize="xs" color="gray.600">
                 Saved {new Date(resource.saved_at).toLocaleDateString()}
+              </Text>
+            </VStack>
+          </Box>
+        ))}
+      </SimpleGrid>
+    </VStack>
+  );
+}
+
+function TriedResourcesSection() {
+  const navigate = useNavigate();
+  const { data: triedResources = [], isLoading } = useUserTriedResources();
+
+  if (isLoading) {
+    return (
+      <Center py={12}>
+        <Spinner />
+      </Center>
+    );
+  }
+
+  if (triedResources.length === 0) {
+    return (
+      <Box bg="gray.50" p={8} borderRadius="md" textAlign="center">
+        <Text color="gray.600">
+          You haven't tried any ideas yet.{" "}
+          <Button
+            variant="link"
+            colorScheme="blue"
+            onClick={() => navigate("/resources")}
+          >
+            Browse and try ideas →
+          </Button>
+        </Text>
+      </Box>
+    );
+  }
+
+  return (
+    <VStack align="stretch" spacing={4}>
+      <Box bg="green.50" p={4} borderRadius="md" border="1px" borderColor="green.200">
+        <Text fontSize="sm" color="green.900">
+          You've tried <strong>{triedResources.length} idea{triedResources.length !== 1 ? "s" : ""}</strong> from our library.
+        </Text>
+      </Box>
+      <SimpleGrid columns={{ base: 1, md: 2, lg: 3 }} spacing={4}>
+        {triedResources.map((resource: any) => (
+          <Box
+            key={resource.id}
+            bg="white"
+            border="1px"
+            borderColor="gray.200"
+            borderRadius="md"
+            p={4}
+            cursor="pointer"
+            _hover={{ boxShadow: "md" }}
+            transition="all 0.2s"
+            onClick={() => navigate(`/resources/${resource.id}`)}
+          >
+            <VStack align="flex-start" spacing={3}>
+              <HStack>
+                <Badge colorScheme="green" variant="subtle">
+                  {resource.discipline || "General"}
+                </Badge>
+              </HStack>
+              <Heading size="sm">{resource.title}</Heading>
+              <Divider />
+              <Text fontSize="xs" color="gray.600">
+                Tried {new Date(resource.saved_at).toLocaleDateString()}
               </Text>
             </VStack>
           </Box>
@@ -225,15 +294,19 @@ export default function ProfilePage() {
         {/* Main Content Tabs */}
         <Tabs variant="soft-rounded" colorScheme="blue">
           <TabList>
-            <Tab>Contributions ({userContributions.length})</Tab>
+            <Tab>My Activity</Tab>
             <Tab>Settings</Tab>
           </TabList>
 
           <TabPanels>
-            {/* Contributions Tab */}
+            {/* My Activity Tab */}
             <TabPanel>
-              <VStack align="stretch" spacing={6}>
+              <VStack align="stretch" spacing={8}>
+                {/* Shared Ideas Section */}
                 <Box>
+                  <Heading size="md" mb={4}>
+                    Shared Ideas
+                  </Heading>
                   <Text fontSize="sm" color="gray.600" mb={4}>
                     Ideas you've shared that are helping the community
                   </Text>
@@ -298,13 +371,20 @@ export default function ProfilePage() {
                   )}
                 </Box>
 
-                {/* Saved Ideas */}
+                {/* Saved Ideas Section */}
                 <Box>
                   <Heading size="md" mb={4}>
                     Saved Ideas
                   </Heading>
-                  {/* Get saved resources hook */}
                   <SavedIdeasSection />
+                </Box>
+
+                {/* Tried Resources Section */}
+                <Box>
+                  <Heading size="md" mb={4}>
+                    Tried Resources
+                  </Heading>
+                  <TriedResourcesSection />
                 </Box>
               </VStack>
             </TabPanel>

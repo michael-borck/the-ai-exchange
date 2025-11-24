@@ -353,6 +353,58 @@ def get_user_saved_resources(
     return result
 
 
+@router.get("/users/me/tried-resources", response_model=list[SavedResourceItem])
+def get_user_tried_resources(
+    current_user: User = Depends(get_current_user),
+    skip: int = 0,
+    limit: int = 100,
+    session: Session = Depends(get_session),
+) -> list[SavedResourceItem]:
+    """Get all resources tried by the current user.
+
+    Args:
+        current_user: Current authenticated user
+        skip: Number of results to skip
+        limit: Maximum number of results
+        session: Database session
+
+    Returns:
+        List of tried resources with user info
+    """
+    # Get tried resource IDs
+    tried = session.exec(
+        select(UserTriedResource)
+        .where(UserTriedResource.user_id == current_user.id)
+        .order_by(UserTriedResource.tried_at.desc())  # type: ignore[attr-defined]
+        .offset(skip)
+        .limit(limit)
+    ).all()
+
+    # Fetch the actual resources
+    result = []
+    for tried_record in tried:
+        resource = session.get(Resource, tried_record.resource_id)
+        if resource and not resource.is_hidden:
+            # Get user info
+            user = session.get(User, resource.user_id)
+            saved_item = SavedResourceItem(
+                id=resource.id,
+                title=resource.title,
+                content_text=resource.content_text,
+                type=resource.type.value,
+                discipline=resource.discipline,
+                user={
+                    "id": str(user.id),
+                    "full_name": user.full_name,
+                    "email": user.email,
+                } if user else None,
+                saved_at=tried_record.tried_at,
+            )
+            result.append(saved_item)
+
+    return result
+
+
 # Platform Analytics Endpoints
 
 

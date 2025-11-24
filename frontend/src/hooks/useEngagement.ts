@@ -130,6 +130,28 @@ export const useUserSavedResources = (options?: {
 };
 
 /**
+ * Get all resources tried by current user
+ */
+export const useUserTriedResources = (options?: {
+  skip?: number;
+  limit?: number;
+}) => {
+  return useQuery({
+    queryKey: ["triedResources", options?.skip ?? 0, options?.limit ?? 100],
+    queryFn: async () => {
+      const params = new URLSearchParams();
+      if (options?.skip !== undefined) params.append("skip", String(options.skip));
+      if (options?.limit !== undefined) params.append("limit", String(options.limit));
+
+      const response = await apiClient.get<SavedResource[]>(
+        `/users/me/tried-resources?${params.toString()}`
+      );
+      return response.data;
+    },
+  });
+};
+
+/**
  * Get users who tried implementing a resource
  */
 interface UserTriedInfo {
