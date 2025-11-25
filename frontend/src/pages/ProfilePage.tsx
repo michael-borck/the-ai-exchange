@@ -467,37 +467,55 @@ export default function ProfilePage() {
                       </FormControl>
 
                       {/* Specialties */}
-                      {isEditing && (
-                        <FormControl>
-                          <FormLabel fontSize="sm" fontWeight="semibold">
-                            Professional Specialties
-                          </FormLabel>
-                          <VStack align="stretch" spacing={3}>
-                            {selectedSpecialties.map((specialty, index) => (
-                              <Box
-                                key={index}
-                                display="flex"
-                                alignItems="center"
-                                justifyContent="space-between"
-                                bg="blue.50"
-                                p={3}
-                                borderRadius="md"
-                              >
-                                <Text fontSize="sm">{specialty}</Text>
-                                <Button
-                                  size="sm"
-                                  colorScheme="red"
-                                  variant="ghost"
-                                  onClick={() => {
-                                    setSelectedSpecialties(
-                                      selectedSpecialties.filter((_, i) => i !== index)
-                                    );
-                                  }}
+                      <FormControl>
+                        <FormLabel fontSize="sm" fontWeight="semibold" mb={3}>
+                          Professional Specialties
+                        </FormLabel>
+                        <VStack align="stretch" spacing={3}>
+                          {selectedSpecialties.length > 0 && (
+                            <>
+                              <Text fontSize="xs" color="gray.600" fontWeight="medium">
+                                Your specialties:
+                              </Text>
+                              {selectedSpecialties.map((specialty, index) => (
+                                <Box
+                                  key={index}
+                                  display="flex"
+                                  alignItems="center"
+                                  justifyContent="space-between"
+                                  bg="blue.50"
+                                  p={3}
+                                  borderRadius="md"
+                                  border={isEditing ? "1px solid" : "none"}
+                                  borderColor={isEditing ? "blue.200" : "transparent"}
                                 >
-                                  Remove
-                                </Button>
-                              </Box>
-                            ))}
+                                  <Text fontSize="sm">{specialty}</Text>
+                                  {isEditing && (
+                                    <Button
+                                      size="sm"
+                                      colorScheme="red"
+                                      variant="ghost"
+                                      onClick={() => {
+                                        setSelectedSpecialties(
+                                          selectedSpecialties.filter((_, i) => i !== index)
+                                        );
+                                      }}
+                                    >
+                                      Remove
+                                    </Button>
+                                  )}
+                                </Box>
+                              ))}
+                            </>
+                          )}
+
+                          {selectedSpecialties.length === 0 && !isEditing && (
+                            <Text fontSize="sm" color="gray.500" fontStyle="italic">
+                              No specialties selected. Click Edit Profile to add some.
+                            </Text>
+                          )}
+
+                          {isEditing && (
                             <ConfigSelect
                               label="Add Specialty"
                               value=""
@@ -511,9 +529,9 @@ export default function ProfilePage() {
                               configType="specialty"
                               helpText="Select or request a new specialty"
                             />
-                          </VStack>
-                        </FormControl>
-                      )}
+                          )}
+                        </VStack>
+                      </FormControl>
 
                       <Divider />
 
