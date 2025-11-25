@@ -1,13 +1,16 @@
 """FastAPI application entry point for The AI Exchange."""
 
 import logging
+import os
 from collections.abc import AsyncGenerator
 from contextlib import asynccontextmanager
+from pathlib import Path
 
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.trustedhost import TrustedHostMiddleware
 from fastapi.responses import JSONResponse
+from fastapi.staticfiles import StaticFiles
 from slowapi.errors import RateLimitExceeded
 from slowapi.middleware import SlowAPIMiddleware
 from sqlmodel import SQLModel
@@ -144,6 +147,17 @@ def read_root() -> dict[str, str]:
         "message": "Welcome to The AI Exchange API",
         "docs": f"{settings.api_v1_str}/docs",
     }
+
+
+# Mount static files (built React frontend) if they exist
+# This allows FastAPI to serve the frontend build in Docker
+frontend_dist = Path(__file__).parent.parent.parent / "frontend" / "dist"
+if frontend_dist.exists() and frontend_dist.is_dir():
+    logger.info(f"Mounting static frontend files from {frontend_dist}")
+    app.mount("/", StaticFiles(directory=frontend_dist, html=True), name="frontend")
+else:
+    logger.warning(f"Frontend dist directory not found at {frontend_dist}")
+    logger.info("API will be available at /api/v1, but frontend will need to be served separately")
 
 
 if __name__ == "__main__":
