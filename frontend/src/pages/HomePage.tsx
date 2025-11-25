@@ -135,7 +135,7 @@ export default function HomePage() {
               Discover How Colleagues Use AI Across Our School
             </Heading>
             <Text color="gray.600" fontSize="lg" maxW="lg">
-              Share prompts, methods, and workflows • Find collaborators • Save time together
+              Share use cases, research insights, and practical applications • Find collaborators • Build together
             </Text>
           </VStack>
 
