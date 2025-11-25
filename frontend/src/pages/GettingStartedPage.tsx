@@ -33,7 +33,7 @@ export default function GettingStartedPage() {
             Getting Started with The AI Exchange
           </Heading>
           <Text fontSize="lg" color="gray.600" maxW="2xl">
-            A collaborative platform for sharing AI-enhanced teaching methods, research workflows, and professional practices
+            A discovery platform for sharing AI-enhanced teaching methods, research workflows, and professional practices — from early ideas to proven approaches
           </Text>
         </VStack>
 
@@ -57,20 +57,20 @@ export default function GettingStartedPage() {
                     Welcome to The AI Exchange
                   </Heading>
                   <Text fontSize="md" color="gray.700" lineHeight="1.8" mb={4}>
-                    The AI Exchange is an internal platform designed to foster collaboration and knowledge-sharing across Curtin University. Whether you're an educator, researcher, or professional staff member, this platform enables you to:
+                    The AI Exchange is an internal platform for discovering and sharing AI-enhanced practices across Curtin University. Whether you're an educator, researcher, or professional staff member, this platform enables you to:
                   </Text>
                   <UnorderedList spacing={3}>
                     <ListItem>
-                      <strong>Share</strong> your innovative approaches to using AI tools and technologies
+                      <strong>Share</strong> your ideas, experiments, and approaches — from early concepts to proven methods
                     </ListItem>
                     <ListItem>
                       <strong>Discover</strong> how colleagues across disciplines are leveraging AI
                     </ListItem>
                     <ListItem>
-                      <strong>Collaborate</strong> with others on similar challenges and opportunities
+                      <strong>Connect</strong> with others by reaching out through their contact information to discuss ideas or work together
                     </ListItem>
                     <ListItem>
-                      <strong>Learn</strong> from proven practices and real-world implementations
+                      <strong>Learn</strong> from real-world implementations and get inspired by what others have tried
                     </ListItem>
                   </UnorderedList>
                 </Box>
@@ -84,13 +84,13 @@ export default function GettingStartedPage() {
                       <strong>Browse or Search</strong> existing ideas and workflows
                     </ListItem>
                     <ListItem>
-                      <strong>Share Your Idea</strong> with the community
+                      <strong>Share Your Idea</strong> — even if it's early-stage or experimental
                     </ListItem>
                     <ListItem>
-                      <strong>Engage</strong> with collaborators and get feedback
+                      <strong>Reach out</strong> to colleagues whose work interests you to discuss, ask questions, or brainstorm
                     </ListItem>
                     <ListItem>
-                      <strong>Iterate</strong> and improve together
+                      <strong>Learn</strong> from feedback and get inspired by what others have shared
                     </ListItem>
                   </OrderedList>
                 </Box>
@@ -124,7 +124,7 @@ export default function GettingStartedPage() {
                   </Heading>
                   <UnorderedList spacing={3}>
                     <ListItem>
-                      <strong>Share teaching strategies</strong> - Document how you use AI to create case studies, generate discussion prompts, or develop assessment rubrics
+                      <strong>Share teaching strategies</strong> - Document how you use AI to create case studies, generate discussion prompts, or develop assessment rubrics (finished work or rough experiments welcome)
                     </ListItem>
                     <ListItem>
                       <strong>Reduce preparation time</strong> - Find proven workflows that save hours on grading, content creation, and student feedback
@@ -133,7 +133,7 @@ export default function GettingStartedPage() {
                       <strong>Enhance student engagement</strong> - Discover methods for using AI to personalize learning or provide rapid feedback
                     </ListItem>
                     <ListItem>
-                      <strong>Collaborate across disciplines</strong> - Connect with colleagues using AI in similar or different ways
+                      <strong>Connect with peers</strong> - Find colleagues using AI in similar or different ways and reach out to share ideas
                     </ListItem>
                   </UnorderedList>
                 </Box>
@@ -187,7 +187,7 @@ export default function GettingStartedPage() {
                   </Heading>
                   <UnorderedList spacing={3}>
                     <ListItem>
-                      <strong>Document research workflows</strong> - Share how you use AI for literature reviews, data analysis, or research proposal development
+                      <strong>Document research workflows</strong> - Share how you use AI for literature reviews, data analysis, or research proposal development (from early experiments to established methods)
                     </ListItem>
                     <ListItem>
                       <strong>Accelerate research processes</strong> - Find proven methods to reduce time spent on repetitive research tasks
@@ -196,7 +196,7 @@ export default function GettingStartedPage() {
                       <strong>Strengthen funding applications</strong> - Learn how to use AI to structure and refine research proposals
                     </ListItem>
                     <ListItem>
-                      <strong>Build interdisciplinary networks</strong> - Connect with researchers across different fields using complementary AI approaches
+                      <strong>Connect with researchers</strong> - Reach out to colleagues across different fields using complementary AI approaches to discuss and share insights
                     </ListItem>
                   </UnorderedList>
                 </Box>
@@ -250,7 +250,7 @@ export default function GettingStartedPage() {
                   </Heading>
                   <UnorderedList spacing={3}>
                     <ListItem>
-                      <strong>Streamline workflows</strong> - Share how you use AI to automate administrative tasks or improve processes
+                      <strong>Streamline workflows</strong> - Share how you use AI to automate administrative tasks or improve processes (whether tested or experimental)
                     </ListItem>
                     <ListItem>
                       <strong>Increase efficiency</strong> - Find proven methods to save time on routine tasks and boost productivity
@@ -259,7 +259,7 @@ export default function GettingStartedPage() {
                       <strong>Improve service delivery</strong> - Learn how to use AI to enhance communication and support quality
                     </ListItem>
                     <ListItem>
-                      <strong>Network professionally</strong> - Connect with peers across departments and share best practices
+                      <strong>Connect with colleagues</strong> - Reach out to peers across departments to discuss ideas, share best practices, and learn from each other
                     </ListItem>
                   </UnorderedList>
                 </Box>
