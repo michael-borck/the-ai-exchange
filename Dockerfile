@@ -29,7 +29,7 @@ WORKDIR /app/backend
 # Create and activate virtual environment, install dependencies
 RUN uv venv .venv && \
     . .venv/bin/activate && \
-    uv pip install -r requirements.txt
+    uv pip install .
 
 # Create necessary directories for data persistence
 RUN mkdir -p /app/data/db /app/data/uploads /app/data/logs && \
@@ -42,7 +42,7 @@ WORKDIR /app/frontend
 
 # Install Node dependencies and build React app
 RUN npm install && \
-    npm run build
+    npx vite build
 
 # ============================================
 # Final Setup

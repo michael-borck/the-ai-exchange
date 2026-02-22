@@ -24,39 +24,7 @@ services:
       - ./data/uploads:/app/data/uploads
       - ./data/logs:/app/data/logs
 
-    # Environment variables (can be overridden by .env file)
-    environment:
-      # Database
-      - DATABASE_URL=sqlite:///./data/db/ai_exchange.db
-
-      # Security (IMPORTANT: Override SECRET_KEY in production!)
-      - SECRET_KEY=${SECRET_KEY:-change-this-in-production-min-32-chars}
-      - ALGORITHM=HS256
-      - ACCESS_TOKEN_EXPIRE_MINUTES=30
-
-      # API Configuration
-      - API_V1_STR=/api/v1
-      - PROJECT_NAME=The AI Exchange
-
-      # Domain/Origin Configuration
-      - ALLOWED_ORIGINS=${ALLOWED_ORIGINS:-http://localhost:5173,http://localhost:8000}
-      - ALLOWED_DOMAINS=${ALLOWED_DOMAINS:-curtin.edu.au}
-
-      # Email Whitelist (comma-separated)
-      - EMAIL_WHITELIST=${EMAIL_WHITELIST:-}
-
-      # Logging
-      - LOG_LEVEL=${LOG_LEVEL:-INFO}
-      - DEBUG=${DEBUG:-false}
-
-      # SMTP Configuration (optional - for email notifications)
-      - SMTP_HOST=${SMTP_HOST:-}
-      - SMTP_PORT=${SMTP_PORT:-587}
-      - SMTP_USERNAME=${SMTP_USERNAME:-}
-      - SMTP_PASSWORD=${SMTP_PASSWORD:-}
-      - SMTP_FROM_EMAIL=${SMTP_FROM_EMAIL:-}
-      - SMTP_FROM_NAME=${SMTP_FROM_NAME:-The AI Exchange}
-      - SMTP_TLS=${SMTP_TLS:-true}
+    # All config is in backend/.env (mounted read-only above)
 
     # Health check
     healthcheck:

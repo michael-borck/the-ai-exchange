@@ -97,6 +97,7 @@ app.add_middleware(
         "localhost",
         "127.0.0.1",
         "testserver",  # For tests
+        "theaiexchange.serveur.au",
     ],
 )
 
