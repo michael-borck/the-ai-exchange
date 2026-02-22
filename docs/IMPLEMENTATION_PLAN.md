@@ -242,7 +242,7 @@ This document outlines the phased implementation of **The AI Exchange** MVP for 
 - [ ] Code quality checks passing
 - [ ] Documentation complete
 - [ ] Security review (CORS, auth, input validation)
-- [ ] Performance optimization (database indexes)
+- [ ] Performance optimisation (database indexes)
 - [ ] Error handling and logging
 
 ---

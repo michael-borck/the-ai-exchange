@@ -1,6 +1,6 @@
 /**
  * Password Reset Flow Component
- * Multi-step password reset dialog with email verification and password update
+ * Multi-step password reset modal with email verification and password update
  */
 
 import React, { useState } from "react";

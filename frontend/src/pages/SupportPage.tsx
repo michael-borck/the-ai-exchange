@@ -38,7 +38,7 @@ export default function SupportPage() {
         {/* Hero Section */}
         <VStack spacing={4} align="center" textAlign="center" py={8}>
           <Heading size="2xl" fontWeight="bold">
-            Support & Help Center
+            Support & Help Centre
           </Heading>
           <Text fontSize="lg" color="gray.600" maxW="2xl">
             Get help with The AI Exchange, find answers to common questions, and report issues
@@ -166,7 +166,7 @@ export default function SupportPage() {
                       <AccordionIcon />
                     </AccordionButton>
                     <AccordionPanel pb={4}>
-                      Yes, you need to verify your email address after registering. We'll send you a 6-digit verification code. This helps us ensure users are from authorized institutions and protects the community.
+                      Yes, you need to verify your email address after registering. We'll send you a 6-digit verification code. This helps us ensure users are from authorised institutions and protects the community.
                     </AccordionPanel>
                   </AccordionItem>
 
@@ -178,7 +178,7 @@ export default function SupportPage() {
                       <AccordionIcon />
                     </AccordionButton>
                     <AccordionPanel pb={4}>
-                      Absolutely! The AI Exchange welcomes ideas at any stage — from early concepts and experiments to polished, proven approaches. Share what you're working on, even if you're not sure it'll work. That's where the most interesting learning happens.
+                      Absolutely! The AI Exchange welcomes ideas at any stage, from early concepts and experiments to polished, proven approaches. Share what you're working on, even if you're not sure it'll work. That's where the most interesting learning happens.
                     </AccordionPanel>
                   </AccordionItem>
 

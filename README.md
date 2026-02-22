@@ -32,7 +32,7 @@ This is a **complete full-stack web application** built with modern technologies
 * **Password Reset:** Secure 6-digit code-based password reset with email delivery
 * **Rate Limiting:** IP-based request throttling on auth endpoints to prevent brute force attacks and abuse
 * **Role-Based Access:** Admin and Staff roles with different capabilities
-* **Notification Preferences:** Users can customize when they receive notifications
+* **Notification Preferences:** Users can customise when they receive notifications
 
 ## ✅ Implementation Status
 
@@ -60,7 +60,7 @@ This is a **complete full-stack web application** built with modern technologies
 - ✅ **Collaboration Features** - "Working on Similar" modal workflow
 - ✅ **Engagement Tracking UI** - Views, saves, "tried it" counts
 - ✅ **Responsive Design** - Works on desktop and mobile
-- ✅ **Production Build** - Optimized bundle
+- ✅ **Production Build** - Optimised bundle
 - ✅ **Full TypeScript** - Type-safe frontend
 
 ### Code Quality
@@ -178,7 +178,7 @@ npm run build          # Build production bundle
 npm run preview        # Preview the build
 ```
 
-The production frontend build is optimized and ready for deployment.
+The production frontend build is optimised and ready for deployment.
 
 -----
 
@@ -404,7 +404,7 @@ Once the backend is running, access the interactive API documentation:
 - Admin analytics dashboards
 - Pagination and infinite scroll
 - Search debouncing
-- Mobile responsiveness optimization
+- Mobile responsiveness optimisation
 
 ## 📚 Development Documentation
 

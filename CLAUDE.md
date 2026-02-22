@@ -8,7 +8,7 @@ This document provides instructions for Claude Code to understand the project st
 
 **The AI Exchange** is a full-stack web application built for the **School of Marketing and Management (SoMM)** to facilitate the discovery, sharing, and discussion of Artificial Intelligence use cases and applications in marketing and management contexts.
 
-- **Organization:** School of Marketing and Management (SoMM) at Curtin University
+- **Organisation:** School of Marketing and Management (SoMM) at Curtin University
 - **Domain:** @curtin.edu.au
 - **Tech Stack:** FastAPI (Python 3.11+) + React 18+ (TypeScript)
 - **Database:** SQLite (MVP) / PostgreSQL (Production)

@@ -33,7 +33,7 @@ export default function GettingStartedPage() {
             Getting Started with The AI Exchange
           </Heading>
           <Text fontSize="lg" color="gray.600" maxW="2xl">
-            A discovery platform for sharing AI-enhanced teaching methods, research workflows, and professional practices — from early ideas to proven approaches
+            A discovery platform for sharing AI-enhanced teaching methods, research workflows, and professional practices, from early ideas to proven approaches
           </Text>
         </VStack>
 
@@ -61,7 +61,7 @@ export default function GettingStartedPage() {
                   </Text>
                   <UnorderedList spacing={3}>
                     <ListItem>
-                      <strong>Share</strong> your ideas, experiments, and approaches — from early concepts to proven methods
+                      <strong>Share</strong> your ideas, experiments, and approaches, from early concepts to proven methods
                     </ListItem>
                     <ListItem>
                       <strong>Discover</strong> how colleagues across disciplines are leveraging AI
@@ -84,7 +84,7 @@ export default function GettingStartedPage() {
                       <strong>Browse or Search</strong> existing ideas and workflows
                     </ListItem>
                     <ListItem>
-                      <strong>Share Your Idea</strong> — even if it's early-stage or experimental
+                      <strong>Share Your Idea</strong>, even if it's early-stage or experimental
                     </ListItem>
                     <ListItem>
                       <strong>Reach out</strong> to colleagues whose work interests you to discuss, ask questions, or brainstorm
@@ -130,7 +130,7 @@ export default function GettingStartedPage() {
                       <strong>Reduce preparation time</strong> - Find proven workflows that save hours on grading, content creation, and student feedback
                     </ListItem>
                     <ListItem>
-                      <strong>Enhance student engagement</strong> - Discover methods for using AI to personalize learning or provide rapid feedback
+                      <strong>Enhance student engagement</strong> - Discover methods for using AI to personalise learning or provide rapid feedback
                     </ListItem>
                     <ListItem>
                       <strong>Connect with peers</strong> - Find colleagues using AI in similar or different ways and reach out to share ideas
@@ -208,7 +208,7 @@ export default function GettingStartedPage() {
                   <UnorderedList spacing={2} color="purple.900" fontSize="sm">
                     <ListItem>Automated literature review and synthesis pipelines</ListItem>
                     <ListItem>AI-assisted research proposal structuring</ListItem>
-                    <ListItem>Data analysis workflow optimization</ListItem>
+                    <ListItem>Data analysis workflow optimisation</ListItem>
                     <ListItem>Collaborative research documentation methods</ListItem>
                     <ListItem>AI-supported methodology exploration</ListItem>
                   </UnorderedList>
@@ -270,9 +270,9 @@ export default function GettingStartedPage() {
                   </Heading>
                   <UnorderedList spacing={2} color="orange.900" fontSize="sm">
                     <ListItem>Email drafting and correspondence templates</ListItem>
-                    <ListItem>Meeting note automation and summarization</ListItem>
-                    <ListItem>Workflow optimization and process improvement</ListItem>
-                    <ListItem>Data organization and reporting tools</ListItem>
+                    <ListItem>Meeting note automation and summarisation</ListItem>
+                    <ListItem>Workflow optimisation and process improvement</ListItem>
+                    <ListItem>Data organisation and reporting tools</ListItem>
                     <ListItem>Communication and documentation standards</ListItem>
                   </UnorderedList>
                 </Box>
@@ -306,13 +306,13 @@ export default function GettingStartedPage() {
             Need Help?
           </Heading>
           <Text color="blue.900" mb={4}>
-            Can't find what you're looking for? Our Support & Help Center has answers to common questions, contact information, and feedback options.
+            Can't find what you're looking for? Our Support & Help Centre has answers to common questions, contact information, and feedback options.
           </Text>
           <Button
             colorScheme="blue"
             onClick={() => navigate("/support")}
           >
-            Visit Help Center
+            Visit Help Centre
           </Button>
         </Box>
       </VStack>

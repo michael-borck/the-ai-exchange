@@ -131,7 +131,7 @@ def get_config_snapshot(admin: User = Depends(_require_admin)) -> ConfigSnapshot
     """Get current configuration (safe values only, no secrets).
 
     Returns:
-        ConfigSnapshot with categorized settings
+        ConfigSnapshot with categorised settings
     """
     return ConfigSnapshot(
         general={

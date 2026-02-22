@@ -178,11 +178,11 @@ export default function ExportPage() {
                     <Td fontSize="sm">{row.author_email}</Td>
                     <Td fontSize="sm">{row.creator_role}</Td>
                     <Td fontSize="sm" isNumeric>
-                      {row.time_saved !== null ? row.time_saved.toFixed(1) : "—"}
+                      {row.time_saved !== null ? row.time_saved.toFixed(1) : "-"}
                     </Td>
                     <Td fontSize="sm">
                       <Box maxW="200px" noOfLines={1}>
-                        {row.tools || "—"}
+                        {row.tools || "-"}
                       </Box>
                     </Td>
                     <Td fontSize="sm" isNumeric>

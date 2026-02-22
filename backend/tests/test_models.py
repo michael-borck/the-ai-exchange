@@ -103,7 +103,7 @@ def test_resource_with_tags(session: Session) -> None:
         user_id=user.id,
         type=ResourceType.PROMPT,
         title="Marketing Analytics Prompt",
-        content_text="Use this prompt for analyzing customer data...",
+        content_text="Use this prompt for analysing customer data...",
         system_tags=["ChatGPT", "Marketing", "Analytics"],
         user_tags=["Segmentation"],
     )

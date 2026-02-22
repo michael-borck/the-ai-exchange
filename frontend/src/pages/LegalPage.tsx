@@ -86,7 +86,7 @@ export default function LegalPage() {
                   </Heading>
                   <UnorderedList spacing={2}>
                     <ListItem>To provide and improve The AI Exchange platform</ListItem>
-                    <ListItem>To personalize your experience and show relevant content</ListItem>
+                    <ListItem>To personalise your experience and show relevant content</ListItem>
                     <ListItem>To send important notifications (if you've opted in)</ListItem>
                     <ListItem>To help colleagues contact you about shared ideas</ListItem>
                     <ListItem>To comply with legal obligations</ListItem>
@@ -139,7 +139,7 @@ export default function LegalPage() {
                     License & Access
                   </Heading>
                   <Text mb={3}>
-                    The AI Exchange is provided for use by Curtin University staff and authorized users only. You are granted a personal, non-transferable license to access and use the platform in accordance with these terms.
+                    The AI Exchange is provided for use by Curtin University staff and authorised users only. You are granted a personal, non-transferable licence to access and use the platform in accordance with these terms.
                   </Text>
                 </Box>
 
@@ -163,7 +163,7 @@ export default function LegalPage() {
                     Content Rights
                   </Heading>
                   <Text mb={3}>
-                    <strong>User-Submitted Content:</strong> You retain ownership of content you share on The AI Exchange. By posting, you grant Curtin University and other users a non-exclusive license to view and use your content within this platform.
+                    <strong>User-Submitted Content:</strong> You retain ownership of content you share on The AI Exchange. By posting, you grant Curtin University and other users a non-exclusive licence to view and use your content within this platform.
                   </Text>
                   <Text mb={3}>
                     <strong>Platform Content:</strong> The AI Exchange software and documentation are licensed under the MIT License. See the About page for more details.
@@ -210,7 +210,7 @@ export default function LegalPage() {
 
                 <Box bg="blue.50" p={6} borderRadius="lg">
                   <Heading size="md" mb={3} color="blue.900">
-                    Expected Behavior
+                    Expected Behaviour
                   </Heading>
                   <UnorderedList spacing={2} color="blue.900">
                     <ListItem>Be respectful and professional in all interactions</ListItem>
@@ -225,10 +225,10 @@ export default function LegalPage() {
 
                 <Box bg="red.50" p={6} borderRadius="lg" borderLeft="4px" borderColor="red.400">
                   <Heading size="md" mb={3} color="red.900">
-                    Unacceptable Behavior
+                    Unacceptable Behaviour
                   </Heading>
                   <Text color="red.900" mb={3}>
-                    The following behaviors are prohibited:
+                    The following behaviours are prohibited:
                   </Text>
                   <UnorderedList spacing={2} color="red.900">
                     <ListItem>Harassment, discrimination, or offensive language</ListItem>
@@ -245,7 +245,7 @@ export default function LegalPage() {
                     Reporting & Enforcement
                   </Heading>
                   <Text mb={3}>
-                    If you encounter inappropriate content or behavior, please report it immediately. See the Support page for how to report.
+                    If you encounter inappropriate content or behaviour, please report it immediately. See the Support page for how to report.
                   </Text>
                   <Text mb={3}>
                     We investigate all reports promptly and confidentially. Actions may include:

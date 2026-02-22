@@ -348,7 +348,7 @@ docker network inspect caddy_default
 
 ## Performance Tips
 
-### 1. Database Optimization
+### 1. Database Optimisation
 
 SQLite is good for small to medium deployments. For high traffic, consider PostgreSQL:
 

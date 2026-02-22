@@ -52,7 +52,7 @@ A professional, lightweight collaboration hub for sharing AI implementations acr
 ### Core Requirements
 - **Responsive**: Mobile-first design approach
 - **Accessibility**: WCAG 2.1 AA compliance minimum
-- **Performance**: Core Web Vitals optimized
+- **Performance**: Core Web Vitals optimised
 - **Browser Support**: Chrome, Firefox, Safari, Edge (latest 2 versions)
 - **API**: RESTful API with potential GraphQL in Phase 3
 - **Security**: OWASP Top 10 compliance, data encryption at rest
@@ -126,7 +126,7 @@ Recent Contributions          Trending This Week
 ┌────────────────────────────────────────────────┐
 │ [Teaching] [Marketing]           [Something     │
 │                                    Similar: 3]  │
-│ Using Claude for Personalized MBA Case Studies  │
+│ Using Claude for Personalised MBA Case Studies  │
 │ ─────────────────────────────────────────────  │
 │ Dr. Sarah Chen • 2 days ago                     │
 │ Generates industry-specific cases aligned with  │
@@ -144,7 +144,7 @@ Recent Contributions          Trending This Week
 ┌─────────────────────────────────────────────────────┐
 │ « Back to Browse                                     │
 │                                                      │
-│ Using Claude for Personalized MBA Case Studies      │
+│ Using Claude for Personalised MBA Case Studies      │
 │ ════════════════════════════════════════════════    │
 │ Dr. Sarah Chen                                      │
 │ Senior Lecturer, Marketing Department               │
@@ -656,7 +656,7 @@ Frequency
 [Save Preferences]
 ```
 
-### Notification Center
+### Notification Centre
 ```
 ┌─────────────────────────────────────────┐
 │ 🔔 Notifications (3 new)                │
@@ -834,7 +834,7 @@ Idea Quality Badges:
 ✓ Verified Implementation - Tested in classroom
 📊 Evidence-Based - Includes metrics
 🏫 Department Approved - Official endorsement
-⭐ Community Favorite - High engagement
+⭐ Community Favourite - High engagement
 ```
 
 ### Reporting System
@@ -915,7 +915,7 @@ Traffic Source:
 
 ## Visual Design System
 
-### Colors
+### Colours
 - **Primary**: Curtin Navy (#012144)
 - **Secondary**: Warm Grey (#F5F5F5)
 - **Accent**: Curtin Gold (#F0B323)
@@ -959,7 +959,7 @@ Traffic Source:
 
 - **Tags/Badges**:
   - Pill shape (rounded-full)
-  - Muted colors
+  - Muted colours
   - Small text (0.875rem)
 
 ### Spacing System
@@ -1007,7 +1007,7 @@ Traffic Source:
 8. Export functionality
 
 **Improvements**:
-- Performance optimization
+- Performance optimisation
 - Advanced search (Elasticsearch)
 - Real-time notifications
 - Rich text editor
@@ -1030,7 +1030,7 @@ Traffic Source:
 - API documentation
 - User onboarding flow
 
-### Phase 4: Scale & Optimize (Ongoing)
+### Phase 4: Scale & Optimise (Ongoing)
 - Machine learning for matching
 - Advanced moderation tools
 - Multi-language support

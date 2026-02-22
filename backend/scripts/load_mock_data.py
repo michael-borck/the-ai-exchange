@@ -86,7 +86,7 @@ MOCK_USERS = [
 MOCK_RESOURCES = [
     {
         "title": "Using Claude for MBA Case Studies",
-        "content_text": "This resource shows how to use Claude AI to generate industry-specific case studies that are aligned with learning outcomes. The process takes under 5 minutes and produces high-quality, contextually relevant cases.\n\nSteps:\n1. Define learning objectives\n2. Specify industry context\n3. Use Claude to generate case\n4. Review and customize\n5. Deploy to students",
+        "content_text": "This resource shows how to use Claude AI to generate industry-specific case studies that are aligned with learning outcomes. The process takes under 5 minutes and produces high-quality, contextually relevant cases.\n\nSteps:\n1. Define learning objectives\n2. Specify industry context\n3. Use Claude to generate case\n4. Review and customise\n5. Deploy to students",
         "type": "USE_CASE",
         "status": "OPEN",
         "user_email": "sarah.chen@curtin.edu.au",
@@ -100,7 +100,7 @@ MOCK_RESOURCES = [
     },
     {
         "title": "Automated Rubric Generation",
-        "content_text": "Create consistent assessment criteria in seconds using ChatGPT. This reduces grading time and ensures fairness across all students.\n\nWorkflow:\n1. Input assignment description\n2. Specify competencies to assess\n3. Let ChatGPT generate detailed rubric\n4. Customize weight and criteria\n5. Export to gradebook",
+        "content_text": "Create consistent assessment criteria in seconds using ChatGPT. This reduces grading time and ensures fairness across all students.\n\nWorkflow:\n1. Input assignment description\n2. Specify competencies to assess\n3. Let ChatGPT generate detailed rubric\n4. Customise weight and criteria\n5. Export to gradebook",
         "type": "PROMPT",
         "status": "OPEN",
         "user_email": "mike.torres@curtin.edu.au",
@@ -114,14 +114,14 @@ MOCK_RESOURCES = [
     },
     {
         "title": "Literature Review Synthesis with NotebookLM",
-        "content_text": "Automatically extract and summarize key findings from academic papers using Claude and NotebookLM. This process reduces literature review time from weeks to days.\n\nProcess:\n1. Upload PDF papers to NotebookLM\n2. Generate audio overview\n3. Ask Claude to extract methodology, findings, limitations\n4. Organize by theme\n5. Create synthesis table\n6. Identify research gaps",
+        "content_text": "Automatically extract and summarise key findings from academic papers using Claude and NotebookLM. This process reduces literature review time from weeks to days.\n\nProcess:\n1. Upload PDF papers to NotebookLM\n2. Generate audio overview\n3. Ask Claude to extract methodology, findings, limitations\n4. Organise by theme\n5. Create synthesis table\n6. Identify research gaps",
         "type": "USE_CASE",
         "status": "OPEN",
         "user_email": "kumar.prof@curtin.edu.au",
         "discipline": "Future of Work Institute",
         "tools_used": {"LLM": ["Claude", "NotebookLM"]},
         "collaborators": ["kumar.prof@curtin.edu.au"],
-        "quick_summary": "Automatically extract and summarize key findings...",
+        "quick_summary": "Automatically extract and summarise key findings...",
         "time_saved_value": 4.0,
         "time_saved_frequency": "per_week",
         "system_tags": ["Research", "Literature Review", "Synthesis"],
@@ -156,7 +156,7 @@ MOCK_RESOURCES = [
     },
     {
         "title": "AI-Generated Infographics for Lectures",
-        "content_text": "Create visually compelling infographics and diagrams for lectures using DALL-E and Midjourney. Enhance student understanding through visual learning.\n\nProcess:\n1. Input course concept\n2. Generate image prompts with Claude\n3. Create images with DALL-E or Midjourney\n4. Customize colors and text\n5. Embed in presentations",
+        "content_text": "Create visually compelling infographics and diagrams for lectures using DALL-E and Midjourney. Enhance student understanding through visual learning.\n\nProcess:\n1. Input course concept\n2. Generate image prompts with Claude\n3. Create images with DALL-E or Midjourney\n4. Customise colours and text\n5. Embed in presentations",
         "type": "USE_CASE",
         "status": "OPEN",
         "user_email": "sarah.chen@curtin.edu.au",

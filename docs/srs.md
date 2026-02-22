@@ -9,7 +9,7 @@
 ## 1. Introduction
 
 ### 1.1 Project Overview
-**The AI Exchange** is a centralized, internal platform for business school staff to share, discover, and discuss AI use cases, prompts, policies, and requests. It operates as a demand-driven marketplace where staff post "Requests" (problems/needs), and peers respond with "Solutions" (use cases/prompts/policies). The platform features a unified catalogue/search interface where users can browse existing submissions with filters, and if content isn't found, they can post a Request for others to fulfill.
+**The AI Exchange** is a centralised, internal platform for business school staff to share, discover, and discuss AI use cases, prompts, policies, and requests. It operates as a demand-driven marketplace where staff post "Requests" (problems/needs), and peers respond with "Solutions" (use cases/prompts/policies). The platform features a unified catalogue/search interface where users can browse existing submissions with filters, and if content isn't found, they can post a Request for others to fulfil.
 
 ### 1.2 Core Philosophy
 - **Verified Anonymity:** Encourages safe sharing while maintaining governance through admin oversight
@@ -251,7 +251,7 @@ Simple many-to-many relationship for notifications.
 
 ### 6.1 Performance
 - FastAPI for high-performance backend
-- React with Vite for optimized frontend builds
+- React with Vite for optimised frontend builds
 - YAKE for CPU-only keyword extraction (no external API calls)
 
 ### 6.2 Security
@@ -309,7 +309,7 @@ services:
 ### 8.2 Technical Success
 - Fast page loads (< 2 seconds)
 - Reliable email notifications
-- Secure authentication and authorization
+- Secure authentication and authorisation
 - Stable deployment on VPS
 
 ---

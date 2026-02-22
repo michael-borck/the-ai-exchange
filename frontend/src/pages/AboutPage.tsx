@@ -65,7 +65,7 @@ export default function AboutPage() {
                   </Heading>
                   <UnorderedList spacing={3}>
                     <ListItem>
-                      <strong>Democratize Learning:</strong> Make knowledge accessible to everyone at Curtin, regardless of department or experience level
+                      <strong>Democratise Learning:</strong> Make knowledge accessible to everyone at Curtin, regardless of department or experience level
                     </ListItem>
                     <ListItem>
                       <strong>Encourage Experimentation:</strong> Create a safe space to share rough ideas, early experiments, and lessons learned (not just polished work)
@@ -119,7 +119,7 @@ export default function AboutPage() {
                     The AI Exchange application is released under the <strong>MIT License</strong>, enabling transparency, collaboration, and future extensibility.
                   </Text>
                   <Text fontSize="sm" color="gray.600">
-                    This means you can inspect the code, modify it, and use it in other projects — with appropriate attribution.
+                    This means you can inspect the code, modify it, and use it in other projects, with appropriate attribution.
                   </Text>
                 </Box>
 
@@ -132,22 +132,22 @@ export default function AboutPage() {
                   </Text>
                   <UnorderedList spacing={2}>
                     <ListItem>
-                      <strong>React</strong> (MIT License) — Modern UI framework
+                      <strong>React</strong> (MIT License): Modern UI framework
                     </ListItem>
                     <ListItem>
-                      <strong>FastAPI</strong> (MIT License) — Lightning-fast backend framework
+                      <strong>FastAPI</strong> (MIT License): Lightning-fast backend framework
                     </ListItem>
                     <ListItem>
-                      <strong>SQLModel</strong> (MIT License) — SQL database ORM
+                      <strong>SQLModel</strong> (MIT License): SQL database ORM
                     </ListItem>
                     <ListItem>
-                      <strong>Chakra UI</strong> (MIT License) — Accessible component library
+                      <strong>Chakra UI</strong> (MIT License): Accessible component library
                     </ListItem>
                     <ListItem>
-                      <strong>SQLite</strong> (Public Domain) — Reliable database
+                      <strong>SQLite</strong> (Public Domain): Reliable database
                     </ListItem>
                     <ListItem>
-                      <strong>Python & TypeScript</strong> — Powerful, accessible languages
+                      <strong>Python & TypeScript</strong>: Powerful, accessible languages
                     </ListItem>
                     <ListItem>
                       And dozens of other excellent open source libraries (full list in source code)
@@ -180,7 +180,7 @@ export default function AboutPage() {
                     Our Approach to Human-AI Collaboration
                   </Heading>
                   <Text color="blue.900" lineHeight="1.8" mb={4}>
-                    We don't believe AI should replace human judgment. Instead, we use AI as a tool to augment human creativity, accelerate development, and ensure quality. At every step — from ideation to implementation to testing — humans made strategic decisions and verified the work.
+                    We don't believe AI should replace human judgement. Instead, we use AI as a tool to augment human creativity, accelerate development, and ensure quality. At every step, from ideation to implementation to testing, humans made strategic decisions and verified the work.
                   </Text>
                   <Text color="blue.900" fontWeight="semibold" mb={3}>
                     This allowed us to:
@@ -236,10 +236,10 @@ export default function AboutPage() {
                     Leadership & Vision
                   </Heading>
                   <Text mb={3}>
-                    <strong>School of Marketing and Management</strong> — for sponsoring this project and believing that knowledge-sharing and discovery should be core to how Curtin operates.
+                    <strong>School of Marketing and Management</strong>, for sponsoring this project and believing that knowledge-sharing and discovery should be core to how Curtin operates.
                   </Text>
                   <Text>
-                    <strong>Michael Borck</strong> — Principal developer and product owner, who translated vision into reality.
+                    <strong>Michael Borck</strong>, Principal developer and product owner, who translated vision into reality.
                   </Text>
                 </Box>
 
@@ -251,11 +251,11 @@ export default function AboutPage() {
                     Special thanks to the creators and maintainers of:
                   </Text>
                   <UnorderedList spacing={2} fontSize="sm">
-                    <ListItem><strong>React & Vite</strong> — Modern, fast frontend development</ListItem>
-                    <ListItem><strong>FastAPI</strong> — Elegant backend framework</ListItem>
-                    <ListItem><strong>SQLModel</strong> — Bridges SQL and Python beautifully</ListItem>
-                    <ListItem><strong>Chakra UI</strong> — Accessible, themeable components</ListItem>
-                    <ListItem><strong>The Python & TypeScript communities</strong> — for incredible ecosystems</ListItem>
+                    <ListItem><strong>React & Vite</strong>: Modern, fast frontend development</ListItem>
+                    <ListItem><strong>FastAPI</strong>: Elegant backend framework</ListItem>
+                    <ListItem><strong>SQLModel</strong>: Bridges SQL and Python beautifully</ListItem>
+                    <ListItem><strong>Chakra UI</strong>: Accessible, themeable components</ListItem>
+                    <ListItem><strong>The Python & TypeScript communities</strong>, for incredible ecosystems</ListItem>
                   </UnorderedList>
                 </Box>
 
@@ -264,7 +264,7 @@ export default function AboutPage() {
                     AI Assistance
                   </Heading>
                   <Text mb={3}>
-                    <strong>Claude AI (Anthropic)</strong> — Provided AI-assisted development, helping translate ideas into code while maintaining human oversight and decision-making.
+                    <strong>Claude AI (Anthropic)</strong>: Provided AI-assisted development, helping translate ideas into code while maintaining human oversight and decision-making.
                   </Text>
                 </Box>
 

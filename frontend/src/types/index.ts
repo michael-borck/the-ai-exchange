@@ -120,7 +120,7 @@ export interface Resource {
   // Metadata fields
   specialty?: string;
   author_title?: string;
-  tools_used?: Record<string, string[]>; // Categorized tools, e.g., { "LLM": ["Claude"], "CUSTOM_APP": ["Talk-Buddy"] }
+  tools_used?: Record<string, string[]>; // Categorised tools, e.g., { "LLM": ["Claude"], "CUSTOM_APP": ["Talk-Buddy"] }
   tools_used_flat?: string[]; // Flattened list of all tools
   collaborators?: string[]; // Email addresses of collaborators
   time_saved_value?: number;

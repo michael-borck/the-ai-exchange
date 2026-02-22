@@ -3,8 +3,8 @@
  */
 
 /**
- * Flatten categorized tools structure to a simple array
- * @param toolsUsed - Categorized tools object, e.g., { "LLM": ["Claude"], "CUSTOM_APP": ["Talk-Buddy"] }
+ * Flatten categorised tools structure to a simple array
+ * @param toolsUsed - Categorised tools object, e.g., { "LLM": ["Claude"], "CUSTOM_APP": ["Talk-Buddy"] }
  * @returns Flattened array of tool names
  */
 export function flattenTools(toolsUsed?: Record<string, string[]> | string[]): string[] {
@@ -17,7 +17,7 @@ export function flattenTools(toolsUsed?: Record<string, string[]> | string[]): s
     return toolsUsed;
   }
 
-  // Otherwise, flatten the categorized structure
+  // Otherwise, flatten the categorised structure
   const flattened: string[] = [];
   Object.values(toolsUsed).forEach((tools) => {
     if (Array.isArray(tools)) {
@@ -30,7 +30,7 @@ export function flattenTools(toolsUsed?: Record<string, string[]> | string[]): s
 
 /**
  * Get tools by category
- * @param toolsUsed - Categorized tools object
+ * @param toolsUsed - Categorised tools object
  * @param category - The category to filter by (e.g., "LLM")
  * @returns Array of tools in the category, or empty array if category doesn't exist
  */
@@ -47,7 +47,7 @@ export function getToolsByCategory(
 
 /**
  * Get all categories that have tools
- * @param toolsUsed - Categorized tools object
+ * @param toolsUsed - Categorised tools object
  * @returns Array of category names
  */
 export function getToolCategories(toolsUsed: Record<string, string[]> | undefined): string[] {
