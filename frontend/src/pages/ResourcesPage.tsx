@@ -28,7 +28,6 @@ import { ResourceCard } from "@/components/ResourceCard";
 import { FilterSidebar, FilterState } from "@/components/FilterSidebar";
 import { flattenTools } from "@/lib/tools";
 import { downloadCSV, getExportFilename } from "@/lib/csvExport";
-import { ProfessionalRole } from "@/types/index";
 
 interface ResourceCardData {
   id: string;
@@ -108,9 +107,9 @@ export default function ResourcesPage() {
 
       // Professional role filter
       if (filters.professionalRoles && filters.professionalRoles.length > 0) {
-        if (!resource.user?.professional_role || !filters.professionalRoles.includes(resource.user.professional_role)) {
-          return false;
-        }
+        const roles = resource.author_professional_roles || [];
+        const hasMatchingRole = filters.professionalRoles.some(role => roles.includes(role));
+        if (!hasMatchingRole) return false;
       }
 
       // Time saved filter

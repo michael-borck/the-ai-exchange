@@ -153,7 +153,9 @@ def list_resources(
     for resource in resources:
         # Get only the fields we need for author info with a targeted query
         user_data = session.exec(
-            select(User.id, User.full_name, User.email).where(User.id == resource.user_id)
+            select(User.id, User.full_name, User.email, User.professional_roles).where(
+                User.id == resource.user_id
+            )
         ).first()
 
         # Get analytics for the resource
@@ -171,7 +173,7 @@ def list_resources(
             )
 
             # Respect anonymity: show author name only if not anonymous
-            user_id, full_name, email = user_data
+            user_id, full_name, email, professional_roles = user_data
             author_name = "Faculty Member" if resource.is_anonymous else full_name
             author_email = None if resource.is_anonymous else email
 
@@ -180,6 +182,7 @@ def list_resources(
                 author_name=author_name,
                 author_email=author_email,
                 author_id=user_id,
+                author_professional_roles=professional_roles or [],
             )
             result.append(resource_with_author)
 
@@ -213,7 +216,9 @@ def get_resource(
 
     # Get only the fields we need for author info with a targeted query
     user_data = session.exec(
-        select(User.id, User.full_name, User.email).where(User.id == resource.user_id)
+        select(User.id, User.full_name, User.email, User.professional_roles).where(
+            User.id == resource.user_id
+        )
     ).first()
 
     # Get analytics for the resource
@@ -232,7 +237,7 @@ def get_resource(
     # Build response with user information
     if user_data:
         # Respect anonymity: show author name only if not anonymous
-        user_id, full_name, email = user_data
+        user_id, full_name, email, professional_roles = user_data
         author_name = "Faculty Member" if resource.is_anonymous else full_name
         author_email = None if resource.is_anonymous else email
 
@@ -241,6 +246,7 @@ def get_resource(
             author_name=author_name,
             author_email=author_email,
             author_id=user_id,
+            author_professional_roles=professional_roles or [],
         )
 
     # Fallback if no user found (shouldn't happen)

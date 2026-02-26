@@ -706,6 +706,7 @@ class ResourceWithAuthor(ResourceResponse):
     author_name: str
     author_email: str | None = None
     author_id: UUID
+    author_professional_roles: list[str] = []
 
 
 class SubscriptionCreate(SQLModel):

@@ -11,7 +11,6 @@ import {
   Heading,
   Input,
   Textarea,
-  Select,
   Button,
   Box,
   useToast,
@@ -20,10 +19,36 @@ import {
   FormHelperText,
   Checkbox,
   Text,
+  Tooltip,
+  Radio,
+  RadioGroup,
+  SimpleGrid,
 } from "@chakra-ui/react";
 import { useCreateResource } from "@/hooks/useResources";
 import { ResourceType } from "@/types/index";
-const TOOL_CATEGORIES = ["LLM", "CUSTOM_APP", "VISION", "SPEECH", "WORKFLOW", "DEVELOPMENT", "OTHER"];
+const RESOURCE_TYPES = [
+  { key: "REQUEST", label: "Request", tooltip: "Ask for help, advice, or ideas from colleagues" },
+  { key: "USE_CASE", label: "Use Case", tooltip: "A real-world example of AI applied in your work" },
+  { key: "PROMPT", label: "Prompt Template", tooltip: "A reusable prompt you've found effective" },
+  { key: "TOOL", label: "Tool", tooltip: "An AI tool, software, or integration you use" },
+  { key: "POLICY", label: "Policy", tooltip: "Guidelines, governance, or ethical frameworks" },
+  { key: "PAPER", label: "Paper", tooltip: "A research paper or article you've written or contributed to" },
+  { key: "PROJECT", label: "Project", tooltip: "Something you've built, are building, or plan to build" },
+  { key: "CONFERENCE", label: "Conference", tooltip: "A talk or presentation you gave or attended" },
+  { key: "DATASET", label: "Dataset", tooltip: "A dataset you've created or curated for research" },
+  { key: "BOOK", label: "Book", tooltip: "A book or textbook you've authored or recommend" },
+  { key: "OTHER", label: "Other", tooltip: "Anything that doesn't fit the categories above" },
+];
+
+const TOOL_CATEGORIES = [
+  { key: "LLM", label: "LLM", tooltip: "Large language models like ChatGPT, Claude, Gemini" },
+  { key: "CUSTOM_APP", label: "Custom App", tooltip: "Purpose-built applications using AI APIs" },
+  { key: "VISION", label: "Vision", tooltip: "Image recognition, generation, or analysis tools" },
+  { key: "SPEECH", label: "Speech", tooltip: "Speech-to-text, text-to-speech, or voice tools" },
+  { key: "WORKFLOW", label: "Workflow", tooltip: "Automation tools like Zapier, Make, or Power Automate" },
+  { key: "DEVELOPMENT", label: "Development", tooltip: "AI coding assistants and development tools" },
+  { key: "OTHER", label: "Other", tooltip: "Any other AI tool or technology" },
+];
 
 export default function CreateResourcePage() {
   const navigate = useNavigate();
@@ -114,19 +139,30 @@ export default function CreateResourcePage() {
             {/* Type */}
             <FormControl isRequired>
               <FormLabel fontWeight="bold">Resource Type</FormLabel>
-              <Select value={type} onChange={(e) => setType(e.target.value as ResourceType)}>
-                <option value="REQUEST">Request (help needed)</option>
-                <option value="USE_CASE">Use Case</option>
-                <option value="PROMPT">Prompt Template</option>
-                <option value="TOOL">Tool (software or integration)</option>
-                <option value="POLICY">Policy (guidelines or governance)</option>
-                <option value="PAPER">Paper (research or article)</option>
-                <option value="PROJECT">Project (example or case study)</option>
-                <option value="CONFERENCE">Conference (talk or presentation)</option>
-                <option value="DATASET">Dataset</option>
-                <option value="BOOK">Book</option>
-                <option value="OTHER">Other</option>
-              </Select>
+              <RadioGroup value={type} onChange={(val) => setType(val as ResourceType)}>
+                <SimpleGrid columns={{ base: 2, md: 3 }} spacing={2}>
+                  {RESOURCE_TYPES.map((rt) => (
+                    <Tooltip key={rt.key} label={rt.tooltip} placement="top" hasArrow>
+                      <Box
+                        borderWidth="1px"
+                        borderColor={type === rt.key ? "blue.400" : "gray.200"}
+                        bg={type === rt.key ? "blue.50" : "white"}
+                        borderRadius="md"
+                        px={3}
+                        py={2}
+                        cursor="pointer"
+                        onClick={() => setType(rt.key as ResourceType)}
+                        _hover={{ borderColor: "blue.300" }}
+                      >
+                        <Radio value={rt.key} size="sm">
+                          <Text fontSize="sm">{rt.label}</Text>
+                        </Radio>
+                      </Box>
+                    </Tooltip>
+                  ))}
+                </SimpleGrid>
+              </RadioGroup>
+              <FormHelperText>Hover over each option for a description</FormHelperText>
             </FormControl>
 
             {/* Title */}
@@ -167,14 +203,15 @@ export default function CreateResourcePage() {
               <FormLabel fontWeight="bold">AI Tools & Technologies Used</FormLabel>
               <Box borderWidth="1px" borderColor="gray.200" borderRadius="md" p={4} bg="gray.50">
                 {TOOL_CATEGORIES.map((tool) => (
-                  <Checkbox
-                    key={tool}
-                    mb={2}
-                    isChecked={selectedTools.includes(tool)}
-                    onChange={() => handleToolToggle(tool)}
-                  >
-                    {tool.replace("_", " ")}
-                  </Checkbox>
+                  <Tooltip key={tool.key} label={tool.tooltip} placement="right" hasArrow>
+                    <Checkbox
+                      mb={2}
+                      isChecked={selectedTools.includes(tool.key)}
+                      onChange={() => handleToolToggle(tool.key)}
+                    >
+                      {tool.label}
+                    </Checkbox>
+                  </Tooltip>
                 ))}
               </Box>
               <FormHelperText>Select all that apply to your resource</FormHelperText>

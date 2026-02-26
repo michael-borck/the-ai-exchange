@@ -141,16 +141,11 @@ export interface Resource {
     comment_count?: number;
     helpful_count?: number;
   };
-  user?: {
-    id: string;
-    full_name: string;
-    email: string;
-    professional_role?: ProfessionalRole;
-  };
   // Author information (from ResourceWithAuthor response)
   author_id?: string;
   author_name?: string;
   author_email?: string | null;
+  author_professional_roles?: string[];
 }
 
 export interface ResourceCreate {
