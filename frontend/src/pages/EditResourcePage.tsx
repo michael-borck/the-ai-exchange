@@ -188,7 +188,7 @@ export default function EditResourcePage() {
 
   return (
     <Layout>
-      <Box maxW="3xl">
+      <Box maxW="3xl" mx="auto">
         <Heading size="lg" mb={6}>
           Edit Resource
         </Heading>
@@ -243,7 +243,7 @@ export default function EditResourcePage() {
               <Box borderWidth="1px" borderColor="gray.200" borderRadius="md" p={4} bg="gray.50">
                 {TOOL_CATEGORIES.map((tool) => (
                   <Tooltip key={tool.key} label={tool.tooltip} placement="right" hasArrow openDelay={300} closeOnClick>
-                    <Box display="inline-block" width="100%">
+                    <Box display="inline-block">
                       <Checkbox
                         mb={2}
                         isChecked={selectedTools.includes(tool.key)}
