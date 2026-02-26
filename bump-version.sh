@@ -17,11 +17,20 @@ fi
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 
+# Portable in-place sed (works with both GNU and BSD sed)
+sedi() {
+  if sed --version >/dev/null 2>&1; then
+    sed -i "$@"
+  else
+    sed -i '' "$@"
+  fi
+}
+
 # Update frontend/package.json
-sed -i '' "s/\"version\": \".*\"/\"version\": \"${VERSION}\"/" "$SCRIPT_DIR/frontend/package.json"
+sedi "s/\"version\": \".*\"/\"version\": \"${VERSION}\"/" "$SCRIPT_DIR/frontend/package.json"
 
 # Update backend/pyproject.toml
-sed -i '' "s/^version = \".*\"/version = \"${VERSION}\"/" "$SCRIPT_DIR/backend/pyproject.toml"
+sedi "s/^version = \".*\"/version = \"${VERSION}\"/" "$SCRIPT_DIR/backend/pyproject.toml"
 
 echo "Version bumped to ${VERSION} in:"
 echo "  - frontend/package.json"
