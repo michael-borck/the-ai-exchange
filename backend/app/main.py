@@ -9,7 +9,7 @@ from pathlib import Path
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.trustedhost import TrustedHostMiddleware
-from fastapi.responses import JSONResponse
+from fastapi.responses import FileResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 from slowapi.errors import RateLimitExceeded
 from slowapi.middleware import SlowAPIMiddleware
@@ -151,12 +151,23 @@ def read_root() -> dict[str, str]:
     }
 
 
-# Mount static files (built React frontend) if they exist
+# Serve built React frontend if it exists
 # This allows FastAPI to serve the frontend build in Docker
 frontend_dist = Path(__file__).parent.parent.parent / "frontend" / "dist"
 if frontend_dist.exists() and frontend_dist.is_dir():
     logger.info(f"Mounting static frontend files from {frontend_dist}")
-    app.mount("/", StaticFiles(directory=frontend_dist, html=True), name="frontend")
+
+    # Serve static assets (JS, CSS, images) directly
+    app.mount("/assets", StaticFiles(directory=frontend_dist / "assets"), name="static-assets")
+
+    # Catch-all: serve index.html for any non-API route so React Router handles it
+    @app.get("/{full_path:path}")
+    async def serve_spa(full_path: str) -> FileResponse:
+        """Serve React SPA for all non-API routes."""
+        file_path = frontend_dist / full_path
+        if file_path.is_file():
+            return FileResponse(file_path)
+        return FileResponse(frontend_dist / "index.html")
 else:
     logger.warning(f"Frontend dist directory not found at {frontend_dist}")
     logger.info("API will be available at /api/v1, but frontend will need to be served separately")
