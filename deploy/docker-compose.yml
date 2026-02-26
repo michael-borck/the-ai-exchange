@@ -1,8 +1,7 @@
 # VPS production compose — no source code needed, just this file + .env
-# See deploy/.env.example for all configurable variables
+# Identical to root docker-compose.yml but pulls from GHCR instead of building locally
 #
 # Usage:
-#   cp .env.example .env && vim .env
 #   docker compose up -d
 
 services:
@@ -10,27 +9,37 @@ services:
     image: ghcr.io/michael-borck/the-ai-exchange:latest
     container_name: ai-exchange
     restart: unless-stopped
+
+    # Expose port 8000 to host (will be reverse proxied by Caddy/Nginx)
     ports:
       - "8000:8000"
-    env_file: .env
+
+    # Connect to existing Caddy network (for reverse proxy)
+    networks:
+      - caddy_default
+
+    # Mount volumes for persistent data
     volumes:
+      # Environment file
+      - ./backend/.env:/app/backend/.env:ro
+
+      # Persistent data directories
       - ./data/db:/app/data/db
       - ./data/uploads:/app/data/uploads
       - ./data/logs:/app/data/logs
+
     labels:
       - "com.centurylinklabs.watchtower.enable=true"
-    networks:
-      - caddy_default
+
+    # All config is in backend/.env (mounted read-only above)
+
+    # Health check
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
       interval: 30s
       timeout: 10s
       retries: 3
       start_period: 5s
-
-  # Watchtower is NOT included here — use a single shared Watchtower instance.
-  # The app container has the com.centurylinklabs.watchtower.enable=true label,
-  # so any label-filtered Watchtower will pick it up automatically.
 
 networks:
   caddy_default:
