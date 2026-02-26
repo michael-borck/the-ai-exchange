@@ -94,36 +94,44 @@ professional_roles:
 resource_types:
   - key: "request"
     label: "Request"
-    description: "Help request from community"
+    description: "Help needed"
 
   - key: "use_case"
     label: "Use Case"
     description: "Real-world application example"
 
   - key: "prompt"
-    label: "Prompt"
+    label: "Prompt Template"
     description: "AI prompt template"
 
   - key: "tool"
     label: "Tool"
-    description: "AI tool or software"
+    description: "Software or integration"
 
   - key: "policy"
     label: "Policy"
-    description: "Institutional policy or guidance"
+    description: "Guidelines or governance"
 
   - key: "paper"
     label: "Paper"
-    description: "Research paper or article"
+    description: "Research or article"
 
   - key: "project"
     label: "Project"
-    description: "Project implementation or case study"
+    description: "Example or case study"
 
   - key: "conference"
     label: "Conference"
-    description: "Conference paper or presentation"
+    description: "Talk or presentation"
 
   - key: "dataset"
     label: "Dataset"
     description: "Research dataset"
+
+  - key: "book"
+    label: "Book"
+    description: "Book or textbook"
+
+  - key: "other"
+    label: "Other"
+    description: "Other resource type"

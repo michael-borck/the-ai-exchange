@@ -3,8 +3,9 @@
  * Navigation for legal, support, and general information
  */
 
-import { Box, HStack, Text, Link, VStack, Wrap, WrapItem } from "@chakra-ui/react";
+import { Box, Text, Link, VStack, Wrap, WrapItem } from "@chakra-ui/react";
 import { useNavigate } from "react-router-dom";
+import { APP_VERSION } from "@/version";
 
 export function Footer() {
   const navigate = useNavigate();
@@ -46,7 +47,7 @@ export function Footer() {
 
         {/* Copyright & Credits */}
         <Text fontSize="xs" color="gray.600" textAlign="center">
-          &copy; {new Date().getFullYear()} Curtin University • Built with React & FastAPI •
+          &copy; {new Date().getFullYear()} Curtin University • v{APP_VERSION} • Built with React & FastAPI •
           <Link
             href="https://github.com"
             ml={1}

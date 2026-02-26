@@ -119,15 +119,17 @@ export function ResourceModeration() {
             onChange={(e) => setTypeFilter(e.target.value as ResourceType | "")}
             width="200px"
           >
-            <option value="REQUEST">Requests</option>
-            <option value="USE_CASE">Use Cases</option>
-            <option value="PROMPT">Prompts</option>
-            <option value="TOOL">Tools</option>
-            <option value="POLICY">Policies</option>
-            <option value="PAPER">Papers</option>
-            <option value="PROJECT">Projects</option>
-            <option value="CONFERENCE">Conferences</option>
-            <option value="DATASET">Datasets</option>
+            <option value="REQUEST">Request</option>
+            <option value="USE_CASE">Use Case</option>
+            <option value="PROMPT">Prompt Template</option>
+            <option value="TOOL">Tool</option>
+            <option value="POLICY">Policy</option>
+            <option value="PAPER">Paper</option>
+            <option value="PROJECT">Project</option>
+            <option value="CONFERENCE">Conference</option>
+            <option value="DATASET">Dataset</option>
+            <option value="BOOK">Book</option>
+            <option value="OTHER">Other</option>
           </Select>
 
           <Button

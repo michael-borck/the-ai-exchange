@@ -110,6 +110,8 @@ class ResourceType(str, Enum):
     PROJECT = "PROJECT"
     CONFERENCE = "CONFERENCE"
     DATASET = "DATASET"
+    BOOK = "BOOK"
+    OTHER = "OTHER"
 
 
 class ResourceStatus(str, Enum):

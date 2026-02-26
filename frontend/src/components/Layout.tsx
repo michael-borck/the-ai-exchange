@@ -30,6 +30,7 @@ import {
 import { HamburgerIcon } from "@chakra-ui/icons";
 import { useAuth, useLogout } from "@/hooks/useAuth";
 import { Footer } from "@/components/Footer";
+import { APP_VERSION } from "@/version";
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -147,14 +148,14 @@ export function Layout({ children }: LayoutProps) {
       >
         <Container maxW="100%" px={6} display="flex" justifyContent="space-between" alignItems="center">
           {/* Left: Logo */}
-          <Heading
-            size="md"
-            cursor="pointer"
-            onClick={() => navigate("/")}
-            whiteSpace="nowrap"
-          >
-            The AI Exchange
-          </Heading>
+          <HStack spacing={2} cursor="pointer" onClick={() => navigate("/")}>
+            <Heading size="md" whiteSpace="nowrap">
+              The AI Exchange
+            </Heading>
+            <Text fontSize="xs" color="gray.500" fontWeight="normal">
+              v{APP_VERSION}
+            </Text>
+          </HStack>
 
           {/* Center: Navigation (Desktop) */}
           <HStack

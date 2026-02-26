@@ -115,15 +115,17 @@ export default function CreateResourcePage() {
             <FormControl isRequired>
               <FormLabel fontWeight="bold">Resource Type</FormLabel>
               <Select value={type} onChange={(e) => setType(e.target.value as ResourceType)}>
-                <option value="REQUEST">Request / Question</option>
+                <option value="REQUEST">Request (help needed)</option>
                 <option value="USE_CASE">Use Case</option>
                 <option value="PROMPT">Prompt Template</option>
-                <option value="TOOL">AI Tool / Integration</option>
-                <option value="POLICY">Policy / Guidelines</option>
-                <option value="PAPER">Research Paper</option>
-                <option value="PROJECT">Project / Example</option>
-                <option value="CONFERENCE">Conference Talk / Presentation</option>
-                <option value="DATASET">Dataset / Data</option>
+                <option value="TOOL">Tool (software or integration)</option>
+                <option value="POLICY">Policy (guidelines or governance)</option>
+                <option value="PAPER">Paper (research or article)</option>
+                <option value="PROJECT">Project (example or case study)</option>
+                <option value="CONFERENCE">Conference (talk or presentation)</option>
+                <option value="DATASET">Dataset</option>
+                <option value="BOOK">Book</option>
+                <option value="OTHER">Other</option>
               </Select>
             </FormControl>
 
