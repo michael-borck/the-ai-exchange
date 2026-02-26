@@ -337,7 +337,7 @@ def create_resource(
         is_anonymous=resource_data.is_anonymous,
         parent_id=resource_data.parent_id,
         content_meta=resource_data.content_meta,
-        user_area=current_user.area,  # Auto-assign from user's area
+        user_area="General",  # Default area (User model has no area field yet)
     )
 
     session.add(new_resource)
