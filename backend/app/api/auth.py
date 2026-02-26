@@ -534,11 +534,21 @@ def forgot_password(
         select(User).where(User.email == forgot_request.email.lower())
     ).first()
 
-    if user and user.is_active and user.is_approved:
+    if not user:
+        logger.warning(f"Password reset requested for unknown email: {forgot_request.email.lower()}")
+    elif not user.is_active:
+        logger.warning(f"Password reset requested for inactive user: {user.email}")
+    elif not user.is_approved:
+        logger.warning(f"Password reset requested for unapproved user: {user.email}")
+    else:
         # Create and send password reset code
+        logger.info(f"Sending password reset email to {user.email}")
         success, _ = create_and_send_password_reset(session, user)
 
-        if not success:
+        if success:
+            logger.info(f"Password reset email sent successfully to {user.email}")
+        else:
+            logger.error(f"Failed to send password reset email to {user.email}")
             raise HTTPException(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 detail="Failed to send reset code. Please try again later.",

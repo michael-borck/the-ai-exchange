@@ -1,5 +1,6 @@
 """Email provider factory and implementations for flexible email delivery."""
 
+import logging
 import smtplib
 from abc import ABC, abstractmethod
 from email.mime.text import MIMEText
@@ -8,6 +9,8 @@ from email.utils import formataddr
 from typing import Any
 
 from app.core.config import settings
+
+logger = logging.getLogger(__name__)
 
 try:
     import requests
@@ -94,6 +97,8 @@ class SMTPEmailProvider(EmailProvider):
             from_email = from_email or settings.mail_from
             from_name = from_name or settings.mail_from_name
 
+            logger.info(f"SMTP: Sending '{subject}' to {to_email} via {settings.smtp_server}:{settings.smtp_port}")
+
             # Create message
             msg = MIMEMultipart("alternative")
             msg["Subject"] = subject
@@ -119,9 +124,10 @@ class SMTPEmailProvider(EmailProvider):
             smtp.send_message(msg)
             smtp.quit()
 
+            logger.info(f"SMTP: Successfully sent '{subject}' to {to_email}")
             return True
         except Exception as e:
-            print(f"Error sending email via SMTP: {e}")
+            logger.error(f"SMTP: Failed to send '{subject}' to {to_email}: {e}")
             return False
 
 
