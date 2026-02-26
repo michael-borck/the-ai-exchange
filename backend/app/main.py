@@ -15,6 +15,7 @@ from slowapi.errors import RateLimitExceeded
 from slowapi.middleware import SlowAPIMiddleware
 from sqlmodel import SQLModel
 
+from app import __version__
 from app.api import (
     admin,
     admin_config,
@@ -65,7 +66,7 @@ async def lifespan(_app: FastAPI) -> AsyncGenerator[None, None]:
 app = FastAPI(
     title=settings.project_name,
     description="Internal platform for sharing and discovering AI use cases",
-    version="0.1.0",
+    version=__version__,
     openapi_url=f"{settings.api_v1_str}/openapi.json",
     lifespan=lifespan,
 )
