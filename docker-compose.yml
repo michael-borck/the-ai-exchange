@@ -1,5 +1,3 @@
-version: "3.8"
-
 services:
   app:
     build: .
@@ -24,6 +22,9 @@ services:
       - ./data/uploads:/app/data/uploads
       - ./data/logs:/app/data/logs
 
+    labels:
+      - "com.centurylinklabs.watchtower.enable=true"
+    
     # All config is in backend/.env (mounted read-only above)
 
     # Health check
