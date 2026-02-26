@@ -487,7 +487,7 @@ export default function ResourceDetailPage() {
                           size="xs"
                           variant="ghost"
                           fontSize="xs"
-                          justify="flex-start"
+                          justifyContent="flex-start"
                           as="a"
                           href={`mailto:${email}`}
                         >

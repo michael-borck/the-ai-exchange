@@ -8,7 +8,6 @@ import {
   FormControl,
   FormLabel,
   Input,
-  VStack,
   Box,
   Text,
 } from "@chakra-ui/react";

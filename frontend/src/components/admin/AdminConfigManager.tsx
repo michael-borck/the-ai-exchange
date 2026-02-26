@@ -20,7 +20,6 @@ import {
   Input,
   Textarea,
   Switch,
-  Select,
   Tabs,
   TabList,
   Tab,
@@ -38,7 +37,6 @@ import {
   InputRightElement,
   IconButton,
   Grid,
-  GridItem,
 } from "@chakra-ui/react";
 import { ViewIcon, ViewOffIcon } from "@chakra-ui/icons";
 import { useAuth } from "@/hooks/useAuth";
@@ -97,13 +95,13 @@ export const AdminConfigManager = () => {
         });
 
         if (!snapshotRes.ok) throw new Error("Failed to fetch config snapshot");
-        const snapshot = await snapshotRes.json();
+        const snapshot: ConfigSnapshot = await snapshotRes.json();
         setConfigSnapshot(snapshot);
 
         // Initialize editable values from snapshot
         const editableInit: Record<string, any> = {};
-        Object.values(snapshot).forEach((group: SafeSettingGroup) => {
-          Object.values(group).forEach((setting: SafeSetting) => {
+        (Object.values(snapshot) as SafeSettingGroup[]).forEach((group) => {
+          (Object.values(group) as SafeSetting[]).forEach((setting) => {
             if (setting.editable) {
               editableInit[setting.name] = setting.value;
             }
@@ -306,7 +304,7 @@ export const AdminConfigManager = () => {
               {categoryName.replace(/_/g, " ")}
             </Heading>
             <SimpleGrid columns={{ base: 1, md: 2 }} gap={4}>
-              {Object.entries(settings).map(([key, setting]: [string, SafeSetting]) => (
+              {(Object.entries(settings) as [string, SafeSetting][]).map(([key, setting]) => (
                 <Box key={key} p={4} border="1px solid" borderColor="gray.200" borderRadius="md" bg="gray.50">
                   <HStack justify="space-between" mb={2}>
                     <Text fontWeight="semibold" fontSize="sm">
@@ -353,8 +351,8 @@ export const AdminConfigManager = () => {
     if (!configSnapshot) return null;
 
     const editableSettings: Array<[string, SafeSetting]> = [];
-    Object.values(configSnapshot).forEach((group) => {
-      Object.entries(group).forEach(([key, setting]: [string, SafeSetting]) => {
+    (Object.values(configSnapshot) as SafeSettingGroup[]).forEach((group) => {
+      (Object.entries(group) as [string, SafeSetting][]).forEach(([key, setting]) => {
         if (setting.editable) {
           editableSettings.push([key, setting]);
         }

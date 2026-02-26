@@ -57,8 +57,7 @@ function DisciplineGridItem({ specialty }: { specialty: DisciplineCard }) {
 
 export default function HomePage() {
   const navigate = useNavigate();
-  const { user } = useAuth();
-  const isLoggedIn = !!user;
+  useAuth();
 
   // Fetch all resources
   const { data: allResources = [], isLoading } = useResources({});

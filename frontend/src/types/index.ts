@@ -91,6 +91,7 @@ export interface RegisterRequest {
 export interface UserUpdateRequest {
   full_name?: string;
   professional_roles?: ProfessionalRole[];
+  specialties?: string[];
   notification_prefs?: {
     notify_requests?: boolean;
     notify_solutions?: boolean;

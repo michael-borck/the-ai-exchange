@@ -53,7 +53,7 @@ const TOOL_CATEGORIES = [
 export default function CreateResourcePage() {
   const navigate = useNavigate();
   const toast = useToast();
-  const { user } = useAuth();
+  useAuth();
   const createMutation = useCreateResource();
 
   const [type, setType] = useState<ResourceType>("REQUEST");

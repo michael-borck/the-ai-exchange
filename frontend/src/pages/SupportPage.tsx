@@ -25,7 +25,7 @@ import {
   AccordionPanel,
   AccordionIcon,
 } from "@chakra-ui/react";
-import { EmailIcon, ExternalLinkIcon } from "@chakra-ui/icons";
+import { EmailIcon } from "@chakra-ui/icons";
 import { useNavigate } from "react-router-dom";
 import { Layout } from "@/components/Layout";
 

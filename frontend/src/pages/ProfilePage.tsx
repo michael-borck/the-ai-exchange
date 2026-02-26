@@ -28,7 +28,6 @@ import {
   FormLabel,
   Spinner,
   Center,
-  Select,
 } from "@chakra-ui/react";
 import { useAuth } from "@/hooks/useAuth";
 import { useUpdateProfile } from "@/hooks/useAuth";

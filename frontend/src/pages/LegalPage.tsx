@@ -7,19 +7,16 @@ import {
   Heading,
   Text,
   VStack,
-  HStack,
   Divider,
   UnorderedList,
   ListItem,
   Link,
-  Icon,
   Tabs,
   TabList,
   TabPanels,
   Tab,
   TabPanel,
 } from "@chakra-ui/react";
-import { WarningIcon } from "@chakra-ui/icons";
 import { Layout } from "@/components/Layout";
 
 export default function LegalPage() {

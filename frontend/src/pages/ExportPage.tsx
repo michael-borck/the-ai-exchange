@@ -18,7 +18,6 @@ import {
   Spinner,
   Center,
   Text,
-  Select,
 } from "@chakra-ui/react";
 import { DownloadIcon } from "@chakra-ui/icons";
 import { Layout } from "@/components/Layout";
@@ -54,7 +53,7 @@ export default function ExportPage() {
       id: resource.id,
       title: resource.title,
       author_email: resource.author_email || "Anonymous",
-      creator_role: resource.user?.professional_role || "Educator",
+      creator_role: (resource as any).user?.professional_role || "Educator",
       time_saved: resource.time_saved_value ?? null,
       tools: flattenTools(resource.tools_used).join(", "),
       views: resource.analytics?.view_count ?? 0,
