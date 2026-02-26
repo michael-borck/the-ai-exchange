@@ -36,6 +36,26 @@ interface SavedResource {
 }
 
 /**
+ * Track a view of a resource (fire-and-forget on page load)
+ */
+export const useTrackView = (resourceId: string) => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async () => {
+      const response = await apiClient.post<{ resource_id: string; view_count: number; status: string }>(
+        `/resources/${resourceId}/view`
+      );
+      return response.data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["resource", resourceId] });
+      queryClient.invalidateQueries({ queryKey: ["resources"] });
+    },
+  });
+};
+
+/**
  * Toggle save status for a resource
  */
 export const useSaveResource = () => {

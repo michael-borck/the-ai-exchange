@@ -25,8 +25,8 @@ import {
 } from "@chakra-ui/react";
 import { useAuth } from "@/hooks/useAuth";
 import { useResource, useDeleteResource, useResources } from "@/hooks/useResources";
-import { useSaveResource, useTriedResource, useIsResourceSaved, useResourceUsersTried } from "@/hooks/useEngagement";
-import { useMemo } from "react";
+import { useSaveResource, useTriedResource, useTrackView, useIsResourceSaved, useResourceUsersTried } from "@/hooks/useEngagement";
+import { useEffect, useMemo, useRef } from "react";
 
 export default function ResourceDetailPage() {
   const navigate = useNavigate();
@@ -43,6 +43,16 @@ export default function ResourceDetailPage() {
   const { data: isSavedData } = useIsResourceSaved(id || "", !!user);
   const { data: usersTried = [] } = useResourceUsersTried(id || "");
   const hasSaved = isSavedData ?? false;
+
+  // Track view once when the resource loads
+  const trackViewMutation = useTrackView(id || "");
+  const hasTrackedView = useRef(false);
+  useEffect(() => {
+    if (id && resource && !hasTrackedView.current) {
+      hasTrackedView.current = true;
+      trackViewMutation.mutate();
+    }
+  }, [id, resource]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Get engagement stats from resource analytics
   const engagementStats = useMemo(() => {
