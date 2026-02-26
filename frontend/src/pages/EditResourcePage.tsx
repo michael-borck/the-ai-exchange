@@ -242,14 +242,16 @@ export default function EditResourcePage() {
               <FormLabel fontWeight="bold">AI Tools & Technologies Used</FormLabel>
               <Box borderWidth="1px" borderColor="gray.200" borderRadius="md" p={4} bg="gray.50">
                 {TOOL_CATEGORIES.map((tool) => (
-                  <Tooltip key={tool.key} label={tool.tooltip} placement="right" hasArrow>
-                    <Checkbox
-                      mb={2}
-                      isChecked={selectedTools.includes(tool.key)}
-                      onChange={() => handleToolToggle(tool.key)}
-                    >
-                      {tool.label}
-                    </Checkbox>
+                  <Tooltip key={tool.key} label={tool.tooltip} placement="right" hasArrow openDelay={300} closeOnClick>
+                    <Box display="inline-block" width="100%">
+                      <Checkbox
+                        mb={2}
+                        isChecked={selectedTools.includes(tool.key)}
+                        onChange={() => handleToolToggle(tool.key)}
+                      >
+                        {tool.label}
+                      </Checkbox>
+                    </Box>
                   </Tooltip>
                 ))}
               </Box>
