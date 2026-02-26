@@ -1034,3 +1034,4 @@ class UserRegistrationResponse(SQLModel):
 
     email: str
     message: str
+    email_sent: bool = True

@@ -19,7 +19,7 @@ import {
   Text,
   Badge,
 } from "@chakra-ui/react";
-import { useAdminUsers, useUpdateUserRole, useUpdateUserStatus, useApproveUser, useDeleteUser } from "@/hooks/useAdminUsers";
+import { useAdminUsers, useUpdateUserRole, useUpdateUserStatus, useApproveUser, useVerifyUser, useDeleteUser } from "@/hooks/useAdminUsers";
 import { User } from "@/types/index";
 
 export function UserManagement() {
@@ -29,6 +29,7 @@ export function UserManagement() {
   const updateRoleMutation = useUpdateUserRole();
   const updateStatusMutation = useUpdateUserStatus();
   const approveMutation = useApproveUser();
+  const verifyMutation = useVerifyUser();
   const deleteMutation = useDeleteUser();
 
   const handleRoleChange = async (userId: string, role: "ADMIN" | "STAFF") => {
@@ -88,6 +89,25 @@ export function UserManagement() {
     }
   };
 
+  const handleVerify = async (userId: string) => {
+    try {
+      await verifyMutation.mutateAsync(userId);
+      toast({
+        title: "User email verified",
+        status: "success",
+        duration: 3000,
+        isClosable: true,
+      });
+    } catch {
+      toast({
+        title: "Failed to verify user",
+        status: "error",
+        duration: 5000,
+        isClosable: true,
+      });
+    }
+  };
+
   const handleDelete = async (userId: string) => {
     if (!window.confirm("Are you sure you want to delete this user and all their resources?")) {
       return;
@@ -136,6 +156,7 @@ export function UserManagement() {
             <Th>Name</Th>
             <Th>Role</Th>
             <Th>Status</Th>
+            <Th>Verified</Th>
             <Th>Approved</Th>
             <Th>Created</Th>
             <Th>Actions</Th>
@@ -161,6 +182,11 @@ export function UserManagement() {
               <Td>
                 <Badge colorScheme={user.is_active ? "green" : "red"}>
                   {user.is_active ? "Active" : "Inactive"}
+                </Badge>
+              </Td>
+              <Td>
+                <Badge colorScheme={user.is_verified ? "green" : "yellow"}>
+                  {user.is_verified ? "Verified" : "Pending"}
                 </Badge>
               </Td>
               <Td>
@@ -191,6 +217,16 @@ export function UserManagement() {
                       isLoading={updateStatusMutation.isPending}
                     >
                       Deactivate
+                    </Button>
+                  )}
+                  {!user.is_verified && (
+                    <Button
+                      size="xs"
+                      colorScheme="teal"
+                      onClick={() => handleVerify(user.id)}
+                      isLoading={verifyMutation.isPending}
+                    >
+                      Verify
                     </Button>
                   )}
                   {!user.is_approved && (

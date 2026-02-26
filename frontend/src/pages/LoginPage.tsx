@@ -3,7 +3,7 @@
  */
 
 import React, { useState } from "react";
-import { useNavigate, Link as RouterLink } from "react-router-dom";
+import { useNavigate, useLocation, Link as RouterLink } from "react-router-dom";
 import {
   Container,
   Box,
@@ -25,8 +25,10 @@ import PasswordResetFlow from "@/components/PasswordResetFlow";
 
 export default function LoginPage() {
   const navigate = useNavigate();
+  const location = useLocation();
   const toast = useToast();
   const { isAuthenticated } = useAuth();
+  const sessionExpired = location.state?.sessionExpired === true;
   const loginMutation = useLogin();
   const {
     isOpen: isPasswordResetOpen,
@@ -101,6 +103,16 @@ export default function LoginPage() {
             Sign in to access requests, share solutions, and grow your AI expertise
           </Text>
         </VStack>
+
+        {sessionExpired && (
+          <Alert status="info" borderRadius="md">
+            <AlertIcon />
+            <Text fontSize="sm">
+              For your security, you've been logged out after a period of
+              inactivity. Please log in again.
+            </Text>
+          </Alert>
+        )}
 
         <Box width="full" as="form" onSubmit={handleSubmit}>
           <VStack spacing={4}>

@@ -1,11 +1,14 @@
 """Authentication routes for user login and registration."""
 
+import logging
 from datetime import UTC, datetime, timedelta
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, Header, HTTPException, Request, status
 from pydantic import BaseModel
 from sqlmodel import Session, select
+
+logger = logging.getLogger(__name__)
 
 from app.core.config import settings
 from app.core.rate_limiter import (
@@ -233,16 +236,25 @@ def register(
     session.commit()
 
     # Send verification email
+    email_sent = False
     try:
-        send_verification_email(new_user, verification_code)
+        email_sent = send_verification_email(new_user, verification_code)
     except Exception as e:
-        # Log error but continue - email may fail in dev environment
-        print(f"Warning: Failed to send verification email: {e}")
+        logger.error(f"Failed to send verification email to {new_user.email}: {e}")
 
-    return UserRegistrationResponse(
-        email=new_user.email,
-        message="Registration successful. Please check your email for verification code.",
-    )
+    if email_sent:
+        return UserRegistrationResponse(
+            email=new_user.email,
+            message="Registration successful. Please check your email for verification code.",
+            email_sent=True,
+        )
+    else:
+        logger.warning(f"Verification email failed for {new_user.email}")
+        return UserRegistrationResponse(
+            email=new_user.email,
+            message="Account created, but we couldn't send the verification email. Please contact an administrator.",
+            email_sent=False,
+        )
 
 
 @router.post("/verify-email", response_model=TokenResponse, status_code=status.HTTP_200_OK)

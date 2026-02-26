@@ -28,8 +28,9 @@ export default function VerifyEmailPage() {
   const { isAuthenticated } = useAuth();
   const verifyEmailMutation = useVerifyEmail();
 
-  // Get email from location state (passed from register page)
+  // Get email and email failure flag from location state (passed from register page)
   const email = (location.state?.email as string) || "";
+  const emailFailed = location.state?.emailFailed === true;
 
   const [code, setCode] = useState("");
   const [apiError, setApiError] = useState("");
@@ -102,11 +103,24 @@ export default function VerifyEmailPage() {
         <VStack spacing={3} textAlign="center">
           <Heading size="lg">Verify Your Email</Heading>
           <Text color="gray.600">
-            We've sent a 6-digit verification code to
+            {emailFailed
+              ? "Your account was created but we couldn't send the verification email."
+              : "We've sent a 6-digit verification code to"}
             <br />
             <strong>{email || "your email"}</strong>
           </Text>
         </VStack>
+
+        {emailFailed && (
+          <Alert status="warning" borderRadius="md">
+            <AlertIcon />
+            <Text fontSize="sm">
+              The verification email could not be sent. Please contact an
+              administrator to verify your account, or try the "Resend Code"
+              button below.
+            </Text>
+          </Alert>
+        )}
 
         <Box width="full" as="form" onSubmit={handleSubmit}>
           <VStack spacing={4}>

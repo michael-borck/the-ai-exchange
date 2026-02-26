@@ -92,15 +92,25 @@ export default function RegisterPage() {
         specialties: specialty ? [specialty] : [],
       });
 
-      toast({
-        title: "Account created successfully",
-        description: `Welcome, ${response.full_name}! Please verify your email to complete registration.`,
-        status: "success",
-        duration: 3000,
-        isClosable: true,
-      });
+      if (response.email_sent === false) {
+        toast({
+          title: "Account created",
+          description: response.message || "We couldn't send the verification email. Please contact an administrator.",
+          status: "warning",
+          duration: 8000,
+          isClosable: true,
+        });
+      } else {
+        toast({
+          title: "Account created successfully",
+          description: "Please check your email for a verification code.",
+          status: "success",
+          duration: 3000,
+          isClosable: true,
+        });
+      }
 
-      navigate("/verify-email", { state: { email } });
+      navigate("/verify-email", { state: { email, emailFailed: response.email_sent === false } });
     } catch (error: unknown) {
       const errorMessage = getErrorMessage(error);
       setApiError(errorMessage);

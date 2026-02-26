@@ -88,6 +88,12 @@ export interface RegisterRequest {
   specialties?: string[];
 }
 
+export interface RegistrationResponse {
+  email: string;
+  message: string;
+  email_sent: boolean;
+}
+
 export interface UserUpdateRequest {
   full_name?: string;
   professional_roles?: ProfessionalRole[];

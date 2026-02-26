@@ -12,6 +12,7 @@ import {
   RegisterRequest,
   UserUpdateRequest,
   TokenResponse,
+  RegistrationResponse,
   Subscription,
 } from "@/types/index";
 
@@ -76,7 +77,8 @@ class ApiClient {
           // Clear tokens on 401
           localStorage.removeItem("access_token");
           localStorage.removeItem("refresh_token");
-          // Don't redirect here - let the app handle it through auth state
+          // Notify React auth state via custom event
+          window.dispatchEvent(new CustomEvent("auth:session-expired"));
         }
         return Promise.reject(error);
       }
@@ -84,12 +86,11 @@ class ApiClient {
   }
 
   // Auth endpoints
-  async register(data: RegisterRequest): Promise<TokenResponse> {
-    const response = await this.axiosInstance.post<TokenResponse>(
+  async register(data: RegisterRequest): Promise<RegistrationResponse> {
+    const response = await this.axiosInstance.post<RegistrationResponse>(
       "/auth/register",
       data
     );
-    this.setTokens(response.data);
     return response.data;
   }
 

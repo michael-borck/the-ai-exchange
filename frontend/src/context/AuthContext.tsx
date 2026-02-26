@@ -3,6 +3,7 @@
  */
 
 import React, { createContext, useContext, useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { User } from "@/types/index";
 import { apiClient } from "@/lib/api";
 
@@ -19,6 +20,7 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const navigate = useNavigate();
 
   // Check if user is already logged in on mount
   useEffect(() => {
@@ -39,6 +41,19 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     initializeAuth();
   }, []);
+
+  // Listen for session expiry events from the API interceptor
+  useEffect(() => {
+    const handleSessionExpired = () => {
+      setUser(null);
+      navigate("/login", { state: { sessionExpired: true } });
+    };
+
+    window.addEventListener("auth:session-expired", handleSessionExpired);
+    return () => {
+      window.removeEventListener("auth:session-expired", handleSessionExpired);
+    };
+  }, [navigate]);
 
   const logout = () => {
     apiClient.logout();

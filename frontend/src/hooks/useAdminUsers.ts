@@ -90,6 +90,25 @@ export function useApproveUser() {
 }
 
 /**
+ * Force-verify a user's email (admin only)
+ */
+export function useVerifyUser() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (userId: string) => {
+      const response = await api.patch<User>(
+        `/admin/users/${userId}/verify`
+      );
+      return response.data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["admin", "users"] });
+    },
+  });
+}
+
+/**
  * Delete user and all their resources
  */
 export function useDeleteUser() {

@@ -227,6 +227,42 @@ def approve_user(
     return user
 
 
+@router.patch("/users/{user_id}/verify", response_model=UserResponse)
+def verify_user(
+    user_id: UUID,
+    current_user: User = Depends(get_current_user),
+    session: Session = Depends(get_session),
+) -> UserResponse:
+    """Force-verify a user's email (admin only).
+
+    Args:
+        user_id: User ID
+        current_user: Current authenticated user
+        session: Database session
+
+    Returns:
+        Updated user
+
+    Raises:
+        HTTPException: If not admin or user not found
+    """
+    check_admin(current_user)
+
+    user = session.get(User, user_id)
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="User not found",
+        )
+
+    user.is_verified = True
+    session.add(user)
+    session.commit()
+    session.refresh(user)
+
+    return user
+
+
 @router.delete("/users/{user_id}", status_code=status.HTTP_204_NO_CONTENT)
 def delete_user(
     user_id: UUID,
