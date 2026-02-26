@@ -126,11 +126,12 @@ def list_resources(
 
     if professional_roles:
         # Parse comma-separated professional roles (e.g., "Educator,Researcher")
-        # Filter resources by the creator's professional role
+        # Filter resources by the creator's professional roles (JSON list field)
         from sqlalchemy import or_
         roles = [r.strip() for r in professional_roles.split(",")]
-        # Join with User table to filter by professional_role
-        query = query.join(User, Resource.user_id == User.id).where(User.professional_role.in_(roles))
+        # Join with User table and check if any role matches the JSON array
+        role_conditions = [User.professional_roles.contains(role) for role in roles]  # type: ignore[union-attr]
+        query = query.join(User, Resource.user_id == User.id).where(or_(*role_conditions))
 
     if min_time_saved is not None:
         query = query.where(Resource.time_saved_value >= min_time_saved)  # type: ignore[operator]
