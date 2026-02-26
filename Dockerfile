@@ -2,6 +2,10 @@
 # Builds frontend, serves both frontend and backend API from single container
 FROM python:3.11-slim
 
+LABEL org.opencontainers.image.source="https://github.com/michael-borck/the-ai-exchange"
+LABEL org.opencontainers.image.description="The AI Exchange - AI use case sharing platform for SoMM"
+LABEL org.opencontainers.image.licenses="MIT"
+
 # Install Node.js, build tools, and other dependencies
 RUN apt-get update && apt-get install -y \
     curl \

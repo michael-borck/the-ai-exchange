@@ -1,0 +1,37 @@
+# VPS production compose — no source code needed, just this file + .env
+# See deploy/.env.example for all configurable variables
+#
+# Usage:
+#   cp .env.example .env && vim .env
+#   docker compose up -d
+
+services:
+  app:
+    image: ghcr.io/michael-borck/the-ai-exchange:latest
+    container_name: ai-exchange
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    env_file: .env
+    volumes:
+      - ./data/db:/app/data/db
+      - ./data/uploads:/app/data/uploads
+      - ./data/logs:/app/data/logs
+    labels:
+      - "com.centurylinklabs.watchtower.enable=true"
+    networks:
+      - caddy_default
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 5s
+
+  # Watchtower is NOT included here — use a single shared Watchtower instance.
+  # The app container has the com.centurylinklabs.watchtower.enable=true label,
+  # so any label-filtered Watchtower will pick it up automatically.
+
+networks:
+  caddy_default:
+    external: true
