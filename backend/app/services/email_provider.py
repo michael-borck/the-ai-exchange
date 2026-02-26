@@ -4,6 +4,7 @@ import smtplib
 from abc import ABC, abstractmethod
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
+from email.utils import formataddr
 from typing import Any
 
 from app.core.config import settings
@@ -23,16 +24,18 @@ class EmailProvider(ABC):
         self,
         to_email: str,
         subject: str,
-        body: str,
+        html_body: str,
+        text_body: str,
         from_email: str | None = None,
         from_name: str | None = None,
     ) -> bool:
-        """Send an email.
+        """Send an email with both HTML and plain text bodies.
 
         Args:
             to_email: Recipient email address
             subject: Email subject
-            body: Email body (HTML or plain text)
+            html_body: Email body as HTML
+            text_body: Email body as plain text (fallback)
             from_email: Sender email address
             from_name: Sender name
 
@@ -49,7 +52,8 @@ class DevEmailProvider(EmailProvider):
         self,
         to_email: str,
         subject: str,
-        body: str,
+        html_body: str,
+        text_body: str,
         from_email: str | None = None,
         from_name: str | None = None,
     ) -> bool:
@@ -61,11 +65,13 @@ class DevEmailProvider(EmailProvider):
             f"\n{'='*70}\n"
             f"[DEV EMAIL]\n"
             f"{'='*70}\n"
-            f"From: {from_name} <{from_email}>\n"
+            f"From: {formataddr((from_name, from_email))}\n"
             f"To: {to_email}\n"
             f"Subject: {subject}\n"
             f"{'='*70}\n"
-            f"{body}\n"
+            f"[PLAIN TEXT]\n{text_body}\n"
+            f"{'='*70}\n"
+            f"[HTML]\n{html_body}\n"
             f"{'='*70}\n"
         )
         return True
@@ -78,7 +84,8 @@ class SMTPEmailProvider(EmailProvider):
         self,
         to_email: str,
         subject: str,
-        body: str,
+        html_body: str,
+        text_body: str,
         from_email: str | None = None,
         from_name: str | None = None,
     ) -> bool:
@@ -90,10 +97,12 @@ class SMTPEmailProvider(EmailProvider):
             # Create message
             msg = MIMEMultipart("alternative")
             msg["Subject"] = subject
-            msg["From"] = f"{from_name} <{from_email}>"
+            msg["From"] = formataddr((from_name, from_email))
             msg["To"] = to_email
 
-            msg.attach(MIMEText(body, "html"))
+            # Order matters: plain text first, HTML last (preferred by clients)
+            msg.attach(MIMEText(text_body, "plain"))
+            msg.attach(MIMEText(html_body, "html"))
 
             # Connect and send
             if settings.use_ssl:
@@ -123,7 +132,8 @@ class GmailEmailProvider(EmailProvider):
         self,
         to_email: str,
         subject: str,
-        body: str,
+        html_body: str,
+        text_body: str,
         from_email: str | None = None,
         from_name: str | None = None,
     ) -> bool:
@@ -139,10 +149,11 @@ class GmailEmailProvider(EmailProvider):
             # Create message
             msg = MIMEMultipart("alternative")
             msg["Subject"] = subject
-            msg["From"] = f"{from_name} <{from_email}>"
+            msg["From"] = formataddr((from_name, from_email))
             msg["To"] = to_email
 
-            msg.attach(MIMEText(body, "html"))
+            msg.attach(MIMEText(text_body, "plain"))
+            msg.attach(MIMEText(html_body, "html"))
 
             # Connect to Gmail SMTP
             smtp = smtplib.SMTP_SSL("smtp.gmail.com", 465)
@@ -163,7 +174,8 @@ class SendGridEmailProvider(EmailProvider):
         self,
         to_email: str,
         subject: str,
-        body: str,
+        html_body: str,
+        text_body: str,
         from_email: str | None = None,
         from_name: str | None = None,
     ) -> bool:
@@ -190,7 +202,10 @@ class SendGridEmailProvider(EmailProvider):
                 "personalizations": [{"to": [{"email": to_email}]}],
                 "from": {"email": from_email, "name": from_name},
                 "subject": subject,
-                "content": [{"type": "text/html", "value": body}],
+                "content": [
+                    {"type": "text/plain", "value": text_body},
+                    {"type": "text/html", "value": html_body},
+                ],
             }
 
             response = requests.post(url, json=data, headers=headers, timeout=10)
@@ -208,7 +223,8 @@ class CurtinEmailProvider(EmailProvider):
         self,
         to_email: str,
         subject: str,
-        body: str,
+        html_body: str,
+        text_body: str,
         from_email: str | None = None,
         from_name: str | None = None,
     ) -> bool:
@@ -219,10 +235,11 @@ class CurtinEmailProvider(EmailProvider):
 
             msg = MIMEMultipart("alternative")
             msg["Subject"] = subject
-            msg["From"] = f"{from_name} <{from_email}>"
+            msg["From"] = formataddr((from_name, from_email))
             msg["To"] = to_email
 
-            msg.attach(MIMEText(body, "html"))
+            msg.attach(MIMEText(text_body, "plain"))
+            msg.attach(MIMEText(html_body, "html"))
 
             # Curtin uses TLS on port 587
             smtp = smtplib.SMTP(settings.smtp_server, settings.smtp_port)
