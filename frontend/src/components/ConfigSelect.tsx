@@ -123,7 +123,7 @@ export const ConfigSelect: React.FC<ConfigSelectProps> = ({
         value={value}
         onChange={handleSelectChange}
         placeholder={`Select ${label.toLowerCase()}`}
-        required={isRequired}
+        required={false}
       >
         {options.map((option) => (
           <option key={option.key} value={option.key}>

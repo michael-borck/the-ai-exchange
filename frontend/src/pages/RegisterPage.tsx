@@ -64,7 +64,7 @@ export default function RegisterPage() {
 
     // Validation
     if (!specialty) {
-      setApiError("Professional Specialty is required");
+      setApiError("Please select a professional specialty from the list");
       return;
     }
 

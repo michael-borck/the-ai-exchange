@@ -7,7 +7,7 @@ packages = ["app"]
 
 [project]
 name = "the-ai-exchange"
-version = "0.2.4"
+version = "0.2.5"
 description = "A centralized platform for sharing and discovering AI use cases and prompts in a business school environment"
 readme = "../README.md"
 license = { text = "MIT" }
