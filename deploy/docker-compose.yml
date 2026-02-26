@@ -18,20 +18,17 @@ services:
     networks:
       - caddy_default
 
+    # Load environment from .env file next to this compose file
+    env_file: .env
+
     # Mount volumes for persistent data
     volumes:
-      # Environment file
-      - ./backend/.env:/app/backend/.env:ro
-
-      # Persistent data directories
       - ./data/db:/app/data/db
       - ./data/uploads:/app/data/uploads
       - ./data/logs:/app/data/logs
 
     labels:
       - "com.centurylinklabs.watchtower.enable=true"
-
-    # All config is in backend/.env (mounted read-only above)
 
     # Health check
     healthcheck:
