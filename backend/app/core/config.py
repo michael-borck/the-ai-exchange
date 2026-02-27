@@ -51,6 +51,14 @@ class Settings(BaseSettings):
     use_ssl: bool = False
     validate_certs: bool = True
 
+    # Trusted Hosts
+    allowed_hosts: list[str] = [
+        "localhost",
+        "127.0.0.1",
+        "testserver",
+        "theaiexchange.serveur.au",
+    ]
+
     # CORS
     allowed_origins: list[str] = [
         "http://localhost:5173",

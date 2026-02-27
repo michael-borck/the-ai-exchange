@@ -94,12 +94,7 @@ app.add_middleware(SlowAPIMiddleware)
 # Add middleware for security
 app.add_middleware(
     TrustedHostMiddleware,
-    allowed_hosts=[
-        "localhost",
-        "127.0.0.1",
-        "testserver",  # For tests
-        "theaiexchange.serveur.au",
-    ],
+    allowed_hosts=settings.allowed_hosts,
 )
 
 # Add CORS middleware
