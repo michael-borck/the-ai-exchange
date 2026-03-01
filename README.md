@@ -1,5 +1,9 @@
 # The AI Exchange
 
+<!-- BADGES:START -->
+[![website](https://img.shields.io/badge/-website-2196f3?style=flat-square)](https://github.com/topics/website) [![artificial-intelligence](https://img.shields.io/badge/-artificial--intelligence-blue?style=flat-square)](https://github.com/topics/artificial-intelligence) [![edtech](https://img.shields.io/badge/-edtech-4caf50?style=flat-square)](https://github.com/topics/edtech) [![full-stack](https://img.shields.io/badge/-full--stack-blue?style=flat-square)](https://github.com/topics/full-stack) [![internal-platform](https://img.shields.io/badge/-internal--platform-blue?style=flat-square)](https://github.com/topics/internal-platform) [![knowledge-sharing](https://img.shields.io/badge/-knowledge--sharing-blue?style=flat-square)](https://github.com/topics/knowledge-sharing) [![machine-learning](https://img.shields.io/badge/-machine--learning-ff6f00?style=flat-square)](https://github.com/topics/machine-learning) [![nlp](https://img.shields.io/badge/-nlp-blue?style=flat-square)](https://github.com/topics/nlp) [![python](https://img.shields.io/badge/-python-3776ab?style=flat-square)](https://github.com/topics/python) [![typescript](https://img.shields.io/badge/-typescript-3178c6?style=flat-square)](https://github.com/topics/typescript)
+<!-- BADGES:END -->
+
 **The AI Exchange** is an internal platform designed for the **School of Marketing and Management (SoMM)** to facilitate the discovery, sharing, and discussion of Artificial Intelligence use cases and applications.
 
 The goal is to connect SoMM staff who are experimenting with AI ("The Spark") with those looking for guidance, while offering a safe ("Verified Anonymity") space to share failures, successes, and best practices in marketing and management contexts.
