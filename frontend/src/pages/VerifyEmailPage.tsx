@@ -2,7 +2,7 @@
  * Email Verification Page - Verify email with 6-digit code
  */
 
-import React, { useState } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import {
   Container,
@@ -17,7 +17,7 @@ import {
   AlertIcon,
   useToast,
 } from "@chakra-ui/react";
-import { useVerifyEmail } from "@/hooks/useAuth";
+import { useVerifyEmail, useResendVerification } from "@/hooks/useAuth";
 import { useAuth } from "@/context/AuthContext";
 import { getErrorMessage } from "@/lib/api";
 
@@ -27,6 +27,7 @@ export default function VerifyEmailPage() {
   const toast = useToast();
   const { isAuthenticated } = useAuth();
   const verifyEmailMutation = useVerifyEmail();
+  const resendMutation = useResendVerification();
 
   // Get email and email failure flag from location state (passed from register page)
   const email = (location.state?.email as string) || "";
@@ -34,6 +35,7 @@ export default function VerifyEmailPage() {
 
   const [code, setCode] = useState("");
   const [apiError, setApiError] = useState("");
+  const [cooldown, setCooldown] = useState(0);
 
   // Redirect if already logged in
   React.useEffect(() => {
@@ -48,6 +50,39 @@ export default function VerifyEmailPage() {
       navigate("/register");
     }
   }, [email, navigate]);
+
+  // Cooldown timer
+  useEffect(() => {
+    if (cooldown <= 0) return;
+    const timer = setInterval(() => {
+      setCooldown((prev) => prev - 1);
+    }, 1000);
+    return () => clearInterval(timer);
+  }, [cooldown]);
+
+  const handleResendCode = useCallback(async () => {
+    if (cooldown > 0 || resendMutation.isPending) return;
+
+    try {
+      await resendMutation.mutateAsync(email);
+      setCooldown(60);
+      toast({
+        title: "Verification code sent",
+        description: "Check your inbox and Junk/Spam folder.",
+        status: "success",
+        duration: 5000,
+        isClosable: true,
+      });
+    } catch (error: unknown) {
+      toast({
+        title: "Failed to resend code",
+        description: getErrorMessage(error),
+        status: "error",
+        duration: 5000,
+        isClosable: true,
+      });
+    }
+  }, [cooldown, email, resendMutation, toast]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -84,17 +119,6 @@ export default function VerifyEmailPage() {
         isClosable: true,
       });
     }
-  };
-
-  const handleResendCode = async () => {
-    // Optional: Implement resend code functionality
-    toast({
-      title: "Feature coming soon",
-      description: "Resend code functionality will be available soon.",
-      status: "info",
-      duration: 3000,
-      isClosable: true,
-    });
   };
 
   return (
@@ -140,7 +164,7 @@ export default function VerifyEmailPage() {
                 required
               />
               <Text fontSize="xs" color="whiteAlpha.600" mt={1}>
-                Enter the 6-digit code from your email
+                Enter the 6-digit code from your email. Can't find it? Check your Junk/Spam folder.
               </Text>
             </Box>
 
@@ -162,6 +186,14 @@ export default function VerifyEmailPage() {
           </VStack>
         </Box>
 
+        <Alert status="info" borderRadius="md">
+          <AlertIcon />
+          <Text fontSize="sm">
+            Please check your <strong>Junk/Spam</strong> folder if you don't see the email in your
+            inbox.
+          </Text>
+        </Alert>
+
         <VStack spacing={2} width="full">
           <Text fontSize="sm" color="whiteAlpha.600">
             Didn't receive the code?
@@ -172,8 +204,10 @@ export default function VerifyEmailPage() {
             size="sm"
             colorScheme="brand"
             onClick={handleResendCode}
+            isDisabled={cooldown > 0 || resendMutation.isPending}
+            isLoading={resendMutation.isPending}
           >
-            Resend Code
+            {cooldown > 0 ? `Resend Code (${cooldown}s)` : "Resend Code"}
           </Button>
         </VStack>
 

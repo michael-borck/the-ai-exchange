@@ -78,6 +78,7 @@ class Settings(BaseSettings):
     rate_limit_login: str = "5/minute"
     rate_limit_register: str = "3/minute"
     rate_limit_forgot_password: str = "3/minute"
+    rate_limit_resend_verification: str = "3/minute"
     rate_limit_reset_password: str = "5/minute"
     rate_limit_read: str = "60/minute"
     rate_limit_write: str = "30/minute"

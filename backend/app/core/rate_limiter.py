@@ -12,6 +12,7 @@ limiter = Limiter(key_func=get_remote_address, enabled=not settings.testing)
 LIMIT_LOGIN = settings.rate_limit_login
 LIMIT_REGISTER = settings.rate_limit_register
 LIMIT_FORGOT_PASSWORD = settings.rate_limit_forgot_password
+LIMIT_RESEND_VERIFICATION = settings.rate_limit_resend_verification
 LIMIT_RESET_PASSWORD = settings.rate_limit_reset_password
 LIMIT_READ = settings.rate_limit_read
 LIMIT_WRITE = settings.rate_limit_write

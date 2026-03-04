@@ -116,6 +116,14 @@ class ApiClient {
     return response.data;
   }
 
+  async resendVerification(email: string): Promise<{ message: string }> {
+    const response = await this.axiosInstance.post<{ message: string }>(
+      "/auth/resend-verification",
+      { email }
+    );
+    return response.data;
+  }
+
   logout(): void {
     localStorage.removeItem("access_token");
     localStorage.removeItem("refresh_token");

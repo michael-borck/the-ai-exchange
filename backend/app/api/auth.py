@@ -16,6 +16,7 @@ from app.core.rate_limiter import (
     LIMIT_LOGIN,
     LIMIT_REGISTER,
     LIMIT_RESET_PASSWORD,
+    LIMIT_RESEND_VERIFICATION,
     limiter,
 )
 from app.core.security import (
@@ -62,6 +63,18 @@ class LoginRequest(BaseModel):
 
     email: str
     password: str
+
+
+class ResendVerificationRequest(BaseModel):
+    """Resend verification code request payload."""
+
+    email: str
+
+
+class ResendVerificationResponse(BaseModel):
+    """Resend verification code response."""
+
+    message: str
 
 
 def get_current_user(
@@ -612,3 +625,75 @@ def reset_password(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Failed to reset password. Please try again.",
         ) from e
+
+
+@router.post("/resend-verification", response_model=ResendVerificationResponse)
+@limiter.limit(LIMIT_RESEND_VERIFICATION)
+def resend_verification(
+    request: Request,  # noqa: ARG001 - required by slowapi for rate limiting
+    resend_request: ResendVerificationRequest,
+    session: Session = Depends(get_session),
+) -> ResendVerificationResponse:
+    """Resend email verification code.
+
+    Generates a new 6-digit verification code and sends it to the user's email.
+    Always returns a success message to prevent email enumeration attacks.
+
+    Args:
+        resend_request: Request with email address
+        session: Database session
+
+    Returns:
+        Success message (generic to prevent email enumeration)
+    """
+    import secrets
+    import string
+
+    from app.models import EmailVerification
+    from app.services.email_service import send_verification_email
+
+    # Find user by email (but don't reveal if they exist)
+    user = session.exec(
+        select(User).where(User.email == resend_request.email.lower())
+    ).first()
+
+    if not user or user.is_verified:
+        # Return success anyway to prevent email enumeration
+        return ResendVerificationResponse(
+            message="If an unverified account with this email exists, a new verification code has been sent. Please check your inbox and Junk/Spam folder."
+        )
+
+    # Mark existing unused verification codes as used
+    existing_codes = session.exec(
+        select(EmailVerification).where(
+            (EmailVerification.user_id == user.id)
+            & (EmailVerification.used == False)  # noqa: E712
+        )
+    ).all()
+
+    for code in existing_codes:
+        code.used = True
+        session.add(code)
+
+    # Generate new 6-digit verification code
+    digits = string.digits
+    verification_code = "".join(secrets.choice(digits) for _ in range(6))
+
+    # Create new EmailVerification record
+    verification = EmailVerification(
+        user_id=user.id,
+        code=verification_code,
+        expires_at=datetime.now(UTC) + timedelta(minutes=60),
+    )
+    session.add(verification)
+    session.commit()
+
+    # Send verification email
+    try:
+        send_verification_email(user, verification_code)
+    except Exception as e:
+        logger.error(f"Failed to send verification email to {user.email}: {e}")
+
+    return ResendVerificationResponse(
+        message="If an unverified account with this email exists, a new verification code has been sent. Please check your inbox and Junk/Spam folder."
+    )

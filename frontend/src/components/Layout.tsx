@@ -79,7 +79,9 @@ export function Layout({ children }: LayoutProps) {
           key={item.href}
           width="full"
           variant={isActive(item.href) ? "solid" : "ghost"}
-          colorScheme={isActive(item.href) ? "brand" : "gray"}
+          colorScheme={isActive(item.href) ? "brand" : undefined}
+          color={isActive(item.href) ? "white" : "whiteAlpha.900"}
+          _hover={isActive(item.href) ? undefined : { bg: "whiteAlpha.200" }}
           justifyContent="flex-start"
           onClick={() => handleNavClick(item.href)}
         >
@@ -92,13 +94,14 @@ export function Layout({ children }: LayoutProps) {
           <Button
             width="full"
             variant="ghost"
-            colorScheme="gray"
+            color="whiteAlpha.900"
+            _hover={{ bg: "whiteAlpha.200" }}
             justifyContent="flex-start"
             onClick={() => handleNavClick("/login")}
           >
             Login
           </Button>
-          <Button width="full" colorScheme="brand" onClick={() => handleNavClick("/register")}>
+          <Button width="full" colorScheme="brand" color="white" onClick={() => handleNavClick("/register")}>
             Sign Up
           </Button>
         </>
@@ -109,7 +112,8 @@ export function Layout({ children }: LayoutProps) {
           <Button
             width="full"
             variant="ghost"
-            colorScheme="gray"
+            color="whiteAlpha.900"
+            _hover={{ bg: "whiteAlpha.200" }}
             justifyContent="flex-start"
             onClick={() => {
               handleNavClick("/profile");
@@ -120,7 +124,8 @@ export function Layout({ children }: LayoutProps) {
           <Button
             width="full"
             variant="ghost"
-            colorScheme="red"
+            color="red.300"
+            _hover={{ bg: "whiteAlpha.200" }}
             justifyContent="flex-start"
             onClick={handleLogout}
           >
@@ -158,7 +163,9 @@ export function Layout({ children }: LayoutProps) {
               <Button
                 key={item.href}
                 variant={isActive(item.href) ? "solid" : "ghost"}
-                colorScheme={isActive(item.href) ? "brand" : "gray"}
+                colorScheme={isActive(item.href) ? "brand" : undefined}
+                color={isActive(item.href) ? "white" : "whiteAlpha.900"}
+                _hover={isActive(item.href) ? undefined : { bg: "whiteAlpha.200" }}
                 size="sm"
                 onClick={() => navigate(item.href)}
               >
@@ -173,11 +180,13 @@ export function Layout({ children }: LayoutProps) {
               // Public/Guest View
               <>
                 <Button
-                  colorScheme="brand"
                   variant="outline"
                   size="sm"
                   onClick={() => navigate("/login")}
                   display={{ base: "none", md: "flex" }}
+                  color="brand.200"
+                  borderColor="brand.400"
+                  _hover={{ bg: "brand.600", color: "white", borderColor: "brand.500" }}
                 >
                   Login
                 </Button>
@@ -186,6 +195,7 @@ export function Layout({ children }: LayoutProps) {
                   size="sm"
                   onClick={() => navigate("/register")}
                   display={{ base: "none", md: "flex" }}
+                  color="white"
                 >
                   Sign Up
                 </Button>
@@ -213,11 +223,13 @@ export function Layout({ children }: LayoutProps) {
                   </MenuList>
                 </Menu>
                 <Button
-                  colorScheme="brand"
                   variant="outline"
                   size="sm"
                   onClick={handleLogout}
                   display={{ base: "none", md: "flex" }}
+                  color="brand.200"
+                  borderColor="brand.400"
+                  _hover={{ bg: "brand.600", color: "white", borderColor: "brand.500" }}
                 >
                   Logout
                 </Button>
@@ -231,6 +243,8 @@ export function Layout({ children }: LayoutProps) {
               display={{ base: "flex", lg: "none" }}
               onClick={onOpen}
               variant="ghost"
+              color="whiteAlpha.900"
+              _hover={{ bg: "whiteAlpha.200" }}
             />
           </HStack>
         </Container>

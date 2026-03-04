@@ -56,5 +56,11 @@ export function useVerifyEmail() {
   });
 }
 
+export function useResendVerification() {
+  return useMutation({
+    mutationFn: (email: string) => apiClient.resendVerification(email),
+  });
+}
+
 // Re-export useAuth from context
 export { useAuth } from "@/context/AuthContext";
