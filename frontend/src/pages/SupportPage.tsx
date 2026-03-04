@@ -2,6 +2,7 @@
  * Support Page - Contact, FAQ, Reporting, and Feedback
  */
 
+import { useState } from "react";
 import {
   Box,
   Heading,
@@ -24,13 +25,77 @@ import {
   AccordionButton,
   AccordionPanel,
   AccordionIcon,
+  Input,
+  Textarea,
+  Select,
+  useToast,
 } from "@chakra-ui/react";
 import { EmailIcon } from "@chakra-ui/icons";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
+import { useMutation } from "@tanstack/react-query";
 import { Layout } from "@/components/Layout";
+import { apiClient, getErrorMessage } from "@/lib/api";
+import { useAuth } from "@/context/AuthContext";
+
+const TAB_NAMES = ["contact", "faq", "report", "feedback"];
 
 export default function SupportPage() {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const toast = useToast();
+  const { user } = useAuth();
+
+  const tabParam = searchParams.get("tab");
+  const defaultTabIndex = tabParam ? Math.max(0, TAB_NAMES.indexOf(tabParam)) : 0;
+
+  const [feedbackType, setFeedbackType] = useState("General Comments");
+  const [feedbackSubject, setFeedbackSubject] = useState("");
+  const [feedbackMessage, setFeedbackMessage] = useState("");
+
+  const feedbackMutation = useMutation({
+    mutationFn: (data: { feedback_type: string; subject: string; message: string }) =>
+      apiClient.submitFeedback(data),
+  });
+
+  const handleFeedbackSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (!feedbackSubject.trim() || !feedbackMessage.trim()) {
+      toast({
+        title: "Please fill in all fields",
+        status: "warning",
+        duration: 3000,
+        isClosable: true,
+      });
+      return;
+    }
+
+    try {
+      const result = await feedbackMutation.mutateAsync({
+        feedback_type: feedbackType,
+        subject: feedbackSubject,
+        message: feedbackMessage,
+      });
+      toast({
+        title: "Feedback sent",
+        description: result.message,
+        status: "success",
+        duration: 5000,
+        isClosable: true,
+      });
+      setFeedbackSubject("");
+      setFeedbackMessage("");
+      setFeedbackType("General Comments");
+    } catch (error: unknown) {
+      toast({
+        title: "Failed to send feedback",
+        description: getErrorMessage(error),
+        status: "error",
+        duration: 5000,
+        isClosable: true,
+      });
+    }
+  };
 
   return (
     <Layout>
@@ -48,7 +113,7 @@ export default function SupportPage() {
         <Divider />
 
         {/* Tabbed Interface */}
-        <Tabs variant="soft-rounded" colorScheme="brand">
+        <Tabs variant="soft-rounded" colorScheme="brand" defaultIndex={defaultTabIndex}>
           <TabList mb={4} flexWrap="wrap">
             <Tab>Contact Us</Tab>
             <Tab>FAQ</Tab>
@@ -392,71 +457,77 @@ export default function SupportPage() {
                   </Text>
                 </Box>
 
-                <Box bg="green.900" p={6} borderRadius="lg">
-                  <Heading size="md" mb={3} color="green.100">
-                    We Value Your Input
-                  </Heading>
-                  <Text color="green.100" mb={4}>
-                    Your feedback helps us build a better platform. We review all suggestions and
-                    use them to guide development.
-                  </Text>
-                  <Button
-                    as={Link}
-                    href="mailto:michael.borck@curtin.edu.au?subject=Feedback%20for%20The%20AI%20Exchange"
-                    rightIcon={<EmailIcon />}
-                    colorScheme="green"
-                    variant="solid"
-                    cursor="pointer"
-                    textDecoration="none"
-                    _hover={{ textDecoration: "none" }}
+                {user ? (
+                  <Box
+                    as="form"
+                    onSubmit={handleFeedbackSubmit}
+                    bg="dark.card"
+                    p={6}
+                    borderRadius="lg"
+                    border="1px"
+                    borderColor="dark.border"
                   >
-                    Send Feedback
-                  </Button>
-                </Box>
+                    <VStack spacing={4} align="stretch">
+                      <Box>
+                        <Text fontSize="sm" fontWeight="medium" mb={2}>
+                          Feedback Type
+                        </Text>
+                        <Select
+                          value={feedbackType}
+                          onChange={(e) => setFeedbackType(e.target.value)}
+                        >
+                          <option value="Feature Request">Feature Request</option>
+                          <option value="Bug Report">Bug Report</option>
+                          <option value="UI/UX Improvement">UI/UX Improvement</option>
+                          <option value="Content Suggestion">Content Suggestion</option>
+                          <option value="General Comments">General Comments</option>
+                        </Select>
+                      </Box>
 
-                <Box>
-                  <Heading size="md" mb={3}>
-                    Types of Feedback We're Looking For
-                  </Heading>
-                  <UnorderedList spacing={3}>
-                    <ListItem>
-                      <strong>Feature Requests:</strong> What new capabilities would make The AI
-                      Exchange more useful for you?
-                    </ListItem>
-                    <ListItem>
-                      <strong>UI/UX Improvements:</strong> Are there parts of the interface that are
-                      confusing or could be better?
-                    </ListItem>
-                    <ListItem>
-                      <strong>Bug Reports:</strong> Found something broken? Tell us how to reproduce
-                      it.
-                    </ListItem>
-                    <ListItem>
-                      <strong>Content Suggestions:</strong> Are there specialties, categories, or
-                      resource types we're missing?
-                    </ListItem>
-                    <ListItem>
-                      <strong>General Comments:</strong> Anything else you'd like us to know?
-                    </ListItem>
-                  </UnorderedList>
-                </Box>
+                      <Box>
+                        <Text fontSize="sm" fontWeight="medium" mb={2}>
+                          Subject
+                        </Text>
+                        <Input
+                          placeholder="Brief summary of your feedback"
+                          value={feedbackSubject}
+                          onChange={(e) => setFeedbackSubject(e.target.value)}
+                          required
+                        />
+                      </Box>
 
-                <Box>
-                  <Heading size="md" mb={3}>
-                    Share Ideas for Improvement
-                  </Heading>
-                  <Text mb={3}>
-                    Ironically, you can also share your ideas for improving The AI Exchange itself!
-                    Use the "Share Idea" feature and tag it with "Platform Improvement" or similar.
-                  </Text>
-                  <Button
-                    colorScheme="brand"
-                    variant="outline"
-                    onClick={() => navigate("/resources/new")}
-                  >
-                    Share an Improvement Idea
-                  </Button>
-                </Box>
+                      <Box>
+                        <Text fontSize="sm" fontWeight="medium" mb={2}>
+                          Message
+                        </Text>
+                        <Textarea
+                          placeholder="Describe your feedback in detail..."
+                          value={feedbackMessage}
+                          onChange={(e) => setFeedbackMessage(e.target.value)}
+                          rows={6}
+                          required
+                        />
+                      </Box>
+
+                      <Button
+                        type="submit"
+                        colorScheme="brand"
+                        rightIcon={<EmailIcon />}
+                        isLoading={feedbackMutation.isPending}
+                        color="white"
+                      >
+                        Send Feedback
+                      </Button>
+                    </VStack>
+                  </Box>
+                ) : (
+                  <Box bg="dark.subtle" p={6} borderRadius="lg" textAlign="center">
+                    <Text mb={4}>Please log in to send feedback.</Text>
+                    <Button colorScheme="brand" color="white" onClick={() => navigate("/login")}>
+                      Login
+                    </Button>
+                  </Box>
+                )}
 
                 <Box bg="dark.subtle" p={4} borderRadius="md">
                   <Text fontSize="sm" color="whiteAlpha.700">

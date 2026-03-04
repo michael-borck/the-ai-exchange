@@ -25,6 +25,7 @@ from app.api import (
     comments,
     config,
     config_requests,
+    feedback,
     prompts,
     resources,
     subscriptions,
@@ -128,6 +129,7 @@ app.include_router(analytics.router)
 app.include_router(admin.router)
 app.include_router(admin_config.router)
 app.include_router(subscriptions.router)
+app.include_router(feedback.router)
 app.include_router(config.router)
 app.include_router(config_requests.router)
 

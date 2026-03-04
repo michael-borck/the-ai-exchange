@@ -124,6 +124,15 @@ class ApiClient {
     return response.data;
   }
 
+  async submitFeedback(data: {
+    feedback_type: string;
+    subject: string;
+    message: string;
+  }): Promise<{ message: string }> {
+    const response = await this.axiosInstance.post<{ message: string }>("/feedback", data);
+    return response.data;
+  }
+
   logout(): void {
     localStorage.removeItem("access_token");
     localStorage.removeItem("refresh_token");

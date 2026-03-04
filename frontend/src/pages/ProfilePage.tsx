@@ -28,6 +28,7 @@ import {
   FormLabel,
   Spinner,
   Center,
+  Link,
 } from "@chakra-ui/react";
 import { useAuth } from "@/hooks/useAuth";
 import { useUpdateProfile } from "@/hooks/useAuth";
@@ -618,16 +619,16 @@ export default function ProfilePage() {
                   <Box bg="red.900" p={4} borderRadius="lg" border="1px" borderColor="red.700">
                     <VStack align="flex-start" spacing={3}>
                       <Text fontSize="sm" color="whiteAlpha.700">
-                        Download your data or delete your account permanently
+                        To export your data or delete your account, please{" "}
+                        <Link
+                          onClick={() => navigate("/support?tab=feedback")}
+                          color="red.200"
+                          cursor="pointer"
+                        >
+                          contact us via the feedback form
+                        </Link>
+                        .
                       </Text>
-                      <HStack spacing={3}>
-                        <Button colorScheme="red" variant="outline" size="sm">
-                          Export Data
-                        </Button>
-                        <Button colorScheme="red" variant="outline" size="sm">
-                          Delete Account
-                        </Button>
-                      </HStack>
                     </VStack>
                   </Box>
                 </Box>

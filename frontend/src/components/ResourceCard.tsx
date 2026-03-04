@@ -64,8 +64,13 @@ export const ResourceCard: React.FC<ResourceCardProps> = ({
     e.stopPropagation();
     try {
       await saveResourceMutation.mutateAsync(id);
-    } catch (error) {
-      console.error("Failed to save resource:", error);
+    } catch {
+      toast({
+        title: "Failed to save resource",
+        status: "error",
+        duration: 3000,
+        isClosable: true,
+      });
     }
   };
 
@@ -73,8 +78,13 @@ export const ResourceCard: React.FC<ResourceCardProps> = ({
     e.stopPropagation();
     try {
       await triedResourceMutation.mutateAsync(id);
-    } catch (error) {
-      console.error("Failed to mark as tried:", error);
+    } catch {
+      toast({
+        title: "Failed to mark as tried",
+        status: "error",
+        duration: 3000,
+        isClosable: true,
+      });
     }
   };
 

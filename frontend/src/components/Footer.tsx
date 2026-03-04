@@ -39,8 +39,8 @@ export function Footer() {
           </WrapItem>
           <WrapItem>•</WrapItem>
           <WrapItem>
-            <Link href="mailto:michael.borck@curtin.edu.au" _hover={{ color: "brand.300" }}>
-              Email
+            <Link onClick={() => handleNavClick("/support?tab=feedback")} _hover={{ color: "brand.300" }}>
+              Feedback
             </Link>
           </WrapItem>
         </Wrap>
