@@ -66,13 +66,8 @@ export function useUpdateResource() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({
-      id,
-      data,
-    }: {
-      id: string;
-      data: ResourceUpdate;
-    }) => apiClient.updateResource(id, data),
+    mutationFn: ({ id, data }: { id: string; data: ResourceUpdate }) =>
+      apiClient.updateResource(id, data),
     onSuccess: (_data, variables) => {
       queryClient.invalidateQueries({ queryKey: ["resource", variables.id] });
       queryClient.invalidateQueries({ queryKey: ["resources"] });

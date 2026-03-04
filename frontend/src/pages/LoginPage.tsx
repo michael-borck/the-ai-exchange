@@ -99,7 +99,7 @@ export default function LoginPage() {
       <VStack spacing={8}>
         <VStack spacing={3} textAlign="center">
           <Heading size="lg">Welcome to The AI Exchange</Heading>
-          <Text color="gray.600">
+          <Text color="whiteAlpha.600">
             Sign in to access requests, share solutions, and grow your AI expertise
           </Text>
         </VStack>
@@ -108,8 +108,8 @@ export default function LoginPage() {
           <Alert status="info" borderRadius="md">
             <AlertIcon />
             <Text fontSize="sm">
-              For your security, you've been logged out after a period of
-              inactivity. Please log in again.
+              For your security, you've been logged out after a period of inactivity. Please log in
+              again.
             </Text>
           </Alert>
         )}
@@ -145,15 +145,13 @@ export default function LoginPage() {
             {loginMutation.isError && (
               <Alert status="error" borderRadius="md">
                 <AlertIcon />
-                <Text fontSize="sm">
-                  Invalid email or password. Please try again.
-                </Text>
+                <Text fontSize="sm">Invalid email or password. Please try again.</Text>
               </Alert>
             )}
 
             <Button
               width="full"
-              colorScheme="blue"
+              colorScheme="brand"
               type="submit"
               isLoading={loginMutation.isPending}
             >
@@ -167,7 +165,7 @@ export default function LoginPage() {
             width="full"
             variant="ghost"
             size="sm"
-            colorScheme="blue"
+            colorScheme="brand"
             onClick={onPasswordResetOpen}
           >
             Forgot password?
@@ -175,11 +173,11 @@ export default function LoginPage() {
         </VStack>
 
         <HStack spacing={1} justify="center">
-          <Text fontSize="sm" color="gray.600">
+          <Text fontSize="sm" color="whiteAlpha.600">
             Don't have an account?
           </Text>
           <RouterLink to="/register">
-            <Button variant="link" colorScheme="blue" fontSize="sm">
+            <Button variant="link" colorScheme="brand" fontSize="sm">
               Create account
             </Button>
           </RouterLink>

@@ -102,7 +102,7 @@ export default function VerifyEmailPage() {
       <VStack spacing={8}>
         <VStack spacing={3} textAlign="center">
           <Heading size="lg">Verify Your Email</Heading>
-          <Text color="gray.600">
+          <Text color="whiteAlpha.600">
             {emailFailed
               ? "Your account was created but we couldn't send the verification email."
               : "We've sent a 6-digit verification code to"}
@@ -115,9 +115,8 @@ export default function VerifyEmailPage() {
           <Alert status="warning" borderRadius="md">
             <AlertIcon />
             <Text fontSize="sm">
-              The verification email could not be sent. Please contact an
-              administrator to verify your account, or try the "Resend Code"
-              button below.
+              The verification email could not be sent. Please contact an administrator to verify
+              your account, or try the "Resend Code" button below.
             </Text>
           </Alert>
         )}
@@ -140,7 +139,7 @@ export default function VerifyEmailPage() {
                 fontWeight="bold"
                 required
               />
-              <Text fontSize="xs" color="gray.600" mt={1}>
+              <Text fontSize="xs" color="whiteAlpha.600" mt={1}>
                 Enter the 6-digit code from your email
               </Text>
             </Box>
@@ -154,7 +153,7 @@ export default function VerifyEmailPage() {
 
             <Button
               width="full"
-              colorScheme="blue"
+              colorScheme="brand"
               type="submit"
               isLoading={verifyEmailMutation.isPending}
             >
@@ -164,14 +163,14 @@ export default function VerifyEmailPage() {
         </Box>
 
         <VStack spacing={2} width="full">
-          <Text fontSize="sm" color="gray.600">
+          <Text fontSize="sm" color="whiteAlpha.600">
             Didn't receive the code?
           </Text>
           <Button
             width="full"
             variant="ghost"
             size="sm"
-            colorScheme="blue"
+            colorScheme="brand"
             onClick={handleResendCode}
           >
             Resend Code
@@ -179,12 +178,12 @@ export default function VerifyEmailPage() {
         </VStack>
 
         <HStack spacing={1} justify="center" width="full">
-          <Text fontSize="sm" color="gray.600">
+          <Text fontSize="sm" color="whiteAlpha.600">
             Back to
           </Text>
           <Button
             variant="link"
-            colorScheme="blue"
+            colorScheme="brand"
             fontSize="sm"
             onClick={() => navigate("/register")}
           >

@@ -111,7 +111,7 @@ export function ResourceModeration() {
   return (
     <VStack align="stretch" spacing={4}>
       {/* Filters */}
-      <Box bg="white" p={4} borderRadius="lg" boxShadow="sm">
+      <Box bg="dark.card" p={4} borderRadius="lg" boxShadow="sm">
         <HStack spacing={4}>
           <Select
             placeholder="Filter by type"
@@ -140,7 +140,7 @@ export function ResourceModeration() {
             {showHiddenOnly ? "Showing Hidden Only" : "Show All"}
           </Button>
 
-          <Text fontSize="sm" color="gray.600">
+          <Text fontSize="sm" color="whiteAlpha.600">
             {filteredResources.length} resource{filteredResources.length !== 1 ? "s" : ""}
           </Text>
         </HStack>
@@ -148,13 +148,13 @@ export function ResourceModeration() {
 
       {/* Table */}
       {filteredResources.length === 0 ? (
-        <Box bg="white" p={6} borderRadius="lg" textAlign="center">
-          <Text color="gray.600">No resources found</Text>
+        <Box bg="dark.card" p={6} borderRadius="lg" textAlign="center">
+          <Text color="whiteAlpha.600">No resources found</Text>
         </Box>
       ) : (
-        <Box bg="white" borderRadius="lg" overflow="hidden" boxShadow="sm">
+        <Box bg="dark.card" borderRadius="lg" overflow="hidden" boxShadow="sm">
           <Table variant="simple" size="sm">
-            <Thead bg="gray.50">
+            <Thead bg="dark.subtle">
               <Tr>
                 <Th>Title</Th>
                 <Th>Type</Th>
@@ -183,9 +183,7 @@ export function ResourceModeration() {
                       {resource.is_hidden ? "Hidden" : "Visible"}
                     </Badge>
                   </Td>
-                  <Td fontSize="sm">
-                    {new Date(resource.created_at).toLocaleDateString()}
-                  </Td>
+                  <Td fontSize="sm">{new Date(resource.created_at).toLocaleDateString()}</Td>
                   <Td>
                     <HStack spacing={2}>
                       {!resource.is_verified && (

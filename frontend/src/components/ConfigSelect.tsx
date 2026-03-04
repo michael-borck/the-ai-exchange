@@ -116,7 +116,11 @@ export const ConfigSelect: React.FC<ConfigSelectProps> = ({
     <VStack align="flex-start" width="full" spacing={2}>
       <FormLabel fontSize="sm" fontWeight="medium" mb={0}>
         {label}
-        {isRequired && <Text as="span" color="red.500" ml={1}>*</Text>}
+        {isRequired && (
+          <Text as="span" color="red.500" ml={1}>
+            *
+          </Text>
+        )}
       </FormLabel>
 
       <Select
@@ -134,13 +138,13 @@ export const ConfigSelect: React.FC<ConfigSelectProps> = ({
       </Select>
 
       {helpText && (
-        <Text fontSize="xs" color="gray.600">
+        <Text fontSize="xs" color="whiteAlpha.600">
           {helpText}
         </Text>
       )}
 
       {showCustomInput && (
-        <Box width="full" borderLeft="2px solid" borderColor="blue.200" pl={3} py={2}>
+        <Box width="full" borderLeft="2px solid" borderColor="brand.400" pl={3} py={2}>
           <VStack align="flex-start" spacing={3} width="full">
             <Box width="full">
               <Text fontSize="sm" fontWeight="medium" mb={2}>
@@ -155,7 +159,9 @@ export const ConfigSelect: React.FC<ConfigSelectProps> = ({
                   width: "100%",
                   padding: "8px",
                   borderRadius: "4px",
-                  border: "1px solid #cbd5e0",
+                  border: "1px solid #3c3f44",
+                  backgroundColor: "#202127",
+                  color: "rgba(255, 255, 245, 0.86)",
                   fontFamily: "inherit",
                 }}
               />
@@ -180,15 +186,13 @@ export const ConfigSelect: React.FC<ConfigSelectProps> = ({
                   isChecked={requestNewValue}
                   onChange={(e) => setRequestNewValue(e.target.checked)}
                 >
-                  <Text fontSize="sm">
-                    Request this as a new option (admin will review)
-                  </Text>
+                  <Text fontSize="sm">Request this as a new option (admin will review)</Text>
                 </Checkbox>
 
                 {requestNewValue && (
                   <Button
                     size="sm"
-                    colorScheme="blue"
+                    colorScheme="brand"
                     variant="outline"
                     onClick={handleSubmitRequest}
                     isLoading={submitRequestMutation.isPending}
@@ -201,10 +205,9 @@ export const ConfigSelect: React.FC<ConfigSelectProps> = ({
             )}
 
             {showOtherOption && !requestNewValue && customValue && (
-              <Text fontSize="xs" color="gray.500" fontStyle="italic">
-                Note: This will be stored as "{customValue}" for this {label.toLowerCase()}.
-                Check "Request this as a new option" if you'd like it added to the list for
-                others to use.
+              <Text fontSize="xs" color="whiteAlpha.500" fontStyle="italic">
+                Note: This will be stored as "{customValue}" for this {label.toLowerCase()}. Check
+                "Request this as a new option" if you'd like it added to the list for others to use.
               </Text>
             )}
           </VStack>

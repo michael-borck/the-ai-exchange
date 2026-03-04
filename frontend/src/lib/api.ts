@@ -87,18 +87,12 @@ class ApiClient {
 
   // Auth endpoints
   async register(data: RegisterRequest): Promise<RegistrationResponse> {
-    const response = await this.axiosInstance.post<RegistrationResponse>(
-      "/auth/register",
-      data
-    );
+    const response = await this.axiosInstance.post<RegistrationResponse>("/auth/register", data);
     return response.data;
   }
 
   async login(data: LoginRequest): Promise<TokenResponse> {
-    const response = await this.axiosInstance.post<TokenResponse>(
-      "/auth/login",
-      data
-    );
+    const response = await this.axiosInstance.post<TokenResponse>("/auth/login", data);
     this.setTokens(response.data);
     return response.data;
   }
@@ -114,10 +108,10 @@ class ApiClient {
   }
 
   async verifyEmail(email: string, code: string): Promise<TokenResponse> {
-    const response = await this.axiosInstance.post<TokenResponse>(
-      "/auth/verify-email",
-      { email, code }
-    );
+    const response = await this.axiosInstance.post<TokenResponse>("/auth/verify-email", {
+      email,
+      code,
+    });
     this.setTokens(response.data);
     return response.data;
   }
@@ -152,28 +146,17 @@ class ApiClient {
   }
 
   async getResource(id: string): Promise<Resource> {
-    const response = await this.axiosInstance.get<Resource>(
-      `/resources/${id}`
-    );
+    const response = await this.axiosInstance.get<Resource>(`/resources/${id}`);
     return response.data;
   }
 
   async createResource(data: ResourceCreate): Promise<Resource> {
-    const response = await this.axiosInstance.post<Resource>(
-      "/resources",
-      data
-    );
+    const response = await this.axiosInstance.post<Resource>("/resources", data);
     return response.data;
   }
 
-  async updateResource(
-    id: string,
-    data: ResourceUpdate
-  ): Promise<Resource> {
-    const response = await this.axiosInstance.patch<Resource>(
-      `/resources/${id}`,
-      data
-    );
+  async updateResource(id: string, data: ResourceUpdate): Promise<Resource> {
+    const response = await this.axiosInstance.patch<Resource>(`/resources/${id}`, data);
     return response.data;
   }
 
@@ -182,25 +165,20 @@ class ApiClient {
   }
 
   async getResourceSolutions(id: string): Promise<Resource[]> {
-    const response = await this.axiosInstance.get<Resource[]>(
-      `/resources/${id}/solutions`
-    );
+    const response = await this.axiosInstance.get<Resource[]>(`/resources/${id}/solutions`);
     return response.data;
   }
 
   // Subscription endpoints
   async listSubscriptions(): Promise<Subscription[]> {
-    const response = await this.axiosInstance.get<Subscription[]>(
-      "/subscriptions"
-    );
+    const response = await this.axiosInstance.get<Subscription[]>("/subscriptions");
     return response.data;
   }
 
   async subscribe(tag: string): Promise<Subscription> {
-    const response = await this.axiosInstance.post<Subscription>(
-      "/subscriptions/subscribe",
-      { tag }
-    );
+    const response = await this.axiosInstance.post<Subscription>("/subscriptions/subscribe", {
+      tag,
+    });
     return response.data;
   }
 

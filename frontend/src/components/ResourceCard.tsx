@@ -4,15 +4,7 @@
  */
 
 import { useNavigate } from "react-router-dom";
-import {
-  Box,
-  Button,
-  Heading,
-  HStack,
-  Text,
-  VStack,
-  useToast,
-} from "@chakra-ui/react";
+import { Box, Button, Heading, HStack, Text, VStack, useToast } from "@chakra-ui/react";
 import { useSaveResource, useIsResourceSaved, useTriedResource } from "@/hooks/useEngagement";
 import { useDeleteResource } from "@/hooks/useResources";
 import { useAuth } from "@/hooks/useAuth";
@@ -88,7 +80,11 @@ export const ResourceCard: React.FC<ResourceCardProps> = ({
 
   const handleDelete = async (e: React.MouseEvent) => {
     e.stopPropagation();
-    if (!window.confirm("Are you sure you want to delete this resource? This action cannot be undone.")) {
+    if (
+      !window.confirm(
+        "Are you sure you want to delete this resource? This action cannot be undone."
+      )
+    ) {
       return;
     }
 
@@ -115,9 +111,9 @@ export const ResourceCard: React.FC<ResourceCardProps> = ({
   if (variant === "browse") {
     return (
       <Box
-        bg="white"
+        bg="dark.card"
         border="1px"
-        borderColor="gray.200"
+        borderColor="dark.border"
         borderRadius="md"
         p={4}
         cursor="pointer"
@@ -133,8 +129,8 @@ export const ResourceCard: React.FC<ResourceCardProps> = ({
                 <Text
                   fontSize="xs"
                   fontWeight="bold"
-                  color="blue.600"
-                  bg="blue.50"
+                  color="brand.200"
+                  bg="brand.900"
                   px={2}
                   py={1}
                   borderRadius="full"
@@ -142,7 +138,7 @@ export const ResourceCard: React.FC<ResourceCardProps> = ({
                   {area}
                 </Text>
               )}
-</HStack>
+            </HStack>
           </HStack>
 
           {/* Title */}
@@ -158,14 +154,14 @@ export const ResourceCard: React.FC<ResourceCardProps> = ({
           )}
 
           {/* Summary */}
-          <Text fontSize="sm" color="gray.700" lineHeight="1.4">
+          <Text fontSize="sm" color="whiteAlpha.700" lineHeight="1.4">
             {quickSummary}
           </Text>
 
           {/* Tools */}
           <HStack spacing={2} fontSize="xs" flexWrap="wrap">
             {tools.map((tool: string) => (
-              <Text key={tool} bg="gray.100" px={2} py={1} borderRadius="full">
+              <Text key={tool} bg="whiteAlpha.100" px={2} py={1} borderRadius="full">
                 {tool}
               </Text>
             ))}
@@ -175,17 +171,17 @@ export const ResourceCard: React.FC<ResourceCardProps> = ({
           <HStack
             spacing={2}
             fontSize="xs"
-            color="gray.500"
+            color="whiteAlpha.500"
             width="full"
             justify="space-between"
             pt={1}
             pb={2}
           >
             <Text>
-              {new Date(created_at || new Date()).toLocaleDateString('en-US', {
-                year: 'numeric',
-                month: 'short',
-                day: 'numeric',
+              {new Date(created_at || new Date()).toLocaleDateString("en-US", {
+                year: "numeric",
+                month: "short",
+                day: "numeric",
               })}
             </Text>
             <HStack spacing={2}>
@@ -203,7 +199,7 @@ export const ResourceCard: React.FC<ResourceCardProps> = ({
             justify="flex-end"
             pt={2}
             borderTop="1px"
-            borderColor="gray.100"
+            borderColor="dark.divider"
           >
             {isLoggedIn ? (
               <>
@@ -230,7 +226,7 @@ export const ResourceCard: React.FC<ResourceCardProps> = ({
                 <Button
                   size="xs"
                   variant={hasSaved ? "solid" : "ghost"}
-                  colorScheme="blue"
+                  colorScheme="brand"
                   onClick={handleSave}
                   isLoading={saveResourceMutation.isPending}
                 >
@@ -238,7 +234,7 @@ export const ResourceCard: React.FC<ResourceCardProps> = ({
                 </Button>
               </>
             ) : (
-              <Button size="xs" variant="ghost" colorScheme="blue" onClick={handleLoginClick}>
+              <Button size="xs" variant="ghost" colorScheme="brand" onClick={handleLoginClick}>
                 Login to collaborate
               </Button>
             )}
@@ -251,9 +247,9 @@ export const ResourceCard: React.FC<ResourceCardProps> = ({
   // Default "home" variant
   return (
     <Box
-      bg="white"
+      bg="dark.card"
       border="1px"
-      borderColor="gray.200"
+      borderColor="dark.border"
       borderRadius="md"
       p={4}
       cursor="pointer"
@@ -265,7 +261,15 @@ export const ResourceCard: React.FC<ResourceCardProps> = ({
         <HStack spacing={2} width="full" justify="space-between">
           <HStack spacing={1}>
             {area && (
-              <Text fontSize="xs" fontWeight="bold" color="blue.600" bg="blue.50" px={2} py={1} borderRadius="full">
+              <Text
+                fontSize="xs"
+                fontWeight="bold"
+                color="blue.600"
+                bg="blue.50"
+                px={2}
+                py={1}
+                borderRadius="full"
+              >
                 {area}
               </Text>
             )}
@@ -278,34 +282,34 @@ export const ResourceCard: React.FC<ResourceCardProps> = ({
 
         {/* Only show author and time saved for logged-in users */}
         {isLoggedIn && (
-          <Text fontSize="xs" color="gray.600">
+          <Text fontSize="xs" color="whiteAlpha.600">
             {author} • {timeSaved || 2} hrs/week saved
           </Text>
         )}
 
-        <Text fontSize="sm" color="gray.700" lineHeight="1.4">
+        <Text fontSize="sm" color="whiteAlpha.700" lineHeight="1.4">
           {quickSummary}
         </Text>
 
         <HStack spacing={2} fontSize="xs">
           {tools.map((tool: string) => (
-            <Text key={tool} bg="gray.100" px={2} py={1} borderRadius="full">
+            <Text key={tool} bg="whiteAlpha.100" px={2} py={1} borderRadius="full">
               {tool}
             </Text>
           ))}
         </HStack>
 
         {/* Created date */}
-        <Text fontSize="xs" color="gray.500">
-          {new Date(created_at || new Date()).toLocaleDateString('en-US', {
-            year: 'numeric',
-            month: 'short',
-            day: 'numeric',
+        <Text fontSize="xs" color="whiteAlpha.500">
+          {new Date(created_at || new Date()).toLocaleDateString("en-US", {
+            year: "numeric",
+            month: "short",
+            day: "numeric",
           })}
         </Text>
 
         {/* Engagement stats - visible to all users */}
-        <HStack spacing={4} fontSize="xs" color="gray.600" width="full" pt={1}>
+        <HStack spacing={4} fontSize="xs" color="whiteAlpha.600" width="full" pt={1}>
           <HStack spacing={1}>
             <Text title="Views">👁️ {views}</Text>
           </HStack>
@@ -318,7 +322,15 @@ export const ResourceCard: React.FC<ResourceCardProps> = ({
         </HStack>
 
         {/* Action buttons */}
-        <HStack spacing={2} fontSize="sm" width="full" justify="flex-end" pt={2} borderTop="1px" borderColor="gray.100">
+        <HStack
+          spacing={2}
+          fontSize="sm"
+          width="full"
+          justify="flex-end"
+          pt={2}
+          borderTop="1px"
+          borderColor="dark.divider"
+        >
           {isLoggedIn ? (
             <>
               {canDelete && (
@@ -344,7 +356,7 @@ export const ResourceCard: React.FC<ResourceCardProps> = ({
               <Button
                 size="xs"
                 variant={hasSaved ? "solid" : "ghost"}
-                colorScheme="blue"
+                colorScheme="brand"
                 onClick={handleSave}
                 isLoading={saveResourceMutation.isPending}
               >
@@ -352,7 +364,7 @@ export const ResourceCard: React.FC<ResourceCardProps> = ({
               </Button>
             </>
           ) : (
-            <Button size="xs" variant="ghost" colorScheme="blue" onClick={handleLoginClick}>
+            <Button size="xs" variant="ghost" colorScheme="brand" onClick={handleLoginClick}>
               Login to collaborate
             </Button>
           )}

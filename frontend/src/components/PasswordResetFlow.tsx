@@ -34,11 +34,7 @@ interface PasswordResetFlowProps {
 
 type Step = "request" | "verify" | "reset" | "complete";
 
-export default function PasswordResetFlow({
-  isOpen,
-  onClose,
-  onSuccess,
-}: PasswordResetFlowProps) {
+export default function PasswordResetFlow({ isOpen, onClose, onSuccess }: PasswordResetFlowProps) {
   const queryClient = useQueryClient();
 
   const [currentStep, setCurrentStep] = useState<Step>("request");
@@ -163,7 +159,7 @@ export default function PasswordResetFlow({
           <VStack spacing={4} width="full">
             <VStack spacing={2} textAlign="center" width="full">
               <Heading size="md">Reset Password</Heading>
-              <Text fontSize="sm" color="gray.600">
+              <Text fontSize="sm" color="whiteAlpha.600">
                 Enter your email address and we'll send you a code to reset your password.
               </Text>
             </VStack>
@@ -191,12 +187,7 @@ export default function PasswordResetFlow({
                   />
                 </Box>
 
-                <Button
-                  width="full"
-                  colorScheme="blue"
-                  type="submit"
-                  isLoading={isLoading}
-                >
+                <Button width="full" colorScheme="brand" type="submit" isLoading={isLoading}>
                   Send Reset Code
                 </Button>
               </VStack>
@@ -219,7 +210,7 @@ export default function PasswordResetFlow({
 
             <VStack spacing={2} textAlign="center" width="full">
               <Heading size="md">Enter Reset Code</Heading>
-              <Text fontSize="sm" color="gray.600">
+              <Text fontSize="sm" color="whiteAlpha.600">
                 We've sent a 6-digit code to <strong>{email}</strong>
               </Text>
             </VStack>
@@ -241,9 +232,7 @@ export default function PasswordResetFlow({
                     type="text"
                     placeholder="000000"
                     value={code}
-                    onChange={(e) =>
-                      setCode(e.target.value.replace(/\D/g, "").slice(0, 6))
-                    }
+                    onChange={(e) => setCode(e.target.value.replace(/\D/g, "").slice(0, 6))}
                     textAlign="center"
                     fontSize="lg"
                     letterSpacing="widest"
@@ -251,14 +240,14 @@ export default function PasswordResetFlow({
                     disabled={isLoading}
                     required
                   />
-                  <Text fontSize="xs" color="gray.500" mt={1}>
+                  <Text fontSize="xs" color="whiteAlpha.500" mt={1}>
                     {code.length}/6 digits
                   </Text>
                 </Box>
 
                 <Button
                   width="full"
-                  colorScheme="blue"
+                  colorScheme="brand"
                   type="submit"
                   isDisabled={code.length !== 6 || isLoading}
                   isLoading={isLoading}
@@ -275,7 +264,7 @@ export default function PasswordResetFlow({
           <VStack spacing={4} width="full">
             <VStack spacing={2} textAlign="center" width="full">
               <Heading size="md">Set New Password</Heading>
-              <Text fontSize="sm" color="gray.600">
+              <Text fontSize="sm" color="whiteAlpha.600">
                 Choose a strong password for your account
               </Text>
             </VStack>
@@ -301,7 +290,7 @@ export default function PasswordResetFlow({
                     disabled={isLoading}
                     required
                   />
-                  <Text fontSize="xs" color="gray.500" mt={1}>
+                  <Text fontSize="xs" color="whiteAlpha.500" mt={1}>
                     At least 8 characters with uppercase, lowercase, and number
                   </Text>
                 </Box>
@@ -320,11 +309,18 @@ export default function PasswordResetFlow({
                   />
                 </Box>
 
-                <Box width="full" borderWidth={1} borderRadius="md" p={3} bg="blue.50">
-                  <Text fontSize="xs" fontWeight="medium" color="blue.900" mb={2}>
+                <Box
+                  width="full"
+                  borderWidth={1}
+                  borderRadius="md"
+                  p={3}
+                  bg="brand.900"
+                  borderColor="brand.700"
+                >
+                  <Text fontSize="xs" fontWeight="medium" color="brand.100" mb={2}>
                     Password requirements:
                   </Text>
-                  <UnorderedList fontSize="xs" color="blue.800" spacing={1}>
+                  <UnorderedList fontSize="xs" color="brand.200" spacing={1}>
                     <ListItem>At least 8 characters</ListItem>
                     <ListItem>One uppercase letter (A-Z)</ListItem>
                     <ListItem>One lowercase letter (a-z)</ListItem>
@@ -332,12 +328,7 @@ export default function PasswordResetFlow({
                   </UnorderedList>
                 </Box>
 
-                <Button
-                  width="full"
-                  colorScheme="blue"
-                  type="submit"
-                  isLoading={isLoading}
-                >
+                <Button width="full" colorScheme="brand" type="submit" isLoading={isLoading}>
                   Reset Password
                 </Button>
               </VStack>
@@ -352,7 +343,7 @@ export default function PasswordResetFlow({
               width={16}
               height={16}
               borderRadius="full"
-              bg="green.100"
+              bg="green.800"
               display="flex"
               alignItems="center"
               justifyContent="center"
@@ -361,10 +352,10 @@ export default function PasswordResetFlow({
             </Box>
             <VStack spacing={2}>
               <Heading size="md">Password Reset Complete!</Heading>
-              <Text fontSize="sm" color="gray.600">
+              <Text fontSize="sm" color="whiteAlpha.600">
                 Your password has been successfully reset.
               </Text>
-              <Text fontSize="sm" color="gray.600">
+              <Text fontSize="sm" color="whiteAlpha.600">
                 Redirecting to login...
               </Text>
             </VStack>

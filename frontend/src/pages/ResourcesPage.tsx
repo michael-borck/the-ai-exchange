@@ -51,9 +51,7 @@ export default function ResourcesPage() {
   const [searchParams, setSearchParams] = useSearchParams();
   const [search, setSearch] = useState(searchParams.get("search") || "");
   const [filters, setFilters] = useState<FilterState>({
-    specialties: searchParams.get("specialty")
-      ? [searchParams.get("specialty")!]
-      : [],
+    specialties: searchParams.get("specialty") ? [searchParams.get("specialty")!] : [],
     tools: [],
     professionalRoles: [],
     minTimeSaved: 0,
@@ -79,7 +77,7 @@ export default function ResourcesPage() {
   // Apply filters and search client-side for instant UI updates
   // Only the filter sidebar & search box filtering is instant
   const filteredResources = useMemo(() => {
-    return allResources.filter(resource => {
+    return allResources.filter((resource) => {
       // Search filter
       if (search) {
         const searchLower = search.toLowerCase();
@@ -93,14 +91,18 @@ export default function ResourcesPage() {
       }
 
       // Specialty filter
-      if (filters.specialties.length > 0 && resource.specialty && !filters.specialties.includes(resource.specialty)) {
+      if (
+        filters.specialties.length > 0 &&
+        resource.specialty &&
+        !filters.specialties.includes(resource.specialty)
+      ) {
         return false;
       }
 
       // Tool filter
       if (filters.tools.length > 0) {
-        const hasMatchingTool = filters.tools.some(tool =>
-          resource.tools_used && Object.keys(resource.tools_used).includes(tool)
+        const hasMatchingTool = filters.tools.some(
+          (tool) => resource.tools_used && Object.keys(resource.tools_used).includes(tool)
         );
         if (!hasMatchingTool) return false;
       }
@@ -108,7 +110,7 @@ export default function ResourcesPage() {
       // Professional role filter
       if (filters.professionalRoles && filters.professionalRoles.length > 0) {
         const roles = resource.author_professional_roles || [];
-        const hasMatchingRole = filters.professionalRoles.some(role => roles.includes(role));
+        const hasMatchingRole = filters.professionalRoles.some((role) => roles.includes(role));
         if (!hasMatchingRole) return false;
       }
 
@@ -137,7 +139,7 @@ export default function ResourcesPage() {
 
   // Transform API resources to card format
   const mappedResources: ResourceCardData[] = useMemo(() => {
-    return sortedResources.map(resource => ({
+    return sortedResources.map((resource) => ({
       id: resource.id,
       title: resource.title,
       author: resource.author_name || "Faculty Member",
@@ -165,7 +167,7 @@ export default function ResourcesPage() {
         <HStack justify="space-between" align="center">
           <VStack align="flex-start" spacing={1}>
             <Heading size="lg">Browse Ideas</Heading>
-            <Text color="gray.600" fontSize="sm">
+            <Text color="whiteAlpha.600" fontSize="sm">
               Discover AI use cases from colleagues across the school
             </Text>
           </VStack>
@@ -174,17 +176,14 @@ export default function ResourcesPage() {
               <Button
                 leftIcon={<DownloadIcon />}
                 variant="outline"
-                colorScheme="blue"
+                colorScheme="brand"
                 onClick={handleExportFiltered}
                 isDisabled={mappedResources.length === 0}
               >
                 Export
               </Button>
             )}
-            <Button
-              colorScheme="blue"
-              onClick={() => navigate("/resources/new")}
-            >
+            <Button colorScheme="brand" onClick={() => navigate("/resources/new")}>
               Share Your Idea
             </Button>
           </HStack>
@@ -204,11 +203,7 @@ export default function ResourcesPage() {
         </InputGroup>
 
         {/* Main Content Grid */}
-        <Grid
-          templateColumns={{ base: "1fr", lg: "250px 1fr" }}
-          gap={6}
-          alignItems="start"
-        >
+        <Grid templateColumns={{ base: "1fr", lg: "250px 1fr" }} gap={6} alignItems="start">
           {/* Sidebar */}
           <GridItem>
             <FilterSidebar
@@ -225,14 +220,19 @@ export default function ResourcesPage() {
                 <Spinner />
               </Center>
             ) : mappedResources.length === 0 ? (
-              <Box bg="white" p={12} borderRadius="lg" textAlign="center">
-                <Text color="gray.600">
-                  No ideas found. Try adjusting your filters.
-                </Text>
+              <Box
+                bg="dark.card"
+                p={12}
+                borderRadius="lg"
+                textAlign="center"
+                border="1px"
+                borderColor="dark.border"
+              >
+                <Text color="whiteAlpha.600">No ideas found. Try adjusting your filters.</Text>
               </Box>
             ) : (
               <VStack align="stretch" spacing={4}>
-                <Text color="gray.600" fontSize="sm">
+                <Text color="whiteAlpha.600" fontSize="sm">
                   Showing {mappedResources.length} idea
                   {mappedResources.length !== 1 ? "s" : ""}
                 </Text>

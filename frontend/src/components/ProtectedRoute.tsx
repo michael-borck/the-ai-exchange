@@ -12,20 +12,12 @@ interface ProtectedRouteProps {
   requiredRole?: "ADMIN" | "STAFF";
 }
 
-export function ProtectedRoute({
-  children,
-  requiredRole,
-}: ProtectedRouteProps) {
+export function ProtectedRoute({ children, requiredRole }: ProtectedRouteProps) {
   const { isAuthenticated, isLoading, user } = useAuth();
 
   if (isLoading) {
     return (
-      <Box
-        display="flex"
-        justifyContent="center"
-        alignItems="center"
-        minHeight="100vh"
-      >
+      <Box display="flex" justifyContent="center" alignItems="center" minHeight="100vh">
         <Spinner size="lg" />
       </Box>
     );

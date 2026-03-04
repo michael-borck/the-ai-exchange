@@ -93,10 +93,7 @@ export function FilterSidebar({
 
   // Extract unique specialties and tool categories from resources
   const specialties = useMemo(() => extractSpecialties(resources), [resources]);
-  const toolCategories = useMemo(
-    () => extractToolCategories(resources),
-    [resources]
-  );
+  const toolCategories = useMemo(() => extractToolCategories(resources), [resources]);
 
   const [filters, setFilters] = useState<FilterState>(
     initialFilters || {
@@ -144,9 +141,7 @@ export function FilterSidebar({
     onFiltersChange(newFilters);
   };
 
-  const handleSortChange = (
-    sortBy: "newest" | "popular" | "most_tried"
-  ) => {
+  const handleSortChange = (sortBy: "newest" | "popular" | "most_tried") => {
     const newFilters = { ...filters, sortBy };
     setFilters(newFilters);
     onFiltersChange(newFilters);
@@ -172,10 +167,12 @@ export function FilterSidebar({
 
   return (
     <Box
-      bg="white"
+      bg="dark.card"
       borderRadius="lg"
       p={6}
       boxShadow="sm"
+      border="1px"
+      borderColor="dark.border"
       height="fit-content"
       position="sticky"
       top={6}
@@ -186,7 +183,7 @@ export function FilterSidebar({
           <HStack spacing={2}>
             <Heading size="md">Filters</Heading>
             {activeFilterCount > 0 && (
-              <Badge colorScheme="blue" variant="solid">
+              <Badge colorScheme="brand" variant="solid">
                 {activeFilterCount}
               </Badge>
             )}
@@ -202,13 +199,11 @@ export function FilterSidebar({
 
         {/* Sort */}
         <VStack align="stretch" spacing={3}>
-          <Text fontSize="sm" fontWeight="semibold" color="gray.700">
+          <Text fontSize="sm" fontWeight="semibold" color="whiteAlpha.700">
             Sort By
           </Text>
           <Stack direction="column" spacing={2}>
-            {(
-              ["newest", "popular", "most_tried"] as const
-            ).map((option) => (
+            {(["newest", "popular", "most_tried"] as const).map((option) => (
               <Button
                 key={option}
                 size="sm"
@@ -220,8 +215,8 @@ export function FilterSidebar({
                 {option === "newest"
                   ? "Newest"
                   : option === "popular"
-                  ? "Most Helpful"
-                  : "Most Tried"}
+                    ? "Most Helpful"
+                    : "Most Tried"}
               </Button>
             ))}
           </Stack>
@@ -231,13 +226,13 @@ export function FilterSidebar({
 
         {/* Specialty */}
         <VStack align="stretch" spacing={3}>
-          <Text fontSize="sm" fontWeight="semibold" color="gray.700">
+          <Text fontSize="sm" fontWeight="semibold" color="whiteAlpha.700">
             Specialty
           </Text>
           {isLoading ? (
             <Spinner size="sm" />
           ) : specialties.length === 0 ? (
-            <Text fontSize="sm" color="gray.500">
+            <Text fontSize="sm" color="whiteAlpha.500">
               No specialties available
             </Text>
           ) : (
@@ -259,7 +254,7 @@ export function FilterSidebar({
 
         {/* Professional Role */}
         <VStack align="stretch" spacing={3}>
-          <Text fontSize="sm" fontWeight="semibold" color="gray.700">
+          <Text fontSize="sm" fontWeight="semibold" color="whiteAlpha.700">
             Creator Role
           </Text>
           <VStack align="stretch" spacing={2}>
@@ -279,13 +274,13 @@ export function FilterSidebar({
 
         {/* Tools */}
         <VStack align="stretch" spacing={3}>
-          <Text fontSize="sm" fontWeight="semibold" color="gray.700">
+          <Text fontSize="sm" fontWeight="semibold" color="whiteAlpha.700">
             AI Tool Categories
           </Text>
           {isLoading ? (
             <Spinner size="sm" />
           ) : toolCategories.length === 0 ? (
-            <Text fontSize="sm" color="gray.500">
+            <Text fontSize="sm" color="whiteAlpha.500">
               No tools available
             </Text>
           ) : (
@@ -308,19 +303,19 @@ export function FilterSidebar({
         {/* Quick Wins Filter */}
         <VStack align="stretch" spacing={3}>
           <VStack align="stretch" spacing={1}>
-            <Text fontSize="sm" fontWeight="semibold" color="gray.700">
+            <Text fontSize="sm" fontWeight="semibold" color="whiteAlpha.700">
               Minimum Time Saved
             </Text>
-            <Text fontSize="xs" color="gray.600">
+            <Text fontSize="xs" color="whiteAlpha.600">
               {filters.minTimeSaved === 0
                 ? "Any"
                 : filters.minTimeSaved === 0.5
-                ? "≥ 30 min/week"
-                : filters.minTimeSaved === 1
-                ? "≥ 1 hour/week"
-                : filters.minTimeSaved === 2
-                ? "≥ 2 hours/week"
-                : "≥ 4 hours/week"}
+                  ? "≥ 30 min/week"
+                  : filters.minTimeSaved === 1
+                    ? "≥ 1 hour/week"
+                    : filters.minTimeSaved === 2
+                      ? "≥ 2 hours/week"
+                      : "≥ 4 hours/week"}
             </Text>
           </VStack>
           <RangeSlider
@@ -332,7 +327,7 @@ export function FilterSidebar({
             onChange={handleTimeSavedChange}
           >
             <RangeSliderTrack>
-              <RangeSliderFilledTrack bg="blue.400" />
+              <RangeSliderFilledTrack bg="brand.400" />
             </RangeSliderTrack>
             <RangeSliderThumb index={0} />
           </RangeSlider>

@@ -34,9 +34,7 @@ function resourcesToCSV(resources: Resource[]): string {
     title: resource.title,
     author_email: resource.author_email || "Anonymous",
     time_saved: resource.time_saved_value ?? null,
-    tools: resource.tools_used
-      ? Object.keys(resource.tools_used).join("; ")
-      : "",
+    tools: resource.tools_used ? Object.keys(resource.tools_used).join("; ") : "",
     views: resource.analytics?.view_count ?? 0,
     saved: resource.analytics?.save_count ?? 0,
     tried: resource.analytics?.tried_count ?? 0,

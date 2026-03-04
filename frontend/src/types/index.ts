@@ -5,9 +5,9 @@
 export type ProfessionalRole = "Educator" | "Researcher" | "Professional";
 
 export const PROFESSIONAL_ROLES: Record<ProfessionalRole, string> = {
-  "Educator": "Educator",
-  "Researcher": "Researcher",
-  "Professional": "Professional",
+  Educator: "Educator",
+  Researcher: "Researcher",
+  Professional: "Professional",
 };
 
 // Configuration types
@@ -46,7 +46,7 @@ export const SPECIALTIES: Specialty[] = [
   "lt_planning",
   "lt_support",
   "operations_admin",
-  "other"
+  "other",
 ];
 
 export interface User {
@@ -104,7 +104,18 @@ export interface UserUpdateRequest {
   };
 }
 
-export type ResourceType = "REQUEST" | "USE_CASE" | "PROMPT" | "TOOL" | "POLICY" | "PAPER" | "PROJECT" | "CONFERENCE" | "DATASET" | "BOOK" | "OTHER";
+export type ResourceType =
+  | "REQUEST"
+  | "USE_CASE"
+  | "PROMPT"
+  | "TOOL"
+  | "POLICY"
+  | "PAPER"
+  | "PROJECT"
+  | "CONFERENCE"
+  | "DATASET"
+  | "BOOK"
+  | "OTHER";
 export type ResourceStatus = "OPEN" | "SOLVED" | "ARCHIVED";
 
 export interface Resource {

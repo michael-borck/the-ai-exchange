@@ -36,19 +36,19 @@ function DisciplineGridItem({ specialty }: { specialty: DisciplineCard }) {
 
   return (
     <Box
-      bg="white"
+      bg="dark.card"
       border="1px"
-      borderColor="gray.200"
+      borderColor="dark.border"
       borderRadius="md"
       p={4}
       textAlign="center"
       cursor="pointer"
-      _hover={{ bg: "gray.50", borderColor: "blue.400" }}
+      _hover={{ borderColor: "brand.400" }}
       transition="all 0.2s"
       onClick={() => navigate(`/resources?specialty=${specialty.name}`)}
     >
       <Heading size="md">{specialty.name}</Heading>
-      <Text color="gray.600" fontSize="sm">
+      <Text color="whiteAlpha.600" fontSize="sm">
         {specialty.count} ideas
       </Text>
     </Box>
@@ -66,12 +66,9 @@ export default function HomePage() {
   const disciplines = useMemo(() => {
     const disciplineMap = new Map<string, number>();
 
-    allResources.forEach(resource => {
+    allResources.forEach((resource) => {
       if (resource.specialty) {
-        disciplineMap.set(
-          resource.specialty,
-          (disciplineMap.get(resource.specialty) || 0) + 1
-        );
+        disciplineMap.set(resource.specialty, (disciplineMap.get(resource.specialty) || 0) + 1);
       }
     });
 
@@ -87,7 +84,7 @@ export default function HomePage() {
     return [...allResources]
       .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
       .slice(0, 3)
-      .map(resource => ({
+      .map((resource) => ({
         id: resource.id,
         title: resource.title,
         author: resource.author_name || "Faculty Member",
@@ -108,7 +105,7 @@ export default function HomePage() {
     return [...allResources]
       .sort((a, b) => (b.analytics?.view_count || 0) - (a.analytics?.view_count || 0))
       .slice(0, 3)
-      .map(resource => ({
+      .map((resource) => ({
         id: resource.id,
         title: resource.title,
         author: resource.author_name || "Faculty Member",
@@ -133,8 +130,9 @@ export default function HomePage() {
             <Heading size="2xl" fontWeight="bold" lineHeight="tight">
               Discover How Colleagues Use AI Across Our School
             </Heading>
-            <Text color="gray.600" fontSize="lg" maxW="lg">
-              Share use cases, research insights, and practical applications • Find collaborators • Build together
+            <Text color="whiteAlpha.600" fontSize="lg" maxW="lg">
+              Share use cases, research insights, and practical applications • Find collaborators •
+              Build together
             </Text>
           </VStack>
 
@@ -157,22 +155,17 @@ export default function HomePage() {
           </InputGroup>
 
           <HStack spacing={4} pt={2}>
-            <Button
-              size="lg"
-              colorScheme="blue"
-              onClick={() => navigate("/resources/new")}
-            >
+            <Button size="lg" colorScheme="brand" onClick={() => navigate("/resources/new")}>
               Share Your Idea
             </Button>
             <Button
               size="lg"
               variant="outline"
-              colorScheme="blue"
+              colorScheme="brand"
               onClick={() => navigate("/resources")}
             >
               Browse All
             </Button>
-
           </HStack>
         </VStack>
 
@@ -190,7 +183,7 @@ export default function HomePage() {
         <VStack align="stretch" spacing={4}>
           <HStack justify="space-between">
             <Heading size="lg">Recent Contributions</Heading>
-            <Button variant="link" colorScheme="blue" onClick={() => navigate("/resources")}>
+            <Button variant="link" colorScheme="brand" onClick={() => navigate("/resources")}>
               View All →
             </Button>
           </HStack>
@@ -199,8 +192,17 @@ export default function HomePage() {
               <Spinner />
             </Center>
           ) : recentResources.length === 0 ? (
-            <Box bg="gray.50" p={8} borderRadius="md" textAlign="center">
-              <Text color="gray.600">No resources shared yet. Be the first to share an idea!</Text>
+            <Box
+              bg="dark.card"
+              p={8}
+              border="1px"
+              borderColor="dark.border"
+              borderRadius="md"
+              textAlign="center"
+            >
+              <Text color="whiteAlpha.600">
+                No resources shared yet. Be the first to share an idea!
+              </Text>
             </Box>
           ) : (
             <SimpleGrid columns={{ base: 1, md: 3 }} spacing={4}>
@@ -229,7 +231,11 @@ export default function HomePage() {
         <VStack align="stretch" spacing={4} pb={8}>
           <HStack justify="space-between">
             <Heading size="lg">Most Popular</Heading>
-            <Button variant="link" colorScheme="blue" onClick={() => navigate("/resources?sort=popular")}>
+            <Button
+              variant="link"
+              colorScheme="brand"
+              onClick={() => navigate("/resources?sort=popular")}
+            >
               View All →
             </Button>
           </HStack>
@@ -238,8 +244,15 @@ export default function HomePage() {
               <Spinner />
             </Center>
           ) : mostPopularResources.length === 0 ? (
-            <Box bg="gray.50" p={8} borderRadius="md" textAlign="center">
-              <Text color="gray.600">No resources available yet.</Text>
+            <Box
+              bg="dark.card"
+              p={8}
+              border="1px"
+              borderColor="dark.border"
+              borderRadius="md"
+              textAlign="center"
+            >
+              <Text color="whiteAlpha.600">No resources available yet.</Text>
             </Box>
           ) : (
             <SimpleGrid columns={{ base: 1, md: 3 }} spacing={4}>

@@ -25,7 +25,13 @@ import {
 } from "@chakra-ui/react";
 import { useAuth } from "@/hooks/useAuth";
 import { useResource, useDeleteResource, useResources } from "@/hooks/useResources";
-import { useSaveResource, useTriedResource, useTrackView, useIsResourceSaved, useResourceUsersTried } from "@/hooks/useEngagement";
+import {
+  useSaveResource,
+  useTriedResource,
+  useTrackView,
+  useIsResourceSaved,
+  useResourceUsersTried,
+} from "@/hooks/useEngagement";
 import { useEffect, useMemo, useRef } from "react";
 
 export default function ResourceDetailPage() {
@@ -87,7 +93,11 @@ export default function ResourceDetailPage() {
   };
 
   const handleDelete = async () => {
-    if (!window.confirm("Are you sure you want to delete this resource? This action cannot be undone.")) {
+    if (
+      !window.confirm(
+        "Are you sure you want to delete this resource? This action cannot be undone."
+      )
+    ) {
       return;
     }
 
@@ -179,23 +189,21 @@ export default function ResourceDetailPage() {
               <VStack align="flex-start" spacing={3} width="full">
                 <Heading size="lg">{resource.title}</Heading>
                 <HStack spacing={2}>
-                  <Badge colorScheme="blue">{resource.type}</Badge>
+                  <Badge colorScheme="brand">{resource.type}</Badge>
                   {resource.status && (
                     <Badge
                       colorScheme={
                         resource.status === "SOLVED"
                           ? "green"
                           : resource.status === "ARCHIVED"
-                          ? "gray"
-                          : "yellow"
+                            ? "gray"
+                            : "yellow"
                       }
                     >
                       {resource.status}
                     </Badge>
                   )}
-                  {resource.is_verified && (
-                    <Badge colorScheme="green">Verified</Badge>
-                  )}
+                  {resource.is_verified && <Badge colorScheme="green">Verified</Badge>}
                 </HStack>
               </VStack>
 
@@ -206,7 +214,7 @@ export default function ResourceDetailPage() {
                     <Text fontSize="sm" fontWeight="semibold">
                       Shared by {resource.author_name || "Faculty Member"}
                     </Text>
-                    <Text fontSize="xs" color="gray.600">
+                    <Text fontSize="xs" color="whiteAlpha.600">
                       {new Date(resource.created_at).toLocaleDateString()}
                     </Text>
                   </VStack>
@@ -214,11 +222,7 @@ export default function ResourceDetailPage() {
                   {canDelete && (
                     <HStack spacing={2}>
                       {canDelete && (
-                        <Button
-                          size="sm"
-                          colorScheme="blue"
-                          onClick={handleEdit}
-                        >
+                        <Button size="sm" colorScheme="brand" onClick={handleEdit}>
                           Edit
                         </Button>
                       )}
@@ -237,7 +241,7 @@ export default function ResourceDetailPage() {
 
               {/* For guests - only show date, hide author info */}
               {!user && (
-                <Text fontSize="xs" color="gray.600">
+                <Text fontSize="xs" color="whiteAlpha.600">
                   Shared on {new Date(resource.created_at).toLocaleDateString()}
                 </Text>
               )}
@@ -249,7 +253,7 @@ export default function ResourceDetailPage() {
                 <Button
                   size="sm"
                   variant={hasSaved ? "solid" : "outline"}
-                  colorScheme="blue"
+                  colorScheme="brand"
                   onClick={handleSave}
                   isLoading={saveResourceMutation.isPending}
                 >
@@ -269,16 +273,12 @@ export default function ResourceDetailPage() {
 
             {/* Login prompt for guests */}
             {!user && (
-              <Box bg="blue.50" p={4} borderRadius="md" border="1px" borderColor="blue.200">
-                <Text fontSize="sm" color="blue.900">
-                  <strong>Want to collaborate?</strong> Log in to see the creator's details and start working together.
+              <Box bg="brand.900" p={4} borderRadius="md" border="1px" borderColor="brand.700">
+                <Text fontSize="sm" color="brand.100">
+                  <strong>Want to collaborate?</strong> Log in to see the creator's details and
+                  start working together.
                 </Text>
-                <Button
-                  size="sm"
-                  colorScheme="blue"
-                  mt={3}
-                  onClick={() => navigate("/login")}
-                >
+                <Button size="sm" colorScheme="brand" mt={3} onClick={() => navigate("/login")}>
                   Log In
                 </Button>
               </Box>
@@ -287,7 +287,7 @@ export default function ResourceDetailPage() {
             <Divider />
 
             {/* Tabs for content sections */}
-            <Tabs variant="soft-rounded" colorScheme="blue">
+            <Tabs variant="soft-rounded" colorScheme="brand">
               <TabList>
                 <Tab>Overview</Tab>
                 <Tab>Details</Tab>
@@ -299,7 +299,7 @@ export default function ResourceDetailPage() {
                 <TabPanel>
                   <VStack align="stretch" spacing={4}>
                     <Box>
-                      <Text whiteSpace="pre-wrap" color="gray.800">
+                      <Text whiteSpace="pre-wrap" color="whiteAlpha.800">
                         {resource.content_text}
                       </Text>
                     </Box>
@@ -311,12 +311,12 @@ export default function ResourceDetailPage() {
                   <VStack align="stretch" spacing={4}>
                     {resource.system_tags.length > 0 && (
                       <Box>
-                        <Text fontSize="sm" fontWeight="bold" color="gray.600" mb={2}>
+                        <Text fontSize="sm" fontWeight="bold" color="whiteAlpha.600" mb={2}>
                           Topics
                         </Text>
                         <HStack spacing={2} flexWrap="wrap">
                           {resource.system_tags.map((tag) => (
-                            <Badge key={tag} colorScheme="blue" variant="outline">
+                            <Badge key={tag} colorScheme="brand" variant="outline">
                               {tag}
                             </Badge>
                           ))}
@@ -324,7 +324,7 @@ export default function ResourceDetailPage() {
                       </Box>
                     )}
                     <Box>
-                      <Text fontSize="sm" fontWeight="bold" color="gray.600" mb={2}>
+                      <Text fontSize="sm" fontWeight="bold" color="whiteAlpha.600" mb={2}>
                         Resource Information
                       </Text>
                       <VStack align="flex-start" spacing={2} fontSize="sm">
@@ -348,11 +348,11 @@ export default function ResourceDetailPage() {
                   <VStack align="stretch" spacing={4}>
                     {/* Users who tried it */}
                     <Box>
-                      <Text fontSize="sm" fontWeight="bold" color="gray.600" mb={3}>
+                      <Text fontSize="sm" fontWeight="bold" color="whiteAlpha.600" mb={3}>
                         Users Who Tried It ({usersTried.length})
                       </Text>
                       {usersTried.length === 0 ? (
-                        <Text fontSize="xs" color="gray.500" fontStyle="italic">
+                        <Text fontSize="xs" color="whiteAlpha.500" fontStyle="italic">
                           Be the first to try and share your experience!
                         </Text>
                       ) : (
@@ -362,23 +362,23 @@ export default function ResourceDetailPage() {
                               key={user.id}
                               p={3}
                               border="1px"
-                              borderColor="gray.200"
+                              borderColor="dark.border"
                               borderRadius="md"
-                              bg="gray.50"
+                              bg="dark.subtle"
                             >
                               <HStack justify="space-between" width="full">
                                 <VStack align="flex-start" spacing={0}>
                                   <Text fontSize="sm" fontWeight="semibold">
                                     {user.full_name}
                                   </Text>
-                                  <Text fontSize="xs" color="gray.600">
+                                  <Text fontSize="xs" color="whiteAlpha.600">
                                     {user.email}
                                   </Text>
                                 </VStack>
                                 <Button
                                   size="xs"
                                   variant="outline"
-                                  colorScheme="blue"
+                                  colorScheme="brand"
                                   onClick={() => {
                                     window.location.href = `mailto:${user.email}?subject=Re: ${resource?.title || "Resource"}`;
                                   }}
@@ -393,11 +393,11 @@ export default function ResourceDetailPage() {
                     </Box>
 
                     <Box>
-                      <Text fontSize="sm" fontWeight="bold" color="gray.600" mb={3}>
+                      <Text fontSize="sm" fontWeight="bold" color="whiteAlpha.600" mb={3}>
                         Similar Ideas
                       </Text>
                       {similarResources.length === 0 ? (
-                        <Text fontSize="xs" color="gray.500" fontStyle="italic">
+                        <Text fontSize="xs" color="whiteAlpha.500" fontStyle="italic">
                           No similar ideas in this specialty
                         </Text>
                       ) : (
@@ -407,7 +407,7 @@ export default function ResourceDetailPage() {
                               key={similar.id}
                               p={3}
                               border="1px"
-                              borderColor="gray.200"
+                              borderColor="dark.border"
                               borderRadius="md"
                               cursor="pointer"
                               _hover={{ bg: "gray.50" }}
@@ -416,7 +416,7 @@ export default function ResourceDetailPage() {
                               <Text fontSize="sm" fontWeight="semibold" noOfLines={2}>
                                 {similar.title}
                               </Text>
-                              <Text fontSize="xs" color="gray.600" mt={1}>
+                              <Text fontSize="xs" color="whiteAlpha.600" mt={1}>
                                 by {similar.author_name || "Faculty Member"} • {similar.specialty}
                               </Text>
                             </Box>
@@ -435,8 +435,8 @@ export default function ResourceDetailPage() {
         <GridItem display={{ base: "none", lg: "block" }}>
           <VStack align="stretch" spacing={4} position="sticky" top={6}>
             {/* Quick stats */}
-            <Box bg="white" p={4} borderRadius="lg" boxShadow="sm">
-              <Text fontSize="xs" fontWeight="bold" color="gray.600" mb={3}>
+            <Box bg="dark.card" p={4} borderRadius="lg" boxShadow="sm">
+              <Text fontSize="xs" fontWeight="bold" color="whiteAlpha.600" mb={3}>
                 ENGAGEMENT
               </Text>
               <VStack align="stretch" spacing={3}>
@@ -463,8 +463,8 @@ export default function ResourceDetailPage() {
 
             {/* Author card - only show to logged-in users if not anonymous */}
             {user && !resource.is_anonymous && (
-              <Box bg="white" p={4} borderRadius="lg" boxShadow="sm">
-                <Text fontSize="xs" fontWeight="bold" color="gray.600" mb={3}>
+              <Box bg="dark.card" p={4} borderRadius="lg" boxShadow="sm">
+                <Text fontSize="xs" fontWeight="bold" color="whiteAlpha.600" mb={3}>
                   AUTHOR
                 </Text>
                 <VStack align="stretch" spacing={2}>
@@ -474,7 +474,7 @@ export default function ResourceDetailPage() {
                   <Button
                     size="xs"
                     variant="outline"
-                    colorScheme="blue"
+                    colorScheme="brand"
                     width="full"
                     as="a"
                     href={`mailto:${resource?.author_email}`}
@@ -486,8 +486,8 @@ export default function ResourceDetailPage() {
 
                 {/* Collaborators */}
                 {resource?.collaborators && resource.collaborators.length > 0 && (
-                  <Box borderTop="1px solid" borderColor="gray.200" pt={3} mt={3}>
-                    <Text fontSize="xs" fontWeight="bold" color="gray.600" mb={2}>
+                  <Box borderTop="1px solid" borderColor="dark.border" pt={3} mt={3}>
+                    <Text fontSize="xs" fontWeight="bold" color="whiteAlpha.600" mb={2}>
                       COLLABORATORS
                     </Text>
                     <VStack align="stretch" spacing={1}>
@@ -512,7 +512,6 @@ export default function ResourceDetailPage() {
           </VStack>
         </GridItem>
       </Grid>
-
     </Layout>
   );
 }

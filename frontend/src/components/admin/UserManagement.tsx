@@ -19,7 +19,14 @@ import {
   Text,
   Badge,
 } from "@chakra-ui/react";
-import { useAdminUsers, useUpdateUserRole, useUpdateUserStatus, useApproveUser, useVerifyUser, useDeleteUser } from "@/hooks/useAdminUsers";
+import {
+  useAdminUsers,
+  useUpdateUserRole,
+  useUpdateUserStatus,
+  useApproveUser,
+  useVerifyUser,
+  useDeleteUser,
+} from "@/hooks/useAdminUsers";
 import { User } from "@/types/index";
 
 export function UserManagement() {
@@ -141,16 +148,16 @@ export function UserManagement() {
 
   if (users.length === 0) {
     return (
-      <Box bg="white" p={6} borderRadius="lg" textAlign="center">
-        <Text color="gray.600">No users found</Text>
+      <Box bg="dark.card" p={6} borderRadius="lg" textAlign="center">
+        <Text color="whiteAlpha.600">No users found</Text>
       </Box>
     );
   }
 
   return (
-    <Box bg="white" borderRadius="lg" overflow="hidden" boxShadow="sm">
+    <Box bg="dark.card" borderRadius="lg" overflow="hidden" boxShadow="sm">
       <Table variant="simple" size="sm">
-        <Thead bg="gray.50">
+        <Thead bg="dark.subtle">
           <Tr>
             <Th>Email</Th>
             <Th>Name</Th>
@@ -194,9 +201,7 @@ export function UserManagement() {
                   {user.is_approved ? "Approved" : "Pending"}
                 </Badge>
               </Td>
-              <Td fontSize="sm">
-                {new Date(user.created_at).toLocaleDateString()}
-              </Td>
+              <Td fontSize="sm">{new Date(user.created_at).toLocaleDateString()}</Td>
               <Td>
                 <HStack spacing={2}>
                   {!user.is_active && (

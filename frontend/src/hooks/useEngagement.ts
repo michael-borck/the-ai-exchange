@@ -43,9 +43,11 @@ export const useTrackView = (resourceId: string) => {
 
   return useMutation({
     mutationFn: async () => {
-      const response = await apiClient.post<{ resource_id: string; view_count: number; status: string }>(
-        `/resources/${resourceId}/view`
-      );
+      const response = await apiClient.post<{
+        resource_id: string;
+        view_count: number;
+        status: string;
+      }>(`/resources/${resourceId}/view`);
       return response.data;
     },
     onSuccess: () => {
@@ -63,9 +65,7 @@ export const useSaveResource = () => {
 
   return useMutation({
     mutationFn: async (resourceId: string) => {
-      const response = await apiClient.post<SaveResponse>(
-        `/resources/${resourceId}/save`
-      );
+      const response = await apiClient.post<SaveResponse>(`/resources/${resourceId}/save`);
       return response.data;
     },
     onSuccess: (data) => {
@@ -90,9 +90,7 @@ export const useIsResourceSaved = (resourceId: string, isAuthenticated: boolean 
   return useQuery({
     queryKey: ["isResourceSaved", resourceId],
     queryFn: async () => {
-      const response = await apiClient.get<IsSavedResponse>(
-        `/resources/${resourceId}/is-saved`
-      );
+      const response = await apiClient.get<IsSavedResponse>(`/resources/${resourceId}/is-saved`);
       return response.data.is_saved;
     },
     enabled: !!resourceId && isAuthenticated,
@@ -107,9 +105,7 @@ export const useTriedResource = () => {
 
   return useMutation({
     mutationFn: async (resourceId: string) => {
-      const response = await apiClient.post<TriedResponse>(
-        `/resources/${resourceId}/tried`
-      );
+      const response = await apiClient.post<TriedResponse>(`/resources/${resourceId}/tried`);
       return response.data;
     },
     onSuccess: (data) => {
@@ -130,10 +126,7 @@ export const useTriedResource = () => {
 /**
  * Get all resources saved by current user
  */
-export const useUserSavedResources = (options?: {
-  skip?: number;
-  limit?: number;
-}) => {
+export const useUserSavedResources = (options?: { skip?: number; limit?: number }) => {
   return useQuery({
     queryKey: ["savedResources", options?.skip ?? 0, options?.limit ?? 100],
     queryFn: async () => {
@@ -152,10 +145,7 @@ export const useUserSavedResources = (options?: {
 /**
  * Get all resources tried by current user
  */
-export const useUserTriedResources = (options?: {
-  skip?: number;
-  limit?: number;
-}) => {
+export const useUserTriedResources = (options?: { skip?: number; limit?: number }) => {
   return useQuery({
     queryKey: ["triedResources", options?.skip ?? 0, options?.limit ?? 100],
     queryFn: async () => {

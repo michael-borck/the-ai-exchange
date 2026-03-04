@@ -14,9 +14,7 @@ export function useVerifyResource() {
 
   return useMutation({
     mutationFn: async (resourceId: string) => {
-      const response = await api.patch<Resource>(
-        `/admin/resources/${resourceId}/verify`
-      );
+      const response = await api.patch<Resource>(`/admin/resources/${resourceId}/verify`);
       return response.data;
     },
     onSuccess: () => {
@@ -33,9 +31,7 @@ export function useHideResource() {
 
   return useMutation({
     mutationFn: async (resourceId: string) => {
-      const response = await api.patch<Resource>(
-        `/admin/resources/${resourceId}/hide`
-      );
+      const response = await api.patch<Resource>(`/admin/resources/${resourceId}/hide`);
       return response.data;
     },
     onSuccess: () => {
@@ -52,9 +48,7 @@ export function useUnhideResource() {
 
   return useMutation({
     mutationFn: async (resourceId: string) => {
-      const response = await api.patch<Resource>(
-        `/admin/resources/${resourceId}/unhide`
-      );
+      const response = await api.patch<Resource>(`/admin/resources/${resourceId}/unhide`);
       return response.data;
     },
     onSuccess: () => {

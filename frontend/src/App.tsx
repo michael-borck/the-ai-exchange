@@ -2,7 +2,8 @@
  * Main App Component
  */
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
-import { ChakraProvider } from "@chakra-ui/react";
+import { ChakraProvider, ColorModeScript } from "@chakra-ui/react";
+import theme from "@/theme";
 import { QueryClientProvider, QueryClient } from "@tanstack/react-query";
 
 import { AuthProvider } from "@/context/AuthContext";
@@ -36,7 +37,8 @@ const queryClient = new QueryClient({
 
 function App() {
   return (
-    <ChakraProvider>
+    <ChakraProvider theme={theme}>
+      <ColorModeScript initialColorMode={theme.config.initialColorMode} />
       <QueryClientProvider client={queryClient}>
         <Router>
           <AuthProvider>

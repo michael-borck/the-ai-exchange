@@ -28,7 +28,7 @@ export default function LegalPage() {
           <Heading size="2xl" fontWeight="bold">
             Legal & Policies
           </Heading>
-          <Text fontSize="lg" color="gray.600" maxW="2xl">
+          <Text fontSize="lg" color="whiteAlpha.600" maxW="2xl">
             Understanding our policies, terms, and commitment to your privacy and safety
           </Text>
         </VStack>
@@ -36,7 +36,7 @@ export default function LegalPage() {
         <Divider />
 
         {/* Tabbed Interface */}
-        <Tabs variant="soft-rounded" colorScheme="blue">
+        <Tabs variant="soft-rounded" colorScheme="brand">
           <TabList mb={4} flexWrap="wrap">
             <Tab>Privacy Policy</Tab>
             <Tab>Terms of Use</Tab>
@@ -52,8 +52,9 @@ export default function LegalPage() {
                   <Heading size="lg" mb={4}>
                     Privacy Policy
                   </Heading>
-                  <Text fontSize="md" color="gray.700" lineHeight="1.8" mb={4}>
-                    The AI Exchange is committed to protecting your privacy. This policy explains how we collect, use, and protect your information.
+                  <Text fontSize="md" color="whiteAlpha.700" lineHeight="1.8" mb={4}>
+                    The AI Exchange is committed to protecting your privacy. This policy explains
+                    how we collect, use, and protect your information.
                   </Text>
                 </Box>
 
@@ -63,16 +64,20 @@ export default function LegalPage() {
                   </Heading>
                   <UnorderedList spacing={2}>
                     <ListItem>
-                      <strong>Account Information:</strong> Name, email, and institutional affiliation
+                      <strong>Account Information:</strong> Name, email, and institutional
+                      affiliation
                     </ListItem>
                     <ListItem>
-                      <strong>Profile Data:</strong> Professional roles, specialties, and notification preferences
+                      <strong>Profile Data:</strong> Professional roles, specialties, and
+                      notification preferences
                     </ListItem>
                     <ListItem>
-                      <strong>Usage Data:</strong> Pages visited, resources viewed/saved, and interactions
+                      <strong>Usage Data:</strong> Pages visited, resources viewed/saved, and
+                      interactions
                     </ListItem>
                     <ListItem>
-                      <strong>Content You Share:</strong> Ideas, workflows, and professional practices you submit
+                      <strong>Content You Share:</strong> Ideas, workflows, and professional
+                      practices you submit
                     </ListItem>
                   </UnorderedList>
                 </Box>
@@ -95,10 +100,14 @@ export default function LegalPage() {
                     Data Protection
                   </Heading>
                   <Text mb={4}>
-                    Your data is protected using industry-standard security measures. We store data securely and only access it for the purposes stated in this policy.
+                    Your data is protected using industry-standard security measures. We store data
+                    securely and only access it for the purposes stated in this policy.
                   </Text>
                   <Text mb={4}>
-                    This platform is an internal Curtin University service. Data is stored in accordance with Curtin University's data governance policies and relevant privacy legislation (Australian Privacy Act, GDPR compliance for international users, etc.).
+                    This platform is an internal Curtin University service. Data is stored in
+                    accordance with Curtin University's data governance policies and relevant
+                    privacy legislation (Australian Privacy Act, GDPR compliance for international
+                    users, etc.).
                   </Text>
                 </Box>
 
@@ -109,11 +118,20 @@ export default function LegalPage() {
                   <UnorderedList spacing={2}>
                     <ListItem>Access your personal data</ListItem>
                     <ListItem>Correct inaccurate information</ListItem>
-                    <ListItem>Request deletion of your account (certain limitations apply)</ListItem>
+                    <ListItem>
+                      Request deletion of your account (certain limitations apply)
+                    </ListItem>
                     <ListItem>Opt out of non-essential communications</ListItem>
                   </UnorderedList>
-                  <Text mt={4} fontSize="sm" color="gray.600">
-                    For privacy concerns, contact <Link href="mailto:michael.borck@curtin.edu.au" color="blue.600" textDecoration="underline">michael.borck@curtin.edu.au</Link>
+                  <Text mt={4} fontSize="sm" color="whiteAlpha.600">
+                    For privacy concerns, contact{" "}
+                    <Link
+                      href="mailto:michael.borck@curtin.edu.au"
+                      color="brand.300"
+                      textDecoration="underline"
+                    >
+                      michael.borck@curtin.edu.au
+                    </Link>
                   </Text>
                 </Box>
               </VStack>
@@ -126,7 +144,7 @@ export default function LegalPage() {
                   <Heading size="lg" mb={4}>
                     Terms of Use
                   </Heading>
-                  <Text fontSize="md" color="gray.700" lineHeight="1.8" mb={4}>
+                  <Text fontSize="md" color="whiteAlpha.700" lineHeight="1.8" mb={4}>
                     By using The AI Exchange, you agree to these terms. Please read them carefully.
                   </Text>
                 </Box>
@@ -136,7 +154,9 @@ export default function LegalPage() {
                     License & Access
                   </Heading>
                   <Text mb={3}>
-                    The AI Exchange is provided for use by Curtin University staff and authorised users only. You are granted a personal, non-transferable licence to access and use the platform in accordance with these terms.
+                    The AI Exchange is provided for use by Curtin University staff and authorised
+                    users only. You are granted a personal, non-transferable licence to access and
+                    use the platform in accordance with these terms.
                   </Text>
                 </Box>
 
@@ -147,11 +167,17 @@ export default function LegalPage() {
                   <Text mb={3}>You are responsible for:</Text>
                   <UnorderedList spacing={2}>
                     <ListItem>Maintaining the confidentiality of your login credentials</ListItem>
-                    <ListItem>Ensuring shared content complies with applicable laws and university policies</ListItem>
+                    <ListItem>
+                      Ensuring shared content complies with applicable laws and university policies
+                    </ListItem>
                     <ListItem>Not infringing on intellectual property rights of others</ListItem>
                     <ListItem>Respecting the confidentiality and privacy of others</ListItem>
-                    <ListItem>Using the platform in good faith and with appropriate context</ListItem>
-                    <ListItem>Not sharing sensitive, personal, or confidential information</ListItem>
+                    <ListItem>
+                      Using the platform in good faith and with appropriate context
+                    </ListItem>
+                    <ListItem>
+                      Not sharing sensitive, personal, or confidential information
+                    </ListItem>
                   </UnorderedList>
                 </Box>
 
@@ -160,10 +186,13 @@ export default function LegalPage() {
                     Content Rights
                   </Heading>
                   <Text mb={3}>
-                    <strong>User-Submitted Content:</strong> You retain ownership of content you share on The AI Exchange. By posting, you grant Curtin University and other users a non-exclusive licence to view and use your content within this platform.
+                    <strong>User-Submitted Content:</strong> You retain ownership of content you
+                    share on The AI Exchange. By posting, you grant Curtin University and other
+                    users a non-exclusive licence to view and use your content within this platform.
                   </Text>
                   <Text mb={3}>
-                    <strong>Platform Content:</strong> The AI Exchange software and documentation are licensed under the MIT License. See the About page for more details.
+                    <strong>Platform Content:</strong> The AI Exchange software and documentation
+                    are licensed under the MIT License. See the About page for more details.
                   </Text>
                 </Box>
 
@@ -172,13 +201,18 @@ export default function LegalPage() {
                     Disclaimer of Liability
                   </Heading>
                   <Text>
-                    The AI Exchange is provided "as is" without warranties. We are not responsible for:
+                    The AI Exchange is provided "as is" without warranties. We are not responsible
+                    for:
                   </Text>
                   <UnorderedList spacing={2} mt={3}>
                     <ListItem>Accuracy or completeness of user-submitted content</ListItem>
-                    <ListItem>Any damages or losses from using this platform or content within it</ListItem>
+                    <ListItem>
+                      Any damages or losses from using this platform or content within it
+                    </ListItem>
                     <ListItem>Temporary service interruptions or data loss</ListItem>
-                    <ListItem>Third-party tools, links, or resources mentioned in shared content</ListItem>
+                    <ListItem>
+                      Third-party tools, links, or resources mentioned in shared content
+                    </ListItem>
                   </UnorderedList>
                 </Box>
 
@@ -187,7 +221,8 @@ export default function LegalPage() {
                     Termination of Access
                   </Heading>
                   <Text>
-                    We reserve the right to suspend or terminate access to any user who violates these terms or engages in inappropriate conduct.
+                    We reserve the right to suspend or terminate access to any user who violates
+                    these terms or engages in inappropriate conduct.
                   </Text>
                 </Box>
               </VStack>
@@ -200,36 +235,45 @@ export default function LegalPage() {
                   <Heading size="lg" mb={4}>
                     Code of Conduct
                   </Heading>
-                  <Text fontSize="md" color="gray.700" lineHeight="1.8" mb={4}>
-                    The AI Exchange thrives when members treat each other with respect, professionalism, and good faith.
+                  <Text fontSize="md" color="whiteAlpha.700" lineHeight="1.8" mb={4}>
+                    The AI Exchange thrives when members treat each other with respect,
+                    professionalism, and good faith.
                   </Text>
                 </Box>
 
-                <Box bg="blue.50" p={6} borderRadius="lg">
-                  <Heading size="md" mb={3} color="blue.900">
+                <Box bg="brand.900" p={6} borderRadius="lg">
+                  <Heading size="md" mb={3} color="brand.100">
                     Expected Behaviour
                   </Heading>
-                  <UnorderedList spacing={2} color="blue.900">
+                  <UnorderedList spacing={2} color="brand.100">
                     <ListItem>Be respectful and professional in all interactions</ListItem>
-                    <ListItem>Share content in good faith with appropriate context and disclaimers</ListItem>
-                    <ListItem>Respect intellectual property and provide proper attribution</ListItem>
+                    <ListItem>
+                      Share content in good faith with appropriate context and disclaimers
+                    </ListItem>
+                    <ListItem>
+                      Respect intellectual property and provide proper attribution
+                    </ListItem>
                     <ListItem>Acknowledge the contributions and ideas of others</ListItem>
                     <ListItem>Give constructive feedback when engaging with others' ideas</ListItem>
                     <ListItem>Respect confidentiality and privacy of colleagues</ListItem>
-                    <ListItem>Acknowledge limitations and uncertainties in your shared approaches</ListItem>
+                    <ListItem>
+                      Acknowledge limitations and uncertainties in your shared approaches
+                    </ListItem>
                   </UnorderedList>
                 </Box>
 
-                <Box bg="red.50" p={6} borderRadius="lg" borderLeft="4px" borderColor="red.400">
-                  <Heading size="md" mb={3} color="red.900">
+                <Box bg="red.900" p={6} borderRadius="lg" borderLeft="4px" borderColor="red.400">
+                  <Heading size="md" mb={3} color="red.100">
                     Unacceptable Behaviour
                   </Heading>
-                  <Text color="red.900" mb={3}>
+                  <Text color="red.100" mb={3}>
                     The following behaviours are prohibited:
                   </Text>
-                  <UnorderedList spacing={2} color="red.900">
+                  <UnorderedList spacing={2} color="red.100">
                     <ListItem>Harassment, discrimination, or offensive language</ListItem>
-                    <ListItem>Sharing confidential, sensitive, or personal information without consent</ListItem>
+                    <ListItem>
+                      Sharing confidential, sensitive, or personal information without consent
+                    </ListItem>
                     <ListItem>Plagiarism or intellectual property violations</ListItem>
                     <ListItem>Spam or commercial solicitation</ListItem>
                     <ListItem>Spreading misinformation or deliberately deceptive content</ListItem>
@@ -242,7 +286,8 @@ export default function LegalPage() {
                     Reporting & Enforcement
                   </Heading>
                   <Text mb={3}>
-                    If you encounter inappropriate content or behaviour, please report it immediately. See the Support page for how to report.
+                    If you encounter inappropriate content or behaviour, please report it
+                    immediately. See the Support page for how to report.
                   </Text>
                   <Text mb={3}>
                     We investigate all reports promptly and confidentially. Actions may include:
@@ -263,8 +308,9 @@ export default function LegalPage() {
                   <Heading size="lg" mb={4}>
                     Accessibility Statement
                   </Heading>
-                  <Text fontSize="md" color="gray.700" lineHeight="1.8" mb={4}>
-                    The AI Exchange is committed to providing an accessible experience for all users, including people with disabilities.
+                  <Text fontSize="md" color="whiteAlpha.700" lineHeight="1.8" mb={4}>
+                    The AI Exchange is committed to providing an accessible experience for all
+                    users, including people with disabilities.
                   </Text>
                 </Box>
 
@@ -273,7 +319,8 @@ export default function LegalPage() {
                     WCAG Compliance
                   </Heading>
                   <Text mb={3}>
-                    We aim to meet WCAG 2.1 Level AA accessibility standards. The AI Exchange includes:
+                    We aim to meet WCAG 2.1 Level AA accessibility standards. The AI Exchange
+                    includes:
                   </Text>
                   <UnorderedList spacing={2}>
                     <ListItem>Keyboard navigation support</ListItem>
@@ -291,11 +338,14 @@ export default function LegalPage() {
                     Known Limitations
                   </Heading>
                   <Text mb={3}>
-                    While we work to make this platform as accessible as possible, some limitations may exist:
+                    While we work to make this platform as accessible as possible, some limitations
+                    may exist:
                   </Text>
                   <UnorderedList spacing={2}>
                     <ListItem>User-submitted content may not meet accessibility standards</ListItem>
-                    <ListItem>Third-party tools or embedded resources may have accessibility issues</ListItem>
+                    <ListItem>
+                      Third-party tools or embedded resources may have accessibility issues
+                    </ListItem>
                     <ListItem>PDFs or downloadable documents may not be fully accessible</ListItem>
                   </UnorderedList>
                 </Box>
@@ -304,25 +354,38 @@ export default function LegalPage() {
                   <Heading size="md" mb={3}>
                     Accessibility Tools
                   </Heading>
-                  <Text mb={3}>
-                    We recommend using:
-                  </Text>
+                  <Text mb={3}>We recommend using:</Text>
                   <UnorderedList spacing={2}>
-                    <ListItem><strong>Screen Readers:</strong> NVDA, JAWS, VoiceOver (macOS)</ListItem>
-                    <ListItem><strong>Magnification:</strong> Browser zoom or OS-level magnification</ListItem>
-                    <ListItem><strong>Keyboard Navigation:</strong> Tab through interactive elements, Enter to activate</ListItem>
+                    <ListItem>
+                      <strong>Screen Readers:</strong> NVDA, JAWS, VoiceOver (macOS)
+                    </ListItem>
+                    <ListItem>
+                      <strong>Magnification:</strong> Browser zoom or OS-level magnification
+                    </ListItem>
+                    <ListItem>
+                      <strong>Keyboard Navigation:</strong> Tab through interactive elements, Enter
+                      to activate
+                    </ListItem>
                   </UnorderedList>
                 </Box>
 
-                <Box bg="green.50" p={6} borderRadius="lg">
-                  <Heading size="md" mb={3} color="green.900">
+                <Box bg="green.900" p={6} borderRadius="lg">
+                  <Heading size="md" mb={3} color="green.100">
                     Accessibility Issues?
                   </Heading>
-                  <Text color="green.900" mb={3}>
-                    If you encounter accessibility barriers, please let us know. We're committed to improving the experience for everyone.
+                  <Text color="green.100" mb={3}>
+                    If you encounter accessibility barriers, please let us know. We're committed to
+                    improving the experience for everyone.
                   </Text>
-                  <Text color="green.900" fontWeight="bold">
-                    Email: <Link href="mailto:michael.borck@curtin.edu.au" color="green.700" textDecoration="underline">michael.borck@curtin.edu.au</Link>
+                  <Text color="green.100" fontWeight="bold">
+                    Email:{" "}
+                    <Link
+                      href="mailto:michael.borck@curtin.edu.au"
+                      color="green.200"
+                      textDecoration="underline"
+                    >
+                      michael.borck@curtin.edu.au
+                    </Link>
                   </Text>
                 </Box>
               </VStack>

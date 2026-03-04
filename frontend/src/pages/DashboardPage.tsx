@@ -38,7 +38,7 @@ export default function DashboardPage() {
           <Heading size="lg" mb={2}>
             Welcome, {user?.full_name}!
           </Heading>
-          <Text color="gray.600">
+          <Text color="whiteAlpha.600">
             Discover AI use cases, share your expertise, and grow together
           </Text>
         </Box>
@@ -46,7 +46,7 @@ export default function DashboardPage() {
         {/* Quick Stats */}
         <Grid templateColumns={{ base: "1fr", md: "repeat(3, 1fr)" }} gap={6}>
           <GridItem>
-            <Box bg="white" p={6} borderRadius="lg" boxShadow="sm">
+            <Box bg="dark.card" p={6} borderRadius="lg" boxShadow="sm">
               <Stat>
                 <StatLabel>Active Requests</StatLabel>
                 <StatNumber>{requestCount}</StatNumber>
@@ -54,7 +54,7 @@ export default function DashboardPage() {
             </Box>
           </GridItem>
           <GridItem>
-            <Box bg="white" p={6} borderRadius="lg" boxShadow="sm">
+            <Box bg="dark.card" p={6} borderRadius="lg" boxShadow="sm">
               <Stat>
                 <StatLabel>Use Cases Shared</StatLabel>
                 <StatNumber>{useCaseCount}</StatNumber>
@@ -62,7 +62,7 @@ export default function DashboardPage() {
             </Box>
           </GridItem>
           <GridItem>
-            <Box bg="white" p={6} borderRadius="lg" boxShadow="sm">
+            <Box bg="dark.card" p={6} borderRadius="lg" boxShadow="sm">
               <Stat>
                 <StatLabel>Member Since</StatLabel>
                 <StatNumber fontSize="md">
@@ -74,26 +74,17 @@ export default function DashboardPage() {
         </Grid>
 
         {/* Call to Action */}
-        <Box bg="white" p={8} borderRadius="lg" boxShadow="sm">
+        <Box bg="dark.card" p={8} borderRadius="lg" boxShadow="sm">
           <VStack align="flex-start" spacing={4}>
             <Heading size="md">Get Started</Heading>
             <HStack spacing={4} flexWrap="wrap">
-              <Button
-                colorScheme="blue"
-                onClick={() => navigate("/resources/new")}
-              >
+              <Button colorScheme="brand" onClick={() => navigate("/resources/new")}>
                 Post a Request
               </Button>
-              <Button
-                variant="outline"
-                onClick={() => navigate("/resources")}
-              >
+              <Button variant="outline" onClick={() => navigate("/resources")}>
                 Browse Resources
               </Button>
-              <Button
-                variant="outline"
-                onClick={() => navigate("/profile")}
-              >
+              <Button variant="outline" onClick={() => navigate("/profile")}>
                 Manage Subscriptions
               </Button>
             </HStack>
@@ -108,19 +99,17 @@ export default function DashboardPage() {
           {isLoading ? (
             <Text>Loading...</Text>
           ) : resources.length === 0 ? (
-            <Text color="gray.600">No resources yet. Start by posting a request!</Text>
+            <Text color="whiteAlpha.600">No resources yet. Start by posting a request!</Text>
           ) : (
             <VStack spacing={3} align="stretch">
               {resources.slice(0, 5).map((resource) => (
                 <Box
                   key={resource.id}
-                  bg="white"
+                  bg="dark.card"
                   p={4}
                   borderRadius="md"
                   borderLeft="4px"
-                  borderColor={
-                    resource.type === "REQUEST" ? "blue.500" : "green.500"
-                  }
+                  borderColor={resource.type === "REQUEST" ? "blue.500" : "green.500"}
                   cursor="pointer"
                   onClick={() => navigate(`/resources/${resource.id}`)}
                   _hover={{ boxShadow: "md" }}
@@ -129,7 +118,7 @@ export default function DashboardPage() {
                   <HStack justify="space-between">
                     <VStack align="flex-start" spacing={1} flex={1}>
                       <Heading size="sm">{resource.title}</Heading>
-                      <Text fontSize="sm" color="gray.600">
+                      <Text fontSize="sm" color="whiteAlpha.600">
                         {resource.type} • {new Date(resource.created_at).toLocaleDateString()}
                       </Text>
                     </VStack>
@@ -138,8 +127,8 @@ export default function DashboardPage() {
                         {resource.system_tags.slice(0, 2).map((tag) => (
                           <Box
                             key={tag}
-                            bg="blue.100"
-                            color="blue.800"
+                            bg="brand.900"
+                            color="brand.200"
                             px={2}
                             py={1}
                             borderRadius="md"

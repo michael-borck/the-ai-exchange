@@ -51,14 +51,10 @@ function SavedIdeasSection() {
 
   if (savedResources.length === 0) {
     return (
-      <Box bg="gray.50" p={8} borderRadius="md" textAlign="center">
-        <Text color="gray.600">
+      <Box bg="dark.subtle" p={8} borderRadius="md" textAlign="center">
+        <Text color="whiteAlpha.600">
           You haven't saved any ideas yet.{" "}
-          <Button
-            variant="link"
-            colorScheme="blue"
-            onClick={() => navigate("/resources")}
-          >
+          <Button variant="link" colorScheme="brand" onClick={() => navigate("/resources")}>
             Browse and save ideas →
           </Button>
         </Text>
@@ -68,18 +64,22 @@ function SavedIdeasSection() {
 
   return (
     <VStack align="stretch" spacing={4}>
-      <Box bg="blue.50" p={4} borderRadius="md" border="1px" borderColor="blue.200">
-        <Text fontSize="sm" color="blue.900">
-          You've saved <strong>{savedResources.length} idea{savedResources.length !== 1 ? "s" : ""}</strong> to your library.
+      <Box bg="brand.900" p={4} borderRadius="md" border="1px" borderColor="brand.700">
+        <Text fontSize="sm" color="brand.100">
+          You've saved{" "}
+          <strong>
+            {savedResources.length} idea{savedResources.length !== 1 ? "s" : ""}
+          </strong>{" "}
+          to your library.
         </Text>
       </Box>
       <SimpleGrid columns={{ base: 1, md: 2, lg: 3 }} spacing={4}>
         {savedResources.map((resource: any) => (
           <Box
             key={resource.id}
-            bg="white"
+            bg="dark.card"
             border="1px"
-            borderColor="gray.200"
+            borderColor="dark.border"
             borderRadius="md"
             p={4}
             cursor="pointer"
@@ -89,13 +89,13 @@ function SavedIdeasSection() {
           >
             <VStack align="flex-start" spacing={3}>
               <HStack>
-                <Badge colorScheme="blue" variant="subtle">
+                <Badge colorScheme="brand" variant="subtle">
                   {resource.specialty || "General"}
                 </Badge>
               </HStack>
               <Heading size="sm">{resource.title}</Heading>
               <Divider />
-              <Text fontSize="xs" color="gray.600">
+              <Text fontSize="xs" color="whiteAlpha.600">
                 Saved {new Date(resource.saved_at).toLocaleDateString()}
               </Text>
             </VStack>
@@ -120,14 +120,10 @@ function TriedResourcesSection() {
 
   if (triedResources.length === 0) {
     return (
-      <Box bg="gray.50" p={8} borderRadius="md" textAlign="center">
-        <Text color="gray.600">
+      <Box bg="dark.subtle" p={8} borderRadius="md" textAlign="center">
+        <Text color="whiteAlpha.600">
           You haven't tried any ideas yet.{" "}
-          <Button
-            variant="link"
-            colorScheme="blue"
-            onClick={() => navigate("/resources")}
-          >
+          <Button variant="link" colorScheme="brand" onClick={() => navigate("/resources")}>
             Browse and try ideas →
           </Button>
         </Text>
@@ -137,18 +133,22 @@ function TriedResourcesSection() {
 
   return (
     <VStack align="stretch" spacing={4}>
-      <Box bg="green.50" p={4} borderRadius="md" border="1px" borderColor="green.200">
-        <Text fontSize="sm" color="green.900">
-          You've tried <strong>{triedResources.length} idea{triedResources.length !== 1 ? "s" : ""}</strong> from our library.
+      <Box bg="green.900" p={4} borderRadius="md" border="1px" borderColor="green.700">
+        <Text fontSize="sm" color="green.100">
+          You've tried{" "}
+          <strong>
+            {triedResources.length} idea{triedResources.length !== 1 ? "s" : ""}
+          </strong>{" "}
+          from our library.
         </Text>
       </Box>
       <SimpleGrid columns={{ base: 1, md: 2, lg: 3 }} spacing={4}>
         {triedResources.map((resource: any) => (
           <Box
             key={resource.id}
-            bg="white"
+            bg="dark.card"
             border="1px"
-            borderColor="gray.200"
+            borderColor="dark.border"
             borderRadius="md"
             p={4}
             cursor="pointer"
@@ -164,7 +164,7 @@ function TriedResourcesSection() {
               </HStack>
               <Heading size="sm">{resource.title}</Heading>
               <Divider />
-              <Text fontSize="xs" color="gray.600">
+              <Text fontSize="xs" color="whiteAlpha.600">
                 Tried {new Date(resource.saved_at).toLocaleDateString()}
               </Text>
             </VStack>
@@ -208,7 +208,7 @@ export default function ProfilePage() {
   // Filter contributions to only those created by current user
   const userContributions = useMemo(() => {
     if (!user?.id) return [];
-    return allResources.filter(resource => resource.user_id === user.id);
+    return allResources.filter((resource) => resource.user_id === user.id);
   }, [allResources, user?.id]);
 
   const handleRoleToggle = (role: ProfessionalRole) => {
@@ -264,11 +264,7 @@ export default function ProfilePage() {
         {/* Header Section */}
         <Box>
           <HStack spacing={4} mb={4}>
-            <Avatar
-              size="xl"
-              name={user?.full_name || "User"}
-              src=""
-            />
+            <Avatar size="xl" name={user?.full_name || "User"} src="" />
             <VStack align="flex-start" spacing={0}>
               <HStack spacing={2}>
                 <Heading size="lg">{user?.full_name}</Heading>
@@ -277,7 +273,7 @@ export default function ProfilePage() {
                     Admin
                   </Badge>
                 )}
-                <Badge colorScheme="blue" variant="solid">
+                <Badge colorScheme="brand" variant="solid">
                   You
                 </Badge>
               </HStack>
@@ -296,12 +292,12 @@ export default function ProfilePage() {
           {/* Specialties/Focus Areas */}
           {user?.specialties && user.specialties.length > 0 && (
             <Box mt={4}>
-              <Text fontSize="sm" fontWeight="bold" color="gray.700" mb={2}>
+              <Text fontSize="sm" fontWeight="bold" color="whiteAlpha.700" mb={2}>
                 Specialties & Focus
               </Text>
               <HStack spacing={2} flexWrap="wrap">
                 {user.specialties.map((specialty: string) => (
-                  <Badge key={specialty} colorScheme="blue" variant="subtle">
+                  <Badge key={specialty} colorScheme="brand" variant="subtle">
                     {specialty}
                   </Badge>
                 ))}
@@ -313,7 +309,7 @@ export default function ProfilePage() {
         <Divider />
 
         {/* Main Content Tabs */}
-        <Tabs variant="soft-rounded" colorScheme="blue">
+        <Tabs variant="soft-rounded" colorScheme="brand">
           <TabList>
             <Tab>My Activity</Tab>
             <Tab>Settings</Tab>
@@ -328,7 +324,7 @@ export default function ProfilePage() {
                   <Heading size="md" mb={4}>
                     Shared Ideas
                   </Heading>
-                  <Text fontSize="sm" color="gray.600" mb={4}>
+                  <Text fontSize="sm" color="whiteAlpha.600" mb={4}>
                     Ideas you've shared that are helping the community
                   </Text>
                   {isLoadingResources ? (
@@ -336,12 +332,12 @@ export default function ProfilePage() {
                       <Spinner />
                     </Center>
                   ) : userContributions.length === 0 ? (
-                    <Box bg="gray.50" p={8} borderRadius="md" textAlign="center">
-                      <Text color="gray.600">
+                    <Box bg="dark.subtle" p={8} borderRadius="md" textAlign="center">
+                      <Text color="whiteAlpha.600">
                         You haven't shared any ideas yet.{" "}
                         <Button
                           variant="link"
-                          colorScheme="blue"
+                          colorScheme="brand"
                           onClick={() => navigate("/resources/new")}
                         >
                           Share your first idea →
@@ -353,9 +349,9 @@ export default function ProfilePage() {
                       {userContributions.map((contribution) => (
                         <Box
                           key={contribution.id}
-                          bg="white"
+                          bg="dark.card"
                           border="1px"
-                          borderColor="gray.200"
+                          borderColor="dark.border"
                           borderRadius="md"
                           p={4}
                           cursor="pointer"
@@ -365,7 +361,7 @@ export default function ProfilePage() {
                         >
                           <VStack align="flex-start" spacing={3}>
                             <HStack>
-                              <Badge colorScheme="blue" variant="subtle">
+                              <Badge colorScheme="brand" variant="subtle">
                                 {contribution.specialty || "General"}
                               </Badge>
                             </HStack>
@@ -373,16 +369,22 @@ export default function ProfilePage() {
                             <Divider />
                             <HStack spacing={4} width="full" fontSize="xs">
                               <HStack spacing={1}>
-                                <Text color="gray.600">👁️</Text>
-                                <Text fontWeight="bold">{contribution.analytics?.view_count || 0}</Text>
+                                <Text color="whiteAlpha.600">👁️</Text>
+                                <Text fontWeight="bold">
+                                  {contribution.analytics?.view_count || 0}
+                                </Text>
                               </HStack>
                               <HStack spacing={1}>
-                                <Text color="gray.600">💾</Text>
-                                <Text fontWeight="bold">{contribution.analytics?.save_count || 0}</Text>
+                                <Text color="whiteAlpha.600">💾</Text>
+                                <Text fontWeight="bold">
+                                  {contribution.analytics?.save_count || 0}
+                                </Text>
                               </HStack>
                               <HStack spacing={1}>
-                                <Text color="gray.600">✓</Text>
-                                <Text fontWeight="bold">{contribution.analytics?.tried_count || 0}</Text>
+                                <Text color="whiteAlpha.600">✓</Text>
+                                <Text fontWeight="bold">
+                                  {contribution.analytics?.tried_count || 0}
+                                </Text>
                               </HStack>
                             </HStack>
                           </VStack>
@@ -417,15 +419,22 @@ export default function ProfilePage() {
                   <Heading size="md" mb={4}>
                     Profile Information
                   </Heading>
-                  <Box as="form" onSubmit={handleSaveProfile} bg="white" p={6} borderRadius="lg" boxShadow="sm">
+                  <Box
+                    as="form"
+                    onSubmit={handleSaveProfile}
+                    bg="dark.card"
+                    p={6}
+                    borderRadius="lg"
+                    boxShadow="sm"
+                  >
                     <VStack spacing={6} align="stretch">
                       {/* Email */}
                       <FormControl>
                         <FormLabel fontSize="sm" fontWeight="semibold">
                           Email
                         </FormLabel>
-                        <Input value={user?.email} disabled bg="gray.50" />
-                        <Text fontSize="xs" color="gray.600" mt={1}>
+                        <Input value={user?.email} disabled bg="dark.subtle" />
+                        <Text fontSize="xs" color="whiteAlpha.600" mt={1}>
                           Contact your administrator to change email
                         </Text>
                       </FormControl>
@@ -439,7 +448,7 @@ export default function ProfilePage() {
                           value={fullName}
                           onChange={(e) => setFullName(e.target.value)}
                           isDisabled={!isEditing}
-                          bg={isEditing ? "white" : "gray.50"}
+                          bg={isEditing ? "dark.card" : "dark.subtle"}
                         />
                       </FormControl>
 
@@ -460,8 +469,9 @@ export default function ProfilePage() {
                             </Checkbox>
                           ))}
                         </VStack>
-                        <Text fontSize="xs" color="gray.600" mt={2}>
-                          Select all roles that apply to you. This helps others find the right expertise.
+                        <Text fontSize="xs" color="whiteAlpha.600" mt={2}>
+                          Select all roles that apply to you. This helps others find the right
+                          expertise.
                         </Text>
                       </FormControl>
 
@@ -473,7 +483,7 @@ export default function ProfilePage() {
                         <VStack align="stretch" spacing={3}>
                           {selectedSpecialties.length > 0 && (
                             <>
-                              <Text fontSize="xs" color="gray.600" fontWeight="medium">
+                              <Text fontSize="xs" color="whiteAlpha.600" fontWeight="medium">
                                 Your specialties:
                               </Text>
                               {selectedSpecialties.map((specialty, index) => (
@@ -509,7 +519,7 @@ export default function ProfilePage() {
                           )}
 
                           {selectedSpecialties.length === 0 && !isEditing && (
-                            <Text fontSize="sm" color="gray.500" fontStyle="italic">
+                            <Text fontSize="sm" color="whiteAlpha.500" fontStyle="italic">
                               No specialties selected. Click Edit Profile to add some.
                             </Text>
                           )}
@@ -545,7 +555,7 @@ export default function ProfilePage() {
                         >
                           <VStack align="flex-start" spacing={0} ml={2}>
                             <Text fontSize="sm">Notify me when new ideas match my interests</Text>
-                            <Text fontSize="xs" color="gray.600">
+                            <Text fontSize="xs" color="whiteAlpha.600">
                               Get daily digest of new ideas in disciplines you follow
                             </Text>
                           </VStack>
@@ -558,7 +568,7 @@ export default function ProfilePage() {
                         >
                           <VStack align="flex-start" spacing={0} ml={2}>
                             <Text fontSize="sm">Notify me when people collaborate on my ideas</Text>
-                            <Text fontSize="xs" color="gray.600">
+                            <Text fontSize="xs" color="whiteAlpha.600">
                               Get notified when someone wants to work together
                             </Text>
                           </VStack>
@@ -568,16 +578,13 @@ export default function ProfilePage() {
                       {/* Action Buttons */}
                       <HStack spacing={3} pt={4}>
                         {!isEditing ? (
-                          <Button
-                            colorScheme="blue"
-                            onClick={() => setIsEditing(true)}
-                          >
+                          <Button colorScheme="brand" onClick={() => setIsEditing(true)}>
                             Edit Profile
                           </Button>
                         ) : (
                           <>
                             <Button
-                              colorScheme="blue"
+                              colorScheme="brand"
                               type="submit"
                               isLoading={updateMutation.isPending}
                             >
@@ -608,9 +615,9 @@ export default function ProfilePage() {
                   <Heading size="md" mb={4} color="red.600">
                     Danger Zone
                   </Heading>
-                  <Box bg="red.50" p={4} borderRadius="lg" border="1px" borderColor="red.200">
+                  <Box bg="red.900" p={4} borderRadius="lg" border="1px" borderColor="red.700">
                     <VStack align="flex-start" spacing={3}>
-                      <Text fontSize="sm" color="gray.700">
+                      <Text fontSize="sm" color="whiteAlpha.700">
                         Download your data or delete your account permanently
                       </Text>
                       <HStack spacing={3}>

@@ -95,7 +95,9 @@ export default function RegisterPage() {
       if (response.email_sent === false) {
         toast({
           title: "Account created",
-          description: response.message || "We couldn't send the verification email. Please contact an administrator.",
+          description:
+            response.message ||
+            "We couldn't send the verification email. Please contact an administrator.",
           status: "warning",
           duration: 8000,
           isClosable: true,
@@ -129,7 +131,7 @@ export default function RegisterPage() {
       <VStack spacing={8}>
         <VStack spacing={3} textAlign="center">
           <Heading size="lg">Join The AI Exchange</Heading>
-          <Text color="gray.600">
+          <Text color="whiteAlpha.600">
             Create an account to share your AI expertise and learn from others
           </Text>
         </VStack>
@@ -160,7 +162,7 @@ export default function RegisterPage() {
                 onChange={(e) => setEmail(e.target.value)}
                 required
               />
-              <Text fontSize="xs" color="gray.600" mt={1}>
+              <Text fontSize="xs" color="whiteAlpha.600" mt={1}>
                 Only Curtin University email addresses are allowed
               </Text>
             </Box>
@@ -191,7 +193,7 @@ export default function RegisterPage() {
                   </Checkbox>
                 ))}
               </VStack>
-              <Text fontSize="xs" color="gray.600" mt={2}>
+              <Text fontSize="xs" color="whiteAlpha.600" mt={2}>
                 Select all roles that apply to you. This helps others find the right expertise.
               </Text>
             </Box>
@@ -225,15 +227,13 @@ export default function RegisterPage() {
             {(passwordError || apiError) && (
               <Alert status="error" borderRadius="md">
                 <AlertIcon />
-                <Text fontSize="sm">
-                  {passwordError || apiError}
-                </Text>
+                <Text fontSize="sm">{passwordError || apiError}</Text>
               </Alert>
             )}
 
             <Button
               width="full"
-              colorScheme="blue"
+              colorScheme="brand"
               type="submit"
               isLoading={registerMutation.isPending}
             >
@@ -243,11 +243,11 @@ export default function RegisterPage() {
         </Box>
 
         <HStack spacing={1} justify="center">
-          <Text fontSize="sm" color="gray.600">
+          <Text fontSize="sm" color="whiteAlpha.600">
             Already have an account?
           </Text>
           <RouterLink to="/login">
-            <Button variant="link" colorScheme="blue" fontSize="sm">
+            <Button variant="link" colorScheme="brand" fontSize="sm">
               Sign in
             </Button>
           </RouterLink>

@@ -170,9 +170,19 @@ export const AdminConfigManager = () => {
           payload[key] = parseInt(value, 10);
         } else if (key === "debug" || key === "testing") {
           payload[key] = value === true || value === "true";
-        } else if (key === "allowed_domains" || key === "email_whitelist" || key === "allowed_origins") {
+        } else if (
+          key === "allowed_domains" ||
+          key === "email_whitelist" ||
+          key === "allowed_origins"
+        ) {
           // Handle comma-separated string to array conversion
-          payload[key] = typeof value === "string" ? value.split(",").map(s => s.trim()).filter(s => s) : value;
+          payload[key] =
+            typeof value === "string"
+              ? value
+                  .split(",")
+                  .map((s) => s.trim())
+                  .filter((s) => s)
+              : value;
         } else {
           payload[key] = value;
         }
@@ -299,31 +309,38 @@ export const AdminConfigManager = () => {
     return (
       <VStack align="stretch" spacing={6}>
         {categories.map(([categoryName, settings]) => (
-          <Box key={categoryName} bg="white" p={6} borderRadius="lg" boxShadow="sm">
+          <Box key={categoryName} bg="dark.card" p={6} borderRadius="lg" boxShadow="sm">
             <Heading size="md" mb={4} textTransform="capitalize">
               {categoryName.replace(/_/g, " ")}
             </Heading>
             <SimpleGrid columns={{ base: 1, md: 2 }} gap={4}>
               {(Object.entries(settings) as [string, SafeSetting][]).map(([key, setting]) => (
-                <Box key={key} p={4} border="1px solid" borderColor="gray.200" borderRadius="md" bg="gray.50">
+                <Box
+                  key={key}
+                  p={4}
+                  border="1px solid"
+                  borderColor="dark.border"
+                  borderRadius="md"
+                  bg="dark.subtle"
+                >
                   <HStack justify="space-between" mb={2}>
                     <Text fontWeight="semibold" fontSize="sm">
                       {key.replace(/_/g, " ")}
                     </Text>
                     {setting.editable && (
-                      <Badge colorScheme="blue" fontSize="xs">
+                      <Badge colorScheme="brand" fontSize="xs">
                         Editable
                       </Badge>
                     )}
                   </HStack>
-                  <Text fontSize="xs" color="gray.600" mb={2}>
+                  <Text fontSize="xs" color="whiteAlpha.600" mb={2}>
                     {setting.description}
                   </Text>
                   <Box
                     p={2}
-                    bg="white"
+                    bg="dark.card"
                     border="1px solid"
-                    borderColor="gray.200"
+                    borderColor="dark.border"
                     borderRadius="md"
                     fontFamily="monospace"
                     fontSize="sm"
@@ -365,18 +382,18 @@ export const AdminConfigManager = () => {
           <AlertIcon />
           <Box>
             <Text fontWeight="semibold">Safe to Edit</Text>
-            <Text fontSize="sm">These settings can be modified without requiring a server restart.</Text>
+            <Text fontSize="sm">
+              These settings can be modified without requiring a server restart.
+            </Text>
           </Box>
         </Alert>
 
-        <Box bg="white" p={6} borderRadius="lg" boxShadow="sm">
+        <Box bg="dark.card" p={6} borderRadius="lg" boxShadow="sm">
           <Grid templateColumns={{ base: "1fr", md: "1fr 1fr" }} gap={6}>
             {editableSettings.map(([key, setting]) => (
               <FormControl key={key}>
-                <FormLabel fontWeight="semibold">
-                  {key.replace(/_/g, " ")}
-                </FormLabel>
-                <Text fontSize="xs" color="gray.600" mb={2}>
+                <FormLabel fontWeight="semibold">{key.replace(/_/g, " ")}</FormLabel>
+                <Text fontSize="xs" color="whiteAlpha.600" mb={2}>
                   {setting.description}
                 </Text>
 
@@ -388,9 +405,11 @@ export const AdminConfigManager = () => {
                   />
                 ) : Array.isArray(setting.value) ? (
                   <Textarea
-                    value={Array.isArray(editableValues[key])
-                      ? editableValues[key].join(", ")
-                      : editableValues[key]}
+                    value={
+                      Array.isArray(editableValues[key])
+                        ? editableValues[key].join(", ")
+                        : editableValues[key]
+                    }
                     onChange={(e) => handleEditableChange(key, e.target.value)}
                     placeholder="Comma-separated values"
                     fontSize="sm"
@@ -436,21 +455,30 @@ export const AdminConfigManager = () => {
           <AlertIcon />
           <Box>
             <Text fontWeight="semibold">Write-Only Secrets</Text>
-            <Text fontSize="sm">Secret values are never displayed. You can set or update them, but cannot view the current value for security reasons.</Text>
+            <Text fontSize="sm">
+              Secret values are never displayed. You can set or update them, but cannot view the
+              current value for security reasons.
+            </Text>
           </Box>
         </Alert>
 
-        <Box bg="white" p={6} borderRadius="lg" boxShadow="sm">
+        <Box bg="dark.card" p={6} borderRadius="lg" boxShadow="sm">
           <Grid templateColumns={{ base: "1fr", md: "1fr 1fr" }} gap={6}>
             {secretsStatus.map((secret) => (
-              <Box key={secret.name} p={4} border="1px solid" borderColor="gray.200" borderRadius="md">
+              <Box
+                key={secret.name}
+                p={4}
+                border="1px solid"
+                borderColor="dark.border"
+                borderRadius="md"
+              >
                 <HStack justify="space-between" mb={3}>
                   <Heading size="sm">{secret.name}</Heading>
                   <Badge colorScheme={secret.configured ? "green" : "gray"}>
                     {secret.configured ? "Configured" : "Not Set"}
                   </Badge>
                 </HStack>
-                <Text fontSize="xs" color="gray.600" mb={4}>
+                <Text fontSize="xs" color="whiteAlpha.600" mb={4}>
                   {secret.description}
                 </Text>
 
@@ -481,7 +509,7 @@ export const AdminConfigManager = () => {
                 </FormControl>
 
                 <Button
-                  colorScheme="blue"
+                  colorScheme="brand"
                   size="sm"
                   width="full"
                   mt={3}
@@ -516,7 +544,7 @@ export const AdminConfigManager = () => {
   }
 
   return (
-    <Tabs variant="enclosed" colorScheme="blue">
+    <Tabs variant="enclosed" colorScheme="brand">
       <TabList>
         <Tab>Current Configuration</Tab>
         <Tab>Edit Settings</Tab>
@@ -524,17 +552,11 @@ export const AdminConfigManager = () => {
       </TabList>
 
       <TabPanels>
-        <TabPanel pt={6}>
-          {renderSafeSettings()}
-        </TabPanel>
+        <TabPanel pt={6}>{renderSafeSettings()}</TabPanel>
 
-        <TabPanel pt={6}>
-          {renderEditableForm()}
-        </TabPanel>
+        <TabPanel pt={6}>{renderEditableForm()}</TabPanel>
 
-        <TabPanel pt={6}>
-          {renderSecretsManagement()}
-        </TabPanel>
+        <TabPanel pt={6}>{renderSecretsManagement()}</TabPanel>
       </TabPanels>
     </Tabs>
   );

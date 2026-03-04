@@ -32,15 +32,16 @@ export default function GettingStartedPage() {
           <Heading size="2xl" fontWeight="bold">
             Getting Started with The AI Exchange
           </Heading>
-          <Text fontSize="lg" color="gray.600" maxW="2xl">
-            A discovery platform for sharing AI-enhanced teaching methods, research workflows, and professional practices, from early ideas to proven approaches
+          <Text fontSize="lg" color="whiteAlpha.600" maxW="2xl">
+            A discovery platform for sharing AI-enhanced teaching methods, research workflows, and
+            professional practices, from early ideas to proven approaches
           </Text>
         </VStack>
 
         <Divider />
 
         {/* Tabbed Interface */}
-        <Tabs variant="soft-rounded" colorScheme="blue">
+        <Tabs variant="soft-rounded" colorScheme="brand">
           <TabList mb={4} flexWrap="wrap">
             <Tab>Overview</Tab>
             <Tab>For Educators</Tab>
@@ -56,30 +57,35 @@ export default function GettingStartedPage() {
                   <Heading size="lg" mb={3}>
                     Welcome to The AI Exchange
                   </Heading>
-                  <Text fontSize="md" color="gray.700" lineHeight="1.8" mb={4}>
-                    The AI Exchange is an internal platform for discovering and sharing AI-enhanced practices across Curtin University. Whether you're an educator, researcher, or professional staff member, this platform enables you to:
+                  <Text fontSize="md" color="whiteAlpha.700" lineHeight="1.8" mb={4}>
+                    The AI Exchange is an internal platform for discovering and sharing AI-enhanced
+                    practices across Curtin University. Whether you're an educator, researcher, or
+                    professional staff member, this platform enables you to:
                   </Text>
                   <UnorderedList spacing={3}>
                     <ListItem>
-                      <strong>Share</strong> your ideas, experiments, and approaches, from early concepts to proven methods
+                      <strong>Share</strong> your ideas, experiments, and approaches, from early
+                      concepts to proven methods
                     </ListItem>
                     <ListItem>
                       <strong>Discover</strong> how colleagues across disciplines are leveraging AI
                     </ListItem>
                     <ListItem>
-                      <strong>Connect</strong> with others by reaching out through their contact information to discuss ideas or work together
+                      <strong>Connect</strong> with others by reaching out through their contact
+                      information to discuss ideas or work together
                     </ListItem>
                     <ListItem>
-                      <strong>Learn</strong> from real-world implementations and get inspired by what others have tried
+                      <strong>Learn</strong> from real-world implementations and get inspired by
+                      what others have tried
                     </ListItem>
                   </UnorderedList>
                 </Box>
 
-                <Box bg="blue.50" p={6} borderRadius="lg" border="1px" borderColor="blue.200">
-                  <Heading size="md" mb={3} color="blue.900">
+                <Box bg="brand.900" p={6} borderRadius="lg" border="1px" borderColor="brand.700">
+                  <Heading size="md" mb={3} color="brand.100">
                     How It Works
                   </Heading>
-                  <OrderedList spacing={2} color="blue.900">
+                  <OrderedList spacing={2} color="brand.100">
                     <ListItem>
                       <strong>Browse or Search</strong> existing ideas and workflows
                     </ListItem>
@@ -87,10 +93,12 @@ export default function GettingStartedPage() {
                       <strong>Share Your Idea</strong>, even if it's early-stage or experimental
                     </ListItem>
                     <ListItem>
-                      <strong>Reach out</strong> to colleagues whose work interests you to discuss, ask questions, or brainstorm
+                      <strong>Reach out</strong> to colleagues whose work interests you to discuss,
+                      ask questions, or brainstorm
                     </ListItem>
                     <ListItem>
-                      <strong>Learn</strong> from feedback and get inspired by what others have shared
+                      <strong>Learn</strong> from feedback and get inspired by what others have
+                      shared
                     </ListItem>
                   </OrderedList>
                 </Box>
@@ -100,7 +108,8 @@ export default function GettingStartedPage() {
                     Getting Started
                   </Heading>
                   <Text mb={4}>
-                    Select your role from the tabs above to learn how to make the most of The AI Exchange for your specific needs.
+                    Select your role from the tabs above to learn how to make the most of The AI
+                    Exchange for your specific needs.
                   </Text>
                 </Box>
               </VStack>
@@ -113,8 +122,9 @@ export default function GettingStartedPage() {
                   <Heading size="lg" mb={3}>
                     For Educators & Teaching Staff
                   </Heading>
-                  <Text fontSize="md" color="gray.700" lineHeight="1.8" mb={4}>
-                    Discover and share innovative teaching methods enhanced with AI, from lecture preparation to student assessment.
+                  <Text fontSize="md" color="whiteAlpha.700" lineHeight="1.8" mb={4}>
+                    Discover and share innovative teaching methods enhanced with AI, from lecture
+                    preparation to student assessment.
                   </Text>
                 </Box>
 
@@ -124,25 +134,30 @@ export default function GettingStartedPage() {
                   </Heading>
                   <UnorderedList spacing={3}>
                     <ListItem>
-                      <strong>Share teaching strategies</strong> - Document how you use AI to create case studies, generate discussion prompts, or develop assessment rubrics (finished work or rough experiments welcome)
+                      <strong>Share teaching strategies</strong> - Document how you use AI to create
+                      case studies, generate discussion prompts, or develop assessment rubrics
+                      (finished work or rough experiments welcome)
                     </ListItem>
                     <ListItem>
-                      <strong>Reduce preparation time</strong> - Find proven workflows that save hours on grading, content creation, and student feedback
+                      <strong>Reduce preparation time</strong> - Find proven workflows that save
+                      hours on grading, content creation, and student feedback
                     </ListItem>
                     <ListItem>
-                      <strong>Enhance student engagement</strong> - Discover methods for using AI to personalise learning or provide rapid feedback
+                      <strong>Enhance student engagement</strong> - Discover methods for using AI to
+                      personalise learning or provide rapid feedback
                     </ListItem>
                     <ListItem>
-                      <strong>Connect with peers</strong> - Find colleagues using AI in similar or different ways and reach out to share ideas
+                      <strong>Connect with peers</strong> - Find colleagues using AI in similar or
+                      different ways and reach out to share ideas
                     </ListItem>
                   </UnorderedList>
                 </Box>
 
-                <Box bg="green.50" p={4} borderRadius="lg">
-                  <Heading size="sm" mb={2} color="green.900">
+                <Box bg="green.900" p={4} borderRadius="lg">
+                  <Heading size="sm" mb={2} color="green.100">
                     Example Ideas to Share:
                   </Heading>
-                  <UnorderedList spacing={2} color="green.900" fontSize="sm">
+                  <UnorderedList spacing={2} color="green.100" fontSize="sm">
                     <ListItem>AI-powered rubric generation for consistent grading</ListItem>
                     <ListItem>Using Claude to create industry-specific case studies</ListItem>
                     <ListItem>Automated literature review synthesis workflows</ListItem>
@@ -155,15 +170,12 @@ export default function GettingStartedPage() {
                   <Heading size="md" mb={3}>
                     Getting Started
                   </Heading>
-                  <Button
-                    colorScheme="blue"
-                    onClick={() => navigate("/resources")}
-                    mb={3}
-                  >
+                  <Button colorScheme="brand" onClick={() => navigate("/resources")} mb={3}>
                     Browse Teaching Ideas
                   </Button>
-                  <Text fontSize="sm" color="gray.600">
-                    Start by exploring ideas shared by other educators. When you're ready, click "Share Your Idea" to contribute your own approach.
+                  <Text fontSize="sm" color="whiteAlpha.600">
+                    Start by exploring ideas shared by other educators. When you're ready, click
+                    "Share Your Idea" to contribute your own approach.
                   </Text>
                 </Box>
               </VStack>
@@ -176,8 +188,9 @@ export default function GettingStartedPage() {
                   <Heading size="lg" mb={3}>
                     For Researchers & Research Staff
                   </Heading>
-                  <Text fontSize="md" color="gray.700" lineHeight="1.8" mb={4}>
-                    Share research workflows, data analysis methods, and collaborative approaches enhanced by AI tools.
+                  <Text fontSize="md" color="whiteAlpha.700" lineHeight="1.8" mb={4}>
+                    Share research workflows, data analysis methods, and collaborative approaches
+                    enhanced by AI tools.
                   </Text>
                 </Box>
 
@@ -187,25 +200,31 @@ export default function GettingStartedPage() {
                   </Heading>
                   <UnorderedList spacing={3}>
                     <ListItem>
-                      <strong>Document research workflows</strong> - Share how you use AI for literature reviews, data analysis, or research proposal development (from early experiments to established methods)
+                      <strong>Document research workflows</strong> - Share how you use AI for
+                      literature reviews, data analysis, or research proposal development (from
+                      early experiments to established methods)
                     </ListItem>
                     <ListItem>
-                      <strong>Accelerate research processes</strong> - Find proven methods to reduce time spent on repetitive research tasks
+                      <strong>Accelerate research processes</strong> - Find proven methods to reduce
+                      time spent on repetitive research tasks
                     </ListItem>
                     <ListItem>
-                      <strong>Strengthen funding applications</strong> - Learn how to use AI to structure and refine research proposals
+                      <strong>Strengthen funding applications</strong> - Learn how to use AI to
+                      structure and refine research proposals
                     </ListItem>
                     <ListItem>
-                      <strong>Connect with researchers</strong> - Reach out to colleagues across different fields using complementary AI approaches to discuss and share insights
+                      <strong>Connect with researchers</strong> - Reach out to colleagues across
+                      different fields using complementary AI approaches to discuss and share
+                      insights
                     </ListItem>
                   </UnorderedList>
                 </Box>
 
-                <Box bg="purple.50" p={4} borderRadius="lg">
-                  <Heading size="sm" mb={2} color="purple.900">
+                <Box bg="purple.900" p={4} borderRadius="lg">
+                  <Heading size="sm" mb={2} color="purple.100">
                     Example Ideas to Share:
                   </Heading>
-                  <UnorderedList spacing={2} color="purple.900" fontSize="sm">
+                  <UnorderedList spacing={2} color="purple.100" fontSize="sm">
                     <ListItem>Automated literature review and synthesis pipelines</ListItem>
                     <ListItem>AI-assisted research proposal structuring</ListItem>
                     <ListItem>Data analysis workflow optimisation</ListItem>
@@ -218,15 +237,12 @@ export default function GettingStartedPage() {
                   <Heading size="md" mb={3}>
                     Getting Started
                   </Heading>
-                  <Button
-                    colorScheme="blue"
-                    onClick={() => navigate("/resources")}
-                    mb={3}
-                  >
+                  <Button colorScheme="brand" onClick={() => navigate("/resources")} mb={3}>
                     Explore Research Workflows
                   </Button>
-                  <Text fontSize="sm" color="gray.600">
-                    Browse workflows from researchers in your field or adjacent disciplines. Share your own approaches to help others accelerate their research.
+                  <Text fontSize="sm" color="whiteAlpha.600">
+                    Browse workflows from researchers in your field or adjacent disciplines. Share
+                    your own approaches to help others accelerate their research.
                   </Text>
                 </Box>
               </VStack>
@@ -239,8 +255,9 @@ export default function GettingStartedPage() {
                   <Heading size="lg" mb={3}>
                     For Professional & Administrative Staff
                   </Heading>
-                  <Text fontSize="md" color="gray.700" lineHeight="1.8" mb={4}>
-                    Share operational workflows, administrative processes, and professional practices enhanced by AI tools.
+                  <Text fontSize="md" color="whiteAlpha.700" lineHeight="1.8" mb={4}>
+                    Share operational workflows, administrative processes, and professional
+                    practices enhanced by AI tools.
                   </Text>
                 </Box>
 
@@ -250,25 +267,29 @@ export default function GettingStartedPage() {
                   </Heading>
                   <UnorderedList spacing={3}>
                     <ListItem>
-                      <strong>Streamline workflows</strong> - Share how you use AI to automate administrative tasks or improve processes (whether tested or experimental)
+                      <strong>Streamline workflows</strong> - Share how you use AI to automate
+                      administrative tasks or improve processes (whether tested or experimental)
                     </ListItem>
                     <ListItem>
-                      <strong>Increase efficiency</strong> - Find proven methods to save time on routine tasks and boost productivity
+                      <strong>Increase efficiency</strong> - Find proven methods to save time on
+                      routine tasks and boost productivity
                     </ListItem>
                     <ListItem>
-                      <strong>Improve service delivery</strong> - Learn how to use AI to enhance communication and support quality
+                      <strong>Improve service delivery</strong> - Learn how to use AI to enhance
+                      communication and support quality
                     </ListItem>
                     <ListItem>
-                      <strong>Connect with colleagues</strong> - Reach out to peers across departments to discuss ideas, share best practices, and learn from each other
+                      <strong>Connect with colleagues</strong> - Reach out to peers across
+                      departments to discuss ideas, share best practices, and learn from each other
                     </ListItem>
                   </UnorderedList>
                 </Box>
 
-                <Box bg="orange.50" p={4} borderRadius="lg">
-                  <Heading size="sm" mb={2} color="orange.900">
+                <Box bg="orange.900" p={4} borderRadius="lg">
+                  <Heading size="sm" mb={2} color="orange.100">
                     Example Ideas to Share:
                   </Heading>
-                  <UnorderedList spacing={2} color="orange.900" fontSize="sm">
+                  <UnorderedList spacing={2} color="orange.100" fontSize="sm">
                     <ListItem>Email drafting and correspondence templates</ListItem>
                     <ListItem>Meeting note automation and summarisation</ListItem>
                     <ListItem>Workflow optimisation and process improvement</ListItem>
@@ -281,37 +302,31 @@ export default function GettingStartedPage() {
                   <Heading size="md" mb={3}>
                     Getting Started
                   </Heading>
-                  <Button
-                    colorScheme="blue"
-                    onClick={() => navigate("/resources")}
-                    mb={3}
-                  >
+                  <Button colorScheme="brand" onClick={() => navigate("/resources")} mb={3}>
                     Discover Workflow Improvements
                   </Button>
-                  <Text fontSize="sm" color="gray.600">
-                    Explore ideas from other staff members. Share your own professional workflows to help colleagues across the university work more efficiently.
+                  <Text fontSize="sm" color="whiteAlpha.600">
+                    Explore ideas from other staff members. Share your own professional workflows to
+                    help colleagues across the university work more efficiently.
                   </Text>
                 </Box>
               </VStack>
             </TabPanel>
-
           </TabPanels>
         </Tabs>
 
         {/* Help Section */}
         <Divider />
 
-        <Box bg="blue.50" p={6} borderRadius="lg" textAlign="center">
-          <Heading size="md" mb={3} color="blue.900">
+        <Box bg="brand.900" p={6} borderRadius="lg" textAlign="center">
+          <Heading size="md" mb={3} color="brand.100">
             Need Help?
           </Heading>
-          <Text color="blue.900" mb={4}>
-            Can't find what you're looking for? Our Support & Help Centre has answers to common questions, contact information, and feedback options.
+          <Text color="brand.100" mb={4}>
+            Can't find what you're looking for? Our Support & Help Centre has answers to common
+            questions, contact information, and feedback options.
           </Text>
-          <Button
-            colorScheme="blue"
-            onClick={() => navigate("/support")}
-          >
+          <Button colorScheme="brand" onClick={() => navigate("/support")}>
             Visit Help Centre
           </Button>
         </Box>

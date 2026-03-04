@@ -4,13 +4,7 @@
  */
 
 import { useMemo, useState, useRef, useEffect } from "react";
-import {
-  FormControl,
-  FormLabel,
-  Input,
-  Box,
-  Text,
-} from "@chakra-ui/react";
+import { FormControl, FormLabel, Input, Box, Text } from "@chakra-ui/react";
 import { getAreas } from "@/lib/areas";
 
 interface AreaSelectProps {
@@ -40,9 +34,7 @@ export const AreaSelect: React.FC<AreaSelectProps> = ({
   const filteredAreas = useMemo(() => {
     if (!inputValue.trim()) return allAreas;
     const searchLower = inputValue.toLowerCase();
-    return allAreas.filter((area) =>
-      area.toLowerCase().includes(searchLower)
-    );
+    return allAreas.filter((area) => area.toLowerCase().includes(searchLower));
   }, [inputValue, allAreas]);
 
   // Check if current input is a custom entry (not in predefined list)
@@ -70,16 +62,12 @@ export const AreaSelect: React.FC<AreaSelectProps> = ({
       case "ArrowDown":
         e.preventDefault();
         setIsOpen(true);
-        setHighlightedIndex((prev) =>
-          prev < filteredAreas.length - 1 ? prev + 1 : 0
-        );
+        setHighlightedIndex((prev) => (prev < filteredAreas.length - 1 ? prev + 1 : 0));
         break;
       case "ArrowUp":
         e.preventDefault();
         setIsOpen(true);
-        setHighlightedIndex((prev) =>
-          prev > 0 ? prev - 1 : filteredAreas.length - 1
-        );
+        setHighlightedIndex((prev) => (prev > 0 ? prev - 1 : filteredAreas.length - 1));
         break;
       case "Enter":
         e.preventDefault();
@@ -103,10 +91,7 @@ export const AreaSelect: React.FC<AreaSelectProps> = ({
   // Close dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (
-        containerRef.current &&
-        !containerRef.current.contains(event.target as Node)
-      ) {
+      if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
         setIsOpen(false);
       }
     };
@@ -137,9 +122,9 @@ export const AreaSelect: React.FC<AreaSelectProps> = ({
           top="100%"
           left={0}
           right={0}
-          bg="white"
+          bg="dark.card"
           border="1px"
-          borderColor="gray.200"
+          borderColor="dark.border"
           borderRadius="md"
           boxShadow="md"
           zIndex={10}
@@ -155,8 +140,8 @@ export const AreaSelect: React.FC<AreaSelectProps> = ({
                   key={area}
                   p={3}
                   cursor="pointer"
-                  bg={highlightedIndex === index ? "blue.100" : "transparent"}
-                  _hover={{ bg: "gray.100" }}
+                  bg={highlightedIndex === index ? "brand.800" : "transparent"}
+                  _hover={{ bg: "whiteAlpha.100" }}
                   onClick={() => handleSelectArea(area)}
                 >
                   <Text fontSize="sm">{area}</Text>
@@ -167,20 +152,18 @@ export const AreaSelect: React.FC<AreaSelectProps> = ({
 
           {/* Show custom entry option if input doesn't match any area */}
           {isCustomEntry && filteredAreas.length > 0 && (
-            <Box borderTop="1px" borderColor="gray.200" />
+            <Box borderTop="1px" borderColor="dark.border" />
           )}
 
           {isCustomEntry && (
             <Box
               p={3}
               cursor="pointer"
-              bg={
-                highlightedIndex === filteredAreas.length ? "blue.100" : "white"
-              }
-              _hover={{ bg: "gray.100" }}
+              bg={highlightedIndex === filteredAreas.length ? "brand.800" : "dark.card"}
+              _hover={{ bg: "whiteAlpha.100" }}
               onClick={() => handleSelectArea(inputValue)}
             >
-              <Text fontSize="sm" color="blue.600" fontWeight="semibold">
+              <Text fontSize="sm" color="brand.300" fontWeight="semibold">
                 Use "{inputValue}" as custom area
               </Text>
             </Box>
@@ -195,16 +178,16 @@ export const AreaSelect: React.FC<AreaSelectProps> = ({
           top="100%"
           left={0}
           right={0}
-          bg="white"
+          bg="dark.card"
           border="1px"
-          borderColor="gray.200"
+          borderColor="dark.border"
           borderRadius="md"
           boxShadow="md"
           zIndex={10}
           p={3}
           mt={1}
         >
-          <Text fontSize="sm" color="gray.500">
+          <Text fontSize="sm" color="whiteAlpha.500">
             No areas found. Start typing to create a custom area.
           </Text>
         </Box>

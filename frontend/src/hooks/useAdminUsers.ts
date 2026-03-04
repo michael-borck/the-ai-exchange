@@ -56,12 +56,9 @@ export function useUpdateUserStatus() {
 
   return useMutation({
     mutationFn: async (vars: { userId: string; isActive: boolean }) => {
-      const response = await api.patch<User>(
-        `/admin/users/${vars.userId}/status`,
-        {
-          is_active: vars.isActive,
-        }
-      );
+      const response = await api.patch<User>(`/admin/users/${vars.userId}/status`, {
+        is_active: vars.isActive,
+      });
       return response.data;
     },
     onSuccess: () => {
@@ -78,9 +75,7 @@ export function useApproveUser() {
 
   return useMutation({
     mutationFn: async (userId: string) => {
-      const response = await api.patch<User>(
-        `/admin/users/${userId}/approve`
-      );
+      const response = await api.patch<User>(`/admin/users/${userId}/approve`);
       return response.data;
     },
     onSuccess: () => {
@@ -97,9 +92,7 @@ export function useVerifyUser() {
 
   return useMutation({
     mutationFn: async (userId: string) => {
-      const response = await api.patch<User>(
-        `/admin/users/${userId}/verify`
-      );
+      const response = await api.patch<User>(`/admin/users/${userId}/verify`);
       return response.data;
     },
     onSuccess: () => {

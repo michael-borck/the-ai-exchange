@@ -28,13 +28,29 @@ import { useCreateResource } from "@/hooks/useResources";
 import { ResourceType } from "@/types/index";
 const RESOURCE_TYPES = [
   { key: "REQUEST", label: "Request", tooltip: "Ask for help, advice, or ideas from colleagues" },
-  { key: "USE_CASE", label: "Use Case", tooltip: "A real-world example of AI applied in your work" },
+  {
+    key: "USE_CASE",
+    label: "Use Case",
+    tooltip: "A real-world example of AI applied in your work",
+  },
   { key: "PROMPT", label: "Prompt Template", tooltip: "A reusable prompt you've found effective" },
   { key: "TOOL", label: "Tool", tooltip: "An AI tool, software, or integration you use" },
   { key: "POLICY", label: "Policy", tooltip: "Guidelines, governance, or ethical frameworks" },
-  { key: "PAPER", label: "Paper", tooltip: "A research paper or article you've written or contributed to" },
-  { key: "PROJECT", label: "Project", tooltip: "Something you've built, are building, or plan to build" },
-  { key: "CONFERENCE", label: "Conference", tooltip: "A talk or presentation you gave or attended" },
+  {
+    key: "PAPER",
+    label: "Paper",
+    tooltip: "A research paper or article you've written or contributed to",
+  },
+  {
+    key: "PROJECT",
+    label: "Project",
+    tooltip: "Something you've built, are building, or plan to build",
+  },
+  {
+    key: "CONFERENCE",
+    label: "Conference",
+    tooltip: "A talk or presentation you gave or attended",
+  },
   { key: "DATASET", label: "Dataset", tooltip: "A dataset you've created or curated for research" },
   { key: "BOOK", label: "Book", tooltip: "A book or textbook you've authored or recommend" },
   { key: "OTHER", label: "Other", tooltip: "Anything that doesn't fit the categories above" },
@@ -45,8 +61,16 @@ const TOOL_CATEGORIES = [
   { key: "CUSTOM_APP", label: "Custom App", tooltip: "Purpose-built applications using AI APIs" },
   { key: "VISION", label: "Vision", tooltip: "Image recognition, generation, or analysis tools" },
   { key: "SPEECH", label: "Speech", tooltip: "Speech-to-text, text-to-speech, or voice tools" },
-  { key: "WORKFLOW", label: "Workflow", tooltip: "Automation tools like Zapier, Make, or Power Automate" },
-  { key: "DEVELOPMENT", label: "Development", tooltip: "AI coding assistants and development tools" },
+  {
+    key: "WORKFLOW",
+    label: "Workflow",
+    tooltip: "Automation tools like Zapier, Make, or Power Automate",
+  },
+  {
+    key: "DEVELOPMENT",
+    label: "Development",
+    tooltip: "AI coding assistants and development tools",
+  },
   { key: "OTHER", label: "Other", tooltip: "Any other AI tool or technology" },
 ];
 
@@ -134,7 +158,14 @@ export default function CreateResourcePage() {
           Share Your Resource
         </Heading>
 
-        <Box as="form" onSubmit={handleSubmit} bg="white" p={6} borderRadius="lg" boxShadow="sm">
+        <Box
+          as="form"
+          onSubmit={handleSubmit}
+          bg="dark.card"
+          p={6}
+          borderRadius="lg"
+          boxShadow="sm"
+        >
           <VStack spacing={6}>
             {/* Type */}
             <FormControl isRequired>
@@ -145,14 +176,14 @@ export default function CreateResourcePage() {
                     <Tooltip key={rt.key} label={rt.tooltip} placement="top" hasArrow>
                       <Box
                         borderWidth="1px"
-                        borderColor={type === rt.key ? "blue.400" : "gray.200"}
-                        bg={type === rt.key ? "blue.50" : "white"}
+                        borderColor={type === rt.key ? "brand.400" : "dark.border"}
+                        bg={type === rt.key ? "brand.900" : "dark.card"}
                         borderRadius="md"
                         px={3}
                         py={2}
                         cursor="pointer"
                         onClick={() => setType(rt.key as ResourceType)}
-                        _hover={{ borderColor: "blue.300" }}
+                        _hover={{ borderColor: "brand.300" }}
                       >
                         <Radio value={rt.key} size="sm">
                           <Text fontSize="sm">{rt.label}</Text>
@@ -195,15 +226,31 @@ export default function CreateResourcePage() {
                 placeholder="Add email addresses of collaborators involved in this idea (one per line, or separated by commas)"
                 minHeight="80px"
               />
-              <FormHelperText>Enter email addresses of people collaborating on this resource. First email is the primary contact.</FormHelperText>
+              <FormHelperText>
+                Enter email addresses of people collaborating on this resource. First email is the
+                primary contact.
+              </FormHelperText>
             </FormControl>
 
             {/* Tools Used */}
             <FormControl>
               <FormLabel fontWeight="bold">AI Tools & Technologies Used</FormLabel>
-              <Box borderWidth="1px" borderColor="gray.200" borderRadius="md" p={4} bg="gray.50">
+              <Box
+                borderWidth="1px"
+                borderColor="dark.border"
+                borderRadius="md"
+                p={4}
+                bg="dark.subtle"
+              >
                 {TOOL_CATEGORIES.map((tool) => (
-                  <Tooltip key={tool.key} label={tool.tooltip} placement="right" hasArrow openDelay={300} closeOnClick>
+                  <Tooltip
+                    key={tool.key}
+                    label={tool.tooltip}
+                    placement="right"
+                    hasArrow
+                    openDelay={300}
+                    closeOnClick
+                  >
                     <Box display="inline-block">
                       <Checkbox
                         mb={2}
@@ -241,22 +288,21 @@ export default function CreateResourcePage() {
                 onChange={(e) => setUserTags(e.target.value)}
                 placeholder="Add tags separated by commas (e.g., ChatGPT, Assessment, Writing)"
               />
-              <FormHelperText>Help others discover your resource with relevant keywords</FormHelperText>
+              <FormHelperText>
+                Help others discover your resource with relevant keywords
+              </FormHelperText>
             </FormControl>
 
             {/* Anonymous */}
             <FormControl display="flex" alignItems="center">
-              <Checkbox
-                isChecked={isAnonymous}
-                onChange={(e) => setIsAnonymous(e.target.checked)}
-              >
+              <Checkbox isChecked={isAnonymous} onChange={(e) => setIsAnonymous(e.target.checked)}>
                 <Text ml={2}>Post anonymously (your name won't be shown)</Text>
               </Checkbox>
             </FormControl>
 
             {/* Submit */}
             <Button
-              colorScheme="blue"
+              colorScheme="brand"
               type="submit"
               isLoading={createMutation.isPending}
               width="full"

@@ -97,16 +97,10 @@ export default function ExportPage() {
   };
 
   const SortableHeader = ({ field, label }: { field: SortField; label: string }) => (
-    <Th
-      cursor="pointer"
-      _hover={{ bg: "gray.100" }}
-      onClick={() => handleSort(field)}
-    >
+    <Th cursor="pointer" _hover={{ bg: "whiteAlpha.100" }} onClick={() => handleSort(field)}>
       <HStack spacing={2}>
         <span>{label}</span>
-        {sortField === field && (
-          <span>{sortOrder === "asc" ? "↑" : "↓"}</span>
-        )}
+        {sortField === field && <span>{sortOrder === "asc" ? "↑" : "↓"}</span>}
       </HStack>
     </Th>
   );
@@ -118,13 +112,13 @@ export default function ExportPage() {
         <HStack justify="space-between" align="center">
           <VStack align="flex-start" spacing={1}>
             <Heading size="lg">Resource Data Export</Heading>
-            <Text color="gray.600" fontSize="sm">
+            <Text color="whiteAlpha.600" fontSize="sm">
               View and download all resources with engagement metrics
             </Text>
           </VStack>
           <Button
             leftIcon={<DownloadIcon />}
-            colorScheme="blue"
+            colorScheme="brand"
             onClick={handleDownloadCSV}
             isDisabled={isLoading || exportData.length === 0}
             size="lg"
@@ -135,8 +129,8 @@ export default function ExportPage() {
 
         {/* Summary */}
         {!isLoading && (
-          <Box bg="blue.50" p={4} borderRadius="md" borderLeft="4px" borderColor="blue.400">
-            <Text fontSize="sm" color="blue.900">
+          <Box bg="brand.900" p={4} borderRadius="md" borderLeft="4px" borderColor="brand.400">
+            <Text fontSize="sm" color="brand.100">
               <strong>{exportData.length}</strong> resources available for export
             </Text>
           </Box>
@@ -148,13 +142,13 @@ export default function ExportPage() {
             <Spinner />
           </Center>
         ) : exportData.length === 0 ? (
-          <Box bg="white" p={12} borderRadius="lg" textAlign="center">
-            <Text color="gray.600">No resources available for export.</Text>
+          <Box bg="dark.card" p={12} borderRadius="lg" textAlign="center">
+            <Text color="whiteAlpha.600">No resources available for export.</Text>
           </Box>
         ) : (
-          <Box overflowX="auto" bg="white" borderRadius="lg" boxShadow="sm">
+          <Box overflowX="auto" bg="dark.card" borderRadius="lg" boxShadow="sm">
             <Table variant="simple" size="sm">
-              <Thead bg="gray.50">
+              <Thead bg="dark.subtle">
                 <Tr>
                   <SortableHeader field="title" label="Title" />
                   <Th>Author Email</Th>
@@ -168,7 +162,7 @@ export default function ExportPage() {
               </Thead>
               <Tbody>
                 {exportData.map((row) => (
-                  <Tr key={row.id} _hover={{ bg: "gray.50" }}>
+                  <Tr key={row.id} _hover={{ bg: "whiteAlpha.50" }}>
                     <Td fontSize="sm">
                       <Box maxW="300px" noOfLines={2}>
                         {row.title}

@@ -45,8 +45,16 @@ const TOOL_CATEGORIES = [
   { key: "CUSTOM_APP", label: "Custom App", tooltip: "Purpose-built applications using AI APIs" },
   { key: "VISION", label: "Vision", tooltip: "Image recognition, generation, or analysis tools" },
   { key: "SPEECH", label: "Speech", tooltip: "Speech-to-text, text-to-speech, or voice tools" },
-  { key: "WORKFLOW", label: "Workflow", tooltip: "Automation tools like Zapier, Make, or Power Automate" },
-  { key: "DEVELOPMENT", label: "Development", tooltip: "AI coding assistants and development tools" },
+  {
+    key: "WORKFLOW",
+    label: "Workflow",
+    tooltip: "Automation tools like Zapier, Make, or Power Automate",
+  },
+  {
+    key: "DEVELOPMENT",
+    label: "Development",
+    tooltip: "AI coding assistants and development tools",
+  },
   { key: "OTHER", label: "Other", tooltip: "Any other AI tool or technology" },
 ];
 
@@ -193,12 +201,19 @@ export default function EditResourcePage() {
           Edit Resource
         </Heading>
 
-        <Box as="form" onSubmit={handleSubmit} bg="white" p={6} borderRadius="lg" boxShadow="sm">
+        <Box
+          as="form"
+          onSubmit={handleSubmit}
+          bg="dark.card"
+          p={6}
+          borderRadius="lg"
+          boxShadow="sm"
+        >
           <VStack spacing={6}>
             {/* Resource Type (read-only) */}
             <FormControl>
               <FormLabel fontWeight="bold">Resource Type</FormLabel>
-              <Badge colorScheme="blue" fontSize="sm" px={3} py={1} borderRadius="md">
+              <Badge colorScheme="brand" fontSize="sm" px={3} py={1} borderRadius="md">
                 {resourceTypeLabel}
               </Badge>
               <FormHelperText>Resource type cannot be changed after creation</FormHelperText>
@@ -234,15 +249,31 @@ export default function EditResourcePage() {
                 placeholder="Add email addresses of collaborators involved in this idea (one per line, or separated by commas)"
                 minHeight="80px"
               />
-              <FormHelperText>Enter email addresses of people collaborating on this resource. First email is the primary contact.</FormHelperText>
+              <FormHelperText>
+                Enter email addresses of people collaborating on this resource. First email is the
+                primary contact.
+              </FormHelperText>
             </FormControl>
 
             {/* Tools Used */}
             <FormControl>
               <FormLabel fontWeight="bold">AI Tools & Technologies Used</FormLabel>
-              <Box borderWidth="1px" borderColor="gray.200" borderRadius="md" p={4} bg="gray.50">
+              <Box
+                borderWidth="1px"
+                borderColor="dark.border"
+                borderRadius="md"
+                p={4}
+                bg="dark.subtle"
+              >
                 {TOOL_CATEGORIES.map((tool) => (
-                  <Tooltip key={tool.key} label={tool.tooltip} placement="right" hasArrow openDelay={300} closeOnClick>
+                  <Tooltip
+                    key={tool.key}
+                    label={tool.tooltip}
+                    placement="right"
+                    hasArrow
+                    openDelay={300}
+                    closeOnClick
+                  >
                     <Box display="inline-block">
                       <Checkbox
                         mb={2}
@@ -280,15 +311,15 @@ export default function EditResourcePage() {
                 onChange={(e) => setUserTags(e.target.value)}
                 placeholder="Add tags separated by commas (e.g., ChatGPT, Assessment, Writing)"
               />
-              <FormHelperText>Help others discover your resource with relevant keywords</FormHelperText>
+              <FormHelperText>
+                Help others discover your resource with relevant keywords
+              </FormHelperText>
             </FormControl>
 
             {/* Anonymous (read-only) */}
             <FormControl>
               <Checkbox isChecked={resource.is_anonymous} isDisabled>
-                <Text ml={2}>
-                  Posted anonymously
-                </Text>
+                <Text ml={2}>Posted anonymously</Text>
               </Checkbox>
               <FormHelperText>Anonymous setting cannot be changed after creation</FormHelperText>
             </FormControl>
@@ -296,18 +327,14 @@ export default function EditResourcePage() {
             {/* Buttons */}
             <div style={{ display: "flex", gap: "12px", width: "100%" }}>
               <Button
-                colorScheme="blue"
+                colorScheme="brand"
                 type="submit"
                 isLoading={updateMutation.isPending}
                 flex={1}
               >
                 Save Changes
               </Button>
-              <Button
-                variant="outline"
-                onClick={() => navigate(`/resources/${id}`)}
-                flex={1}
-              >
+              <Button variant="outline" onClick={() => navigate(`/resources/${id}`)} flex={1}>
                 Cancel
               </Button>
             </div>

@@ -40,9 +40,7 @@ export const usePlatformAnalytics = () => {
   return useQuery({
     queryKey: ["adminPlatformAnalytics"],
     queryFn: async () => {
-      const response = await apiClient.get<PlatformAnalytics>(
-        "/admin/analytics"
-      );
+      const response = await apiClient.get<PlatformAnalytics>("/admin/analytics");
       return response.data;
     },
     staleTime: 5 * 60 * 1000, // 5 minutes
@@ -56,9 +54,7 @@ export const useAnalyticsBySpecialty = () => {
   return useQuery({
     queryKey: ["adminAnalyticsBySpecialty"],
     queryFn: async () => {
-      const response = await apiClient.get<AnalyticsBySpecialty>(
-        "/admin/analytics/by-specialty"
-      );
+      const response = await apiClient.get<AnalyticsBySpecialty>("/admin/analytics/by-specialty");
       return response.data;
     },
     staleTime: 5 * 60 * 1000, // 5 minutes

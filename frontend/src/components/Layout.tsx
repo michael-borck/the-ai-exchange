@@ -79,7 +79,7 @@ export function Layout({ children }: LayoutProps) {
           key={item.href}
           width="full"
           variant={isActive(item.href) ? "solid" : "ghost"}
-          colorScheme={isActive(item.href) ? "blue" : "gray"}
+          colorScheme={isActive(item.href) ? "brand" : "gray"}
           justifyContent="flex-start"
           onClick={() => handleNavClick(item.href)}
         >
@@ -88,7 +88,7 @@ export function Layout({ children }: LayoutProps) {
       ))}
       {!user && (
         <>
-          <Box h="1px" bg="gray.200" my={2} />
+          <Box h="1px" bg="dark.divider" my={2} />
           <Button
             width="full"
             variant="ghost"
@@ -98,18 +98,14 @@ export function Layout({ children }: LayoutProps) {
           >
             Login
           </Button>
-          <Button
-            width="full"
-            colorScheme="blue"
-            onClick={() => handleNavClick("/register")}
-          >
+          <Button width="full" colorScheme="brand" onClick={() => handleNavClick("/register")}>
             Sign Up
           </Button>
         </>
       )}
       {user && (
         <>
-          <Box h="1px" bg="gray.200" my={2} />
+          <Box h="1px" bg="dark.divider" my={2} />
           <Button
             width="full"
             variant="ghost"
@@ -138,37 +134,31 @@ export function Layout({ children }: LayoutProps) {
   return (
     <Flex height="100vh" flexDirection="column">
       {/* Header */}
-      <Box
-        bg="white"
-        borderBottom="1px"
-        borderColor="gray.200"
-        px={4}
-        py={4}
-        boxShadow="sm"
-      >
-        <Container maxW="100%" px={6} display="flex" justifyContent="space-between" alignItems="center">
+      <Box bg="dark.card" borderBottom="1px" borderColor="dark.border" px={4} py={4} boxShadow="sm">
+        <Container
+          maxW="100%"
+          px={6}
+          display="flex"
+          justifyContent="space-between"
+          alignItems="center"
+        >
           {/* Left: Logo */}
           <HStack spacing={2} cursor="pointer" onClick={() => navigate("/")}>
             <Heading size="md" whiteSpace="nowrap">
               The AI Exchange
             </Heading>
-            <Text fontSize="xs" color="gray.500" fontWeight="normal">
+            <Text fontSize="xs" color="whiteAlpha.500" fontWeight="normal">
               v{APP_VERSION}
             </Text>
           </HStack>
 
           {/* Center: Navigation (Desktop) */}
-          <HStack
-            spacing={1}
-            display={{ base: "none", lg: "flex" }}
-            flex={1}
-            ml={8}
-          >
+          <HStack spacing={1} display={{ base: "none", lg: "flex" }} flex={1} ml={8}>
             {navItems.map((item) => (
               <Button
                 key={item.href}
                 variant={isActive(item.href) ? "solid" : "ghost"}
-                colorScheme={isActive(item.href) ? "blue" : "gray"}
+                colorScheme={isActive(item.href) ? "brand" : "gray"}
                 size="sm"
                 onClick={() => navigate(item.href)}
               >
@@ -191,7 +181,7 @@ export function Layout({ children }: LayoutProps) {
                   Login
                 </Button>
                 <Button
-                  colorScheme="blue"
+                  colorScheme="brand"
                   size="sm"
                   onClick={() => navigate("/register")}
                   display={{ base: "none", md: "flex" }}
@@ -202,18 +192,8 @@ export function Layout({ children }: LayoutProps) {
             ) : (
               // Authenticated View
               <Menu>
-                <MenuButton
-                  as={Button}
-                  rounded="full"
-                  variant="ghost"
-                  cursor="pointer"
-                  size="sm"
-                >
-                  <Avatar
-                    size="sm"
-                    name={user?.full_name || "User"}
-                    src=""
-                  />
+                <MenuButton as={Button} rounded="full" variant="ghost" cursor="pointer" size="sm">
+                  <Avatar size="sm" name={user?.full_name || "User"} src="" />
                 </MenuButton>
                 <MenuList>
                   <MenuItem disabled>
@@ -221,14 +201,12 @@ export function Layout({ children }: LayoutProps) {
                       <Text fontWeight="medium" fontSize="sm">
                         {user?.full_name}
                       </Text>
-                      <Text fontSize="xs" color="gray.600">
+                      <Text fontSize="xs" color="whiteAlpha.600">
                         {user?.email}
                       </Text>
                     </VStack>
                   </MenuItem>
-                  <MenuItem onClick={() => navigate("/profile")}>
-                    Profile
-                  </MenuItem>
+                  <MenuItem onClick={() => navigate("/profile")}>Profile</MenuItem>
                   <MenuItem onClick={handleLogout}>Logout</MenuItem>
                 </MenuList>
               </Menu>
@@ -258,7 +236,7 @@ export function Layout({ children }: LayoutProps) {
       </Drawer>
 
       {/* Page Content (No Sidebar) */}
-      <Box flex={1} overflowY="auto" bg="gray.50">
+      <Box flex={1} overflowY="auto">
         <Container maxW="100%" py={8} px={{ base: 4, md: 6 }}>
           {children}
         </Container>
