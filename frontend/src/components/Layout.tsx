@@ -263,7 +263,7 @@ export function Layout({ children }: LayoutProps) {
 
       {/* Page Content (No Sidebar) */}
       <Box flex={1} overflowY="auto">
-        <Container maxW="100%" py={8} px={{ base: 4, md: 6 }}>
+        <Container maxW="1200px" py={8} px={{ base: 4, md: 6 }}>
           {children}
         </Container>
       </Box>
