@@ -173,7 +173,8 @@ export function Layout({ children }: LayoutProps) {
               // Public/Guest View
               <>
                 <Button
-                  variant="ghost"
+                  colorScheme="brand"
+                  variant="outline"
                   size="sm"
                   onClick={() => navigate("/login")}
                   display={{ base: "none", md: "flex" }}
@@ -191,25 +192,36 @@ export function Layout({ children }: LayoutProps) {
               </>
             ) : (
               // Authenticated View
-              <Menu>
-                <MenuButton as={Button} rounded="full" variant="ghost" cursor="pointer" size="sm">
-                  <Avatar size="sm" name={user?.full_name || "User"} src="" />
-                </MenuButton>
-                <MenuList>
-                  <MenuItem disabled>
-                    <VStack align="flex-start" spacing={0}>
-                      <Text fontWeight="medium" fontSize="sm">
-                        {user?.full_name}
-                      </Text>
-                      <Text fontSize="xs" color="whiteAlpha.600">
-                        {user?.email}
-                      </Text>
-                    </VStack>
-                  </MenuItem>
-                  <MenuItem onClick={() => navigate("/profile")}>Profile</MenuItem>
-                  <MenuItem onClick={handleLogout}>Logout</MenuItem>
-                </MenuList>
-              </Menu>
+              <HStack spacing={2}>
+                <Menu>
+                  <MenuButton as={Button} rounded="full" variant="ghost" cursor="pointer" size="sm">
+                    <Avatar size="sm" name={user?.full_name || "User"} src="" />
+                  </MenuButton>
+                  <MenuList>
+                    <MenuItem disabled>
+                      <VStack align="flex-start" spacing={0}>
+                        <Text fontWeight="medium" fontSize="sm">
+                          {user?.full_name}
+                        </Text>
+                        <Text fontSize="xs" color="whiteAlpha.600">
+                          {user?.email}
+                        </Text>
+                      </VStack>
+                    </MenuItem>
+                    <MenuItem onClick={() => navigate("/profile")}>Profile</MenuItem>
+                    <MenuItem onClick={handleLogout}>Logout</MenuItem>
+                  </MenuList>
+                </Menu>
+                <Button
+                  colorScheme="brand"
+                  variant="outline"
+                  size="sm"
+                  onClick={handleLogout}
+                  display={{ base: "none", md: "flex" }}
+                >
+                  Logout
+                </Button>
+              </HStack>
             )}
 
             {/* Mobile Menu Button */}
