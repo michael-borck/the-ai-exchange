@@ -57,6 +57,7 @@ class Settings(BaseSettings):
         "127.0.0.1",
         "testserver",
         "theaiexchange.serveur.au",
+        "theaiexchange.eduserver.au",
     ]
 
     # CORS
