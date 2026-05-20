@@ -48,16 +48,22 @@ function App() {
               <Route path="/register" element={<RegisterPage />} />
               <Route path="/verify-email" element={<VerifyEmailPage />} />
 
-              {/* Public routes - No authentication required */}
+              {/* Public marketing pages */}
               <Route path="/" element={<HomePage />} />
-              <Route path="/resources" element={<ResourcesPage />} />
-              <Route path="/resources/:id" element={<ResourceDetailPage />} />
               <Route path="/getting-started" element={<GettingStartedPage />} />
               <Route path="/about" element={<AboutPage />} />
               <Route path="/legal" element={<LegalPage />} />
               <Route path="/support" element={<SupportPage />} />
 
               {/* Protected routes - Authentication required */}
+              <Route
+                path="/resources"
+                element={
+                  <ProtectedRoute>
+                    <ResourcesPage />
+                  </ProtectedRoute>
+                }
+              />
               <Route
                 path="/resources/export"
                 element={
@@ -71,6 +77,14 @@ function App() {
                 element={
                   <ProtectedRoute>
                     <CreateResourcePage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/resources/:id"
+                element={
+                  <ProtectedRoute>
+                    <ResourceDetailPage />
                   </ProtectedRoute>
                 }
               />

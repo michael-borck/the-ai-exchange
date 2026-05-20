@@ -53,6 +53,13 @@ RUN npm install && \
 # ============================================
 WORKDIR /app/backend
 
+# Create non-root user and set ownership
+RUN groupadd -r appuser && useradd -r -g appuser -d /app -s /sbin/nologin appuser \
+    && chown -R appuser:appuser /app
+
+# Switch to non-root user
+USER appuser
+
 # Expose backend port (serves both API and built frontend)
 EXPOSE 8000
 

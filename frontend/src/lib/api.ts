@@ -11,7 +11,6 @@ import {
   LoginRequest,
   RegisterRequest,
   UserUpdateRequest,
-  TokenResponse,
   RegistrationResponse,
   Subscription,
 } from "@/types/index";
@@ -55,28 +54,14 @@ class ApiClient {
     this.axiosInstance = axios.create({
       baseURL: API_BASE_URL,
       timeout: 10000,
+      withCredentials: true, // Send httpOnly cookies with every request
     });
-
-    // Add request interceptor to include auth token
-    this.axiosInstance.interceptors.request.use(
-      (config) => {
-        const token = localStorage.getItem("access_token");
-        if (token) {
-          config.headers.Authorization = `Bearer ${token}`;
-        }
-        return config;
-      },
-      (error) => Promise.reject(error)
-    );
 
     // Add response interceptor for error handling
     this.axiosInstance.interceptors.response.use(
       (response) => response,
       (error) => {
         if (error.response?.status === 401) {
-          // Clear tokens on 401
-          localStorage.removeItem("access_token");
-          localStorage.removeItem("refresh_token");
           // Notify React auth state via custom event
           window.dispatchEvent(new CustomEvent("auth:session-expired"));
         }
@@ -91,9 +76,8 @@ class ApiClient {
     return response.data;
   }
 
-  async login(data: LoginRequest): Promise<TokenResponse> {
-    const response = await this.axiosInstance.post<TokenResponse>("/auth/login", data);
-    this.setTokens(response.data);
+  async login(data: LoginRequest): Promise<User> {
+    const response = await this.axiosInstance.post<User>("/auth/login", data);
     return response.data;
   }
 
@@ -107,12 +91,11 @@ class ApiClient {
     return response.data;
   }
 
-  async verifyEmail(email: string, code: string): Promise<TokenResponse> {
-    const response = await this.axiosInstance.post<TokenResponse>("/auth/verify-email", {
+  async verifyEmail(email: string, code: string): Promise<User> {
+    const response = await this.axiosInstance.post<User>("/auth/verify-email", {
       email,
       code,
     });
-    this.setTokens(response.data);
     return response.data;
   }
 
@@ -133,14 +116,12 @@ class ApiClient {
     return response.data;
   }
 
-  logout(): void {
-    localStorage.removeItem("access_token");
-    localStorage.removeItem("refresh_token");
-  }
-
-  private setTokens(data: TokenResponse): void {
-    localStorage.setItem("access_token", data.access_token);
-    localStorage.setItem("refresh_token", data.refresh_token);
+  async logout(): Promise<void> {
+    try {
+      await this.axiosInstance.post("/auth/logout");
+    } catch {
+      // Ignore errors during logout — cookies may already be cleared
+    }
   }
 
   // Resource endpoints

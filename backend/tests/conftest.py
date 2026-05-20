@@ -3,12 +3,18 @@
 from collections.abc import Generator
 
 import pytest
+from fastapi.testclient import TestClient
 from sqlmodel import Session, SQLModel, create_engine
 from sqlmodel.pool import StaticPool
 
 from app.core.rate_limiter import disable_rate_limiter
+from app.core.security import hash_password
 from app.main import app
+from app.models import User, UserRole
 from app.services.database import get_session
+
+# Strong password for all tests (meets complexity requirements)
+TEST_PASSWORD = "TestP@ss1234"
 
 
 @pytest.fixture(name="session")
@@ -51,3 +57,38 @@ def client_fixture(session: Session) -> Generator:  # type: ignore[type-arg]
     client = TestClient(app)
     yield client
     app.dependency_overrides.clear()
+
+
+def create_verified_user(
+    session: Session,
+    email: str = "user@curtin.edu.au",
+    full_name: str = "Test User",
+    role: UserRole = UserRole.STAFF,
+    password: str = TEST_PASSWORD,
+) -> User:
+    """Create a verified, active, approved user for testing."""
+    user = User(
+        email=email,
+        full_name=full_name,
+        hashed_password=hash_password(password),
+        role=role,
+        is_active=True,
+        is_verified=True,
+        is_approved=True,
+    )
+    session.add(user)
+    session.commit()
+    session.refresh(user)
+    return user
+
+
+def login_and_get_token(client: TestClient, email: str, password: str = TEST_PASSWORD) -> str:
+    """Login and return the access token from the httpOnly cookie."""
+    response = client.post(
+        "/api/v1/auth/login",
+        json={"email": email, "password": password},
+    )
+    token = response.cookies.get("access_token")
+    if not token:
+        raise ValueError(f"Login failed or no cookie set: {response.status_code} {response.json()}")
+    return token

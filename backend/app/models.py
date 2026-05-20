@@ -1,10 +1,12 @@
 """Database models for The AI Exchange."""
 
+import re
 from datetime import UTC, datetime
 from enum import Enum
 from typing import Any
 from uuid import UUID, uuid4
 
+from pydantic import field_validator
 from sqlalchemy import JSON
 from sqlmodel import Column, DateTime, Field, SQLModel, Text
 
@@ -180,12 +182,67 @@ class User(SQLModel, table=True):
         return f"User(id={self.id}, email={self.email}, role={self.role})"
 
 
+class LoginAttempt(SQLModel, table=True):
+    """Track failed login attempts for account lockout."""
+
+    id: int | None = Field(default=None, primary_key=True)
+    email: str = Field(index=True)
+    attempted_at: datetime = Field(
+        default_factory=lambda: datetime.now(UTC),
+        sa_column=Column(DateTime(timezone=True)),
+    )
+    success: bool = Field(default=False)
+    ip_address: str | None = Field(default=None)
+
+    def __repr__(self) -> str:
+        """String representation."""
+        return f"LoginAttempt(email={self.email}, success={self.success})"
+
+
+class TokenBlacklist(SQLModel, table=True):
+    """Blacklisted JWT tokens that have been revoked before expiry."""
+
+    id: int | None = Field(default=None, primary_key=True)
+    jti: str = Field(unique=True, index=True, description="JWT ID claim (unique token identifier)")
+    user_id: UUID = Field(foreign_key="user.id", index=True)
+    expires_at: datetime = Field(
+        sa_column=Column(DateTime(timezone=True)),
+        description="Original token expiry — safe to purge after this time",
+    )
+    revoked_at: datetime = Field(
+        default_factory=lambda: datetime.now(UTC),
+        sa_column=Column(DateTime(timezone=True)),
+    )
+
+    def __repr__(self) -> str:
+        """String representation."""
+        return f"TokenBlacklist(jti={self.jti}, user_id={self.user_id})"
+
+
+class AuditLog(SQLModel, table=True):
+    """Audit trail for security-relevant events."""
+
+    id: int | None = Field(default=None, primary_key=True)
+    user_id: UUID | None = Field(default=None, foreign_key="user.id", index=True)
+    action: str = Field(index=True)  # e.g. "login", "logout", "password_reset", "admin_action"
+    detail: str | None = Field(default=None, sa_column=Column(Text))
+    ip_address: str | None = Field(default=None)
+    created_at: datetime = Field(
+        default_factory=lambda: datetime.now(UTC),
+        sa_column=Column(DateTime(timezone=True), index=True),
+    )
+
+    def __repr__(self) -> str:
+        """String representation."""
+        return f"AuditLog(action={self.action}, user_id={self.user_id})"
+
+
 class PasswordReset(SQLModel, table=True):
     """Password reset model for secure password recovery."""
 
     id: UUID = Field(default_factory=uuid4, primary_key=True)
     user_id: UUID = Field(foreign_key="user.id", index=True)
-    token: str = Field(max_length=6, index=True)  # 6-digit reset code
+    token: str = Field(max_length=8, index=True)  # 8-char alphanumeric reset code
     expires_at: datetime = Field(
         sa_column=Column(DateTime(timezone=True)),
         description="Token expiration time",
@@ -221,7 +278,7 @@ class EmailVerification(SQLModel, table=True):
 
     id: UUID = Field(default_factory=uuid4, primary_key=True)
     user_id: UUID = Field(foreign_key="user.id", index=True)
-    code: str = Field(max_length=6, index=True)  # 6-digit verification code
+    code: str = Field(max_length=8, index=True)  # 8-char alphanumeric verification code
     expires_at: datetime = Field(
         sa_column=Column(DateTime(timezone=True)),
         description="Code expiration time",
@@ -545,6 +602,32 @@ class UserTriedResource(SQLModel, table=True):
         return f"UserTriedResource(user_id={self.user_id}, resource_id={self.resource_id})"
 
 
+def validate_password_strength(password: str) -> str:
+    """Validate password meets complexity requirements.
+
+    Requirements:
+    - At least 10 characters long
+    - At least one uppercase letter
+    - At least one lowercase letter
+    - At least one digit
+    - At least one special character
+    """
+    errors: list[str] = []
+    if len(password) < 10:
+        errors.append("at least 10 characters")
+    if not re.search(r"[A-Z]", password):
+        errors.append("one uppercase letter")
+    if not re.search(r"[a-z]", password):
+        errors.append("one lowercase letter")
+    if not re.search(r"\d", password):
+        errors.append("one digit")
+    if not re.search(r"[!@#$%^&*(),.?\":{}|<>\-_=+\[\]\\;'/~`]", password):
+        errors.append("one special character")
+    if errors:
+        raise ValueError(f"Password must contain: {', '.join(errors)}")
+    return password
+
+
 # Response schemas (for API)
 class UserBase(SQLModel):
     """Base user schema."""
@@ -559,6 +642,12 @@ class UserCreate(UserBase):
     password: str
     professional_roles: list[str] | None = None  # Multiple roles
     specialties: list[str] | None = None
+
+    @field_validator("password")
+    @classmethod
+    def check_password_strength(cls, v: str) -> str:
+        """Validate password complexity."""
+        return validate_password_strength(v)
 
 
 class UserUpdate(SQLModel):
@@ -907,11 +996,10 @@ class SavedResourceItem(SQLModel):
 
 
 class UserTriedInfo(SQLModel):
-    """User who tried a resource."""
+    """User who tried a resource. Email intentionally excluded to avoid PII exposure."""
 
     id: UUID
     full_name: str
-    email: str
     tried_at: datetime
 
 
@@ -1007,6 +1095,12 @@ class ResetPasswordRequest(SQLModel):
     email: str
     code: str
     new_password: str
+
+    @field_validator("new_password")
+    @classmethod
+    def check_password_strength(cls, v: str) -> str:
+        """Validate password complexity."""
+        return validate_password_strength(v)
 
 
 class ResetPasswordResponse(SQLModel):

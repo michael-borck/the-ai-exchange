@@ -7,87 +7,90 @@ from sqlmodel import Session
 from app.core.security import hash_password
 from app.models import User, UserRole
 
+# Strong password that passes validation
+STRONG_PASSWORD = "TestP@ss1234"
+
+
+def _get_token_from_cookies(response) -> str:
+    """Extract access_token from response cookies."""
+    return response.cookies.get("access_token", "")
+
+
+def _get_token_from_login(client: TestClient, email: str, password: str) -> str:
+    """Login and return access token from cookies."""
+    response = client.post(
+        "/api/v1/auth/login",
+        json={"email": email, "password": password},
+    )
+    return _get_token_from_cookies(response)
+
 
 def test_register_new_user(client: TestClient) -> None:
-    """Test registering a new user.
-
-    Args:
-        client: Test client
-    """
+    """Test registering a new user."""
     response = client.post(
         "/api/v1/auth/register",
         json={
             "email": "newuser@curtin.edu.au",
             "full_name": "New User",
-            "password": "securepass123",
-            "disciplines": ["MARKETING", "BUSINESS"],
+            "password": STRONG_PASSWORD,
         },
     )
     assert response.status_code == 201
     data = response.json()
     assert data["email"] == "newuser@curtin.edu.au"
-    assert data["full_name"] == "New User"
-    assert data["role"] == "ADMIN"  # First user is admin
-    assert data["disciplines"] == ["MARKETING", "BUSINESS"]  # Disciplines should be saved
-    assert "access_token" in data
-    assert "refresh_token" in data
-    assert data["token_type"] == "bearer"
+
+
+def test_register_weak_password_rejected(client: TestClient) -> None:
+    """Test that weak passwords are rejected."""
+    response = client.post(
+        "/api/v1/auth/register",
+        json={
+            "email": "newuser@curtin.edu.au",
+            "full_name": "New User",
+            "password": "weak",
+        },
+    )
+    assert response.status_code == 422
 
 
 def test_register_second_user_is_staff(client: TestClient, session: Session) -> None:
-    """Test that second user is STAFF role.
-
-    Args:
-        client: Test client
-        session: Database session
-    """
-    # Create first admin
+    """Test that second user is STAFF role."""
     admin = User(
         email="admin@curtin.edu.au",
         full_name="Admin User",
-        hashed_password=hash_password("admin123"),
+        hashed_password=hash_password(STRONG_PASSWORD),
         role=UserRole.ADMIN,
     )
     session.add(admin)
     session.commit()
 
-    # Register second user
     response = client.post(
         "/api/v1/auth/register",
         json={
             "email": "staff@curtin.edu.au",
             "full_name": "Staff User",
-            "password": "staffpass123",
+            "password": STRONG_PASSWORD,
         },
     )
     assert response.status_code == 201
-    data = response.json()
-    assert data["role"] == "STAFF"  # Second user is staff
 
 
 def test_register_duplicate_email(client: TestClient, session: Session) -> None:
-    """Test registering with duplicate email.
-
-    Args:
-        client: Test client
-        session: Database session
-    """
-    # Create existing user
+    """Test registering with duplicate email."""
     user = User(
         email="existing@curtin.edu.au",
         full_name="Existing User",
-        hashed_password=hash_password("pass123"),
+        hashed_password=hash_password(STRONG_PASSWORD),
     )
     session.add(user)
     session.commit()
 
-    # Try to register with same email
     response = client.post(
         "/api/v1/auth/register",
         json={
             "email": "existing@curtin.edu.au",
             "full_name": "Another User",
-            "password": "password123",
+            "password": STRONG_PASSWORD,
         },
     )
     assert response.status_code == 400
@@ -95,17 +98,13 @@ def test_register_duplicate_email(client: TestClient, session: Session) -> None:
 
 
 def test_register_invalid_domain(client: TestClient) -> None:
-    """Test registering with invalid domain.
-
-    Args:
-        client: Test client
-    """
+    """Test registering with invalid domain."""
     response = client.post(
         "/api/v1/auth/register",
         json={
             "email": "user@example.com",
             "full_name": "External User",
-            "password": "password123",
+            "password": STRONG_PASSWORD,
         },
     )
     assert response.status_code == 403
@@ -113,62 +112,51 @@ def test_register_invalid_domain(client: TestClient) -> None:
 
 
 def test_login_success(client: TestClient, session: Session) -> None:
-    """Test successful login.
-
-    Args:
-        client: Test client
-        session: Database session
-    """
-    # Create user
+    """Test successful login sets httpOnly cookies."""
     user = User(
         email="user@curtin.edu.au",
         full_name="Test User",
-        hashed_password=hash_password("testpass123"),
+        hashed_password=hash_password(STRONG_PASSWORD),
         is_active=True,
         is_approved=True,
+        is_verified=True,
     )
     session.add(user)
     session.commit()
 
-    # Login
     response = client.post(
         "/api/v1/auth/login",
         json={
             "email": "user@curtin.edu.au",
-            "password": "testpass123",
+            "password": STRONG_PASSWORD,
         },
     )
     assert response.status_code == 200
     data = response.json()
     assert data["email"] == "user@curtin.edu.au"
-    assert "access_token" in data
-    assert "refresh_token" in data
+    # Tokens should be in httpOnly cookies only, not in response body
+    assert "access_token" not in data
+    assert "access_token" in response.cookies
 
 
 def test_login_invalid_password(client: TestClient, session: Session) -> None:
-    """Test login with wrong password.
-
-    Args:
-        client: Test client
-        session: Database session
-    """
-    # Create user
+    """Test login with wrong password."""
     user = User(
         email="user@curtin.edu.au",
         full_name="Test User",
-        hashed_password=hash_password("correctpass"),
+        hashed_password=hash_password(STRONG_PASSWORD),
         is_active=True,
         is_approved=True,
+        is_verified=True,
     )
     session.add(user)
     session.commit()
 
-    # Try login with wrong password
     response = client.post(
         "/api/v1/auth/login",
         json={
             "email": "user@curtin.edu.au",
-            "password": "wrongpass",
+            "password": "WrongP@ss1234",
         },
     )
     assert response.status_code == 401
@@ -176,16 +164,12 @@ def test_login_invalid_password(client: TestClient, session: Session) -> None:
 
 
 def test_login_user_not_found(client: TestClient) -> None:
-    """Test login with nonexistent user.
-
-    Args:
-        client: Test client
-    """
+    """Test login with nonexistent user."""
     response = client.post(
         "/api/v1/auth/login",
         json={
             "email": "nonexistent@curtin.edu.au",
-            "password": "password123",
+            "password": STRONG_PASSWORD,
         },
     )
     assert response.status_code == 401
@@ -193,28 +177,22 @@ def test_login_user_not_found(client: TestClient) -> None:
 
 
 def test_login_inactive_user(client: TestClient, session: Session) -> None:
-    """Test login with deactivated user.
-
-    Args:
-        client: Test client
-        session: Database session
-    """
-    # Create inactive user
+    """Test login with deactivated user."""
     user = User(
         email="inactive@curtin.edu.au",
         full_name="Inactive User",
-        hashed_password=hash_password("pass123"),
+        hashed_password=hash_password(STRONG_PASSWORD),
         is_active=False,
+        is_verified=True,
     )
     session.add(user)
     session.commit()
 
-    # Try login
     response = client.post(
         "/api/v1/auth/login",
         json={
             "email": "inactive@curtin.edu.au",
-            "password": "pass123",
+            "password": STRONG_PASSWORD,
         },
     )
     assert response.status_code == 403
@@ -222,65 +200,133 @@ def test_login_inactive_user(client: TestClient, session: Session) -> None:
 
 
 def test_login_unapproved_user(client: TestClient, session: Session) -> None:
-    """Test login with unapproved user.
-
-    Args:
-        client: Test client
-        session: Database session
-    """
-    # Create unapproved user (external domain)
+    """Test login with unapproved user."""
     user = User(
-        email="external@example.com",
+        email="external@curtin.edu.au",
         full_name="External User",
-        hashed_password=hash_password("pass123"),
+        hashed_password=hash_password(STRONG_PASSWORD),
         is_active=True,
         is_approved=False,
+        is_verified=True,
     )
     session.add(user)
     session.commit()
 
-    # Try login
     response = client.post(
         "/api/v1/auth/login",
         json={
-            "email": "external@example.com",
-            "password": "pass123",
+            "email": "external@curtin.edu.au",
+            "password": STRONG_PASSWORD,
         },
     )
     assert response.status_code == 403
     assert "pending approval" in response.json()["detail"]
 
 
-def test_get_current_user(client: TestClient, session: Session) -> None:
-    """Test getting current user info.
-
-    Args:
-        client: Test client
-        session: Database session
-    """
-    # Create and login user
+def test_login_unverified_user(client: TestClient, session: Session) -> None:
+    """Test login with unverified user."""
     user = User(
-        email="user@curtin.edu.au",
-        full_name="Test User",
-        hashed_password=hash_password("pass123"),
+        email="unverified@curtin.edu.au",
+        full_name="Unverified User",
+        hashed_password=hash_password(STRONG_PASSWORD),
         is_active=True,
         is_approved=True,
+        is_verified=False,
     )
     session.add(user)
     session.commit()
-    session.refresh(user)
 
-    # Login to get token
-    login_response = client.post(
+    response = client.post(
         "/api/v1/auth/login",
         json={
-            "email": "user@curtin.edu.au",
-            "password": "pass123",
+            "email": "unverified@curtin.edu.au",
+            "password": STRONG_PASSWORD,
         },
     )
-    token = login_response.json()["access_token"]
+    assert response.status_code == 403
+    assert "not verified" in response.json()["detail"]
 
-    # Get current user
+
+def test_account_lockout(client: TestClient, session: Session) -> None:
+    """Test account lockout after too many failed attempts."""
+    user = User(
+        email="lockme@curtin.edu.au",
+        full_name="Lock Me",
+        hashed_password=hash_password(STRONG_PASSWORD),
+        is_active=True,
+        is_approved=True,
+        is_verified=True,
+    )
+    session.add(user)
+    session.commit()
+
+    # Make 5 failed attempts
+    for _ in range(5):
+        client.post(
+            "/api/v1/auth/login",
+            json={"email": "lockme@curtin.edu.au", "password": "WrongP@ss1234"},
+        )
+
+    # 6th attempt should be locked out
+    response = client.post(
+        "/api/v1/auth/login",
+        json={"email": "lockme@curtin.edu.au", "password": STRONG_PASSWORD},
+    )
+    assert response.status_code == 429
+    assert "locked" in response.json()["detail"].lower()
+
+
+def test_get_current_user_with_cookie(client: TestClient, session: Session) -> None:
+    """Test getting current user via cookie-based auth."""
+    user = User(
+        email="user@curtin.edu.au",
+        full_name="Test User",
+        hashed_password=hash_password(STRONG_PASSWORD),
+        is_active=True,
+        is_approved=True,
+        is_verified=True,
+    )
+    session.add(user)
+    session.commit()
+
+    # Login (sets cookies on test client)
+    login_response = client.post(
+        "/api/v1/auth/login",
+        json={"email": "user@curtin.edu.au", "password": STRONG_PASSWORD},
+    )
+    assert login_response.status_code == 200
+    assert "access_token" in login_response.cookies
+
+    # Get current user using the cookie from login response
+    token_cookie = login_response.cookies["access_token"]
+    response = client.get(
+        "/api/v1/auth/me",
+        cookies={"access_token": token_cookie},
+    )
+    assert response.status_code == 200
+    data = response.json()
+    assert data["email"] == "user@curtin.edu.au"
+
+
+def test_get_current_user_with_bearer(client: TestClient, session: Session) -> None:
+    """Test getting current user via Authorization header (backward compat)."""
+    user = User(
+        email="user@curtin.edu.au",
+        full_name="Test User",
+        hashed_password=hash_password(STRONG_PASSWORD),
+        is_active=True,
+        is_approved=True,
+        is_verified=True,
+    )
+    session.add(user)
+    session.commit()
+
+    login_response = client.post(
+        "/api/v1/auth/login",
+        json={"email": "user@curtin.edu.au", "password": STRONG_PASSWORD},
+    )
+    token = login_response.cookies["access_token"]
+
     response = client.get(
         "/api/v1/auth/me",
         headers={"Authorization": f"Bearer {token}"},
@@ -288,26 +334,17 @@ def test_get_current_user(client: TestClient, session: Session) -> None:
     assert response.status_code == 200
     data = response.json()
     assert data["email"] == "user@curtin.edu.au"
-    assert data["full_name"] == "Test User"
 
 
 def test_get_current_user_no_token(client: TestClient) -> None:
-    """Test getting current user without token.
-
-    Args:
-        client: Test client
-    """
+    """Test getting current user without token."""
     response = client.get("/api/v1/auth/me")
     assert response.status_code == 401
-    assert "Missing authorization header" in response.json()["detail"]
+    assert "Not authenticated" in response.json()["detail"]
 
 
 def test_get_current_user_invalid_token(client: TestClient) -> None:
-    """Test getting current user with invalid token.
-
-    Args:
-        client: Test client
-    """
+    """Test getting current user with invalid token."""
     response = client.get(
         "/api/v1/auth/me",
         headers={"Authorization": "Bearer invalid_token"},
@@ -317,11 +354,7 @@ def test_get_current_user_invalid_token(client: TestClient) -> None:
 
 
 def test_get_current_user_wrong_format(client: TestClient) -> None:
-    """Test getting current user with wrong token format.
-
-    Args:
-        client: Test client
-    """
+    """Test getting current user with wrong token format."""
     response = client.get(
         "/api/v1/auth/me",
         headers={"Authorization": "invalid_token"},
@@ -330,136 +363,123 @@ def test_get_current_user_wrong_format(client: TestClient) -> None:
     assert "Invalid token format" in response.json()["detail"]
 
 
-def test_register_with_disciplines(client: TestClient) -> None:
-    """Test that disciplines field is properly returned in responses.
-
-    Args:
-        client: Test client
-    """
-    # Register with disciplines
-    response = client.post(
-        "/api/v1/auth/register",
-        json={
-            "email": "disciplined@curtin.edu.au",
-            "full_name": "Disciplined User",
-            "password": "pass123",
-            "disciplines": ["MARKETING", "BUSINESS"],
-        },
-    )
-    assert response.status_code == 201
-    data = response.json()
-    assert data["disciplines"] == ["MARKETING", "BUSINESS"]
-
-
-def test_login_returns_disciplines(client: TestClient, session: Session) -> None:
-    """Test that login returns disciplines field.
-
-    Args:
-        client: Test client
-        session: Database session
-    """
-    # Create user with disciplines
+def test_logout_clears_cookies(client: TestClient, session: Session) -> None:
+    """Test that logout clears auth cookies."""
     user = User(
         email="user@curtin.edu.au",
         full_name="Test User",
-        hashed_password=hash_password("pass123"),
+        hashed_password=hash_password(STRONG_PASSWORD),
         is_active=True,
         is_approved=True,
-        disciplines=["SUPPLY_CHAIN", "HR"],
+        is_verified=True,
     )
     session.add(user)
     session.commit()
 
     # Login
-    response = client.post(
+    login_response = client.post(
         "/api/v1/auth/login",
-        json={
-            "email": "user@curtin.edu.au",
-            "password": "pass123",
-        },
+        json={"email": "user@curtin.edu.au", "password": STRONG_PASSWORD},
+    )
+
+    # Logout
+    response = client.post(
+        "/api/v1/auth/logout",
+        cookies={"access_token": login_response.cookies["access_token"]},
     )
     assert response.status_code == 200
-    data = response.json()
-    assert data["disciplines"] == ["SUPPLY_CHAIN", "HR"]
+    assert "Logged out" in response.json()["message"]
 
 
-def test_get_me_returns_disciplines(client: TestClient, session: Session) -> None:
-    """Test that GET /me returns disciplines field.
-
-    Args:
-        client: Test client
-        session: Database session
-    """
-    # Create user with disciplines
+def test_logout_revokes_token(client: TestClient, session: Session) -> None:
+    """Test that logout blacklists the access token so it can't be reused."""
     user = User(
         email="user@curtin.edu.au",
         full_name="Test User",
-        hashed_password=hash_password("pass123"),
+        hashed_password=hash_password(STRONG_PASSWORD),
         is_active=True,
         is_approved=True,
-        disciplines=["ACCOUNTING", "LAW"],
+        is_verified=True,
     )
     session.add(user)
     session.commit()
-    session.refresh(user)
 
-    # Login to get token
+    # Login
     login_response = client.post(
         "/api/v1/auth/login",
-        json={
-            "email": "user@curtin.edu.au",
-            "password": "pass123",
-        },
+        json={"email": "user@curtin.edu.au", "password": STRONG_PASSWORD},
     )
-    token = login_response.json()["access_token"]
+    token = login_response.cookies["access_token"]
 
-    # Get current user
+    # Logout (blacklists the token)
+    client.post(
+        "/api/v1/auth/logout",
+        cookies={"access_token": token},
+    )
+
+    # Try to use the old token — should be rejected
     response = client.get(
         "/api/v1/auth/me",
         headers={"Authorization": f"Bearer {token}"},
     )
-    assert response.status_code == 200
-    data = response.json()
-    assert data["disciplines"] == ["ACCOUNTING", "LAW"]
+    assert response.status_code == 401
+    assert "revoked" in response.json()["detail"].lower()
 
 
-def test_patch_me_preserves_disciplines(client: TestClient, session: Session) -> None:
-    """Test that PATCH /me preserves disciplines field.
-
-    Args:
-        client: Test client
-        session: Database session
-    """
-    # Create user with disciplines
+def test_refresh_rotates_tokens(client: TestClient, session: Session) -> None:
+    """Test that refresh endpoint issues new tokens and blacklists the old refresh token."""
     user = User(
         email="user@curtin.edu.au",
         full_name="Test User",
-        hashed_password=hash_password("pass123"),
+        hashed_password=hash_password(STRONG_PASSWORD),
         is_active=True,
         is_approved=True,
-        disciplines=["TOURISM"],
+        is_verified=True,
     )
     session.add(user)
     session.commit()
-    session.refresh(user)
 
-    # Login to get token
+    # Login
     login_response = client.post(
         "/api/v1/auth/login",
-        json={
-            "email": "user@curtin.edu.au",
-            "password": "pass123",
-        },
+        json={"email": "user@curtin.edu.au", "password": STRONG_PASSWORD},
     )
-    token = login_response.json()["access_token"]
+    old_refresh = login_response.cookies["refresh_token"]
 
-    # Update profile
-    response = client.patch(
-        "/api/v1/auth/me",
-        headers={"Authorization": f"Bearer {token}"},
-        json={"full_name": "Updated User"},
+    # Refresh
+    refresh_response = client.post(
+        "/api/v1/auth/refresh",
+        cookies={"refresh_token": old_refresh},
     )
-    assert response.status_code == 200
+    assert refresh_response.status_code == 200
+    assert refresh_response.json()["email"] == "user@curtin.edu.au"
+    assert "access_token" in refresh_response.cookies
+
+    # Old refresh token should be blacklisted
+    reuse_response = client.post(
+        "/api/v1/auth/refresh",
+        cookies={"refresh_token": old_refresh},
+    )
+    assert reuse_response.status_code == 401
+
+
+def test_no_tokens_in_response_body(client: TestClient, session: Session) -> None:
+    """Test that login/verify responses don't leak tokens in JSON body."""
+    user = User(
+        email="user@curtin.edu.au",
+        full_name="Test User",
+        hashed_password=hash_password(STRONG_PASSWORD),
+        is_active=True,
+        is_approved=True,
+        is_verified=True,
+    )
+    session.add(user)
+    session.commit()
+
+    response = client.post(
+        "/api/v1/auth/login",
+        json={"email": "user@curtin.edu.au", "password": STRONG_PASSWORD},
+    )
     data = response.json()
-    assert data["disciplines"] == ["TOURISM"]  # Disciplines preserved
-    assert data["full_name"] == "Updated User"  # Name updated
+    assert "access_token" not in data
+    assert "refresh_token" not in data

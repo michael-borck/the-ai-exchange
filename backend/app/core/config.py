@@ -1,7 +1,10 @@
 """Application configuration from environment variables."""
 
+import secrets
+import warnings
 from pathlib import Path
 
+from pydantic import model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -15,6 +18,35 @@ class Settings(BaseSettings):
     api_v1_str: str = "/api/v1"
     secret_key: str = "change-me-to-secure-random-string"
     debug: bool = False
+
+    # Cookie settings
+    cookie_domain: str | None = None  # None = current domain
+    cookie_secure: bool = True  # Must be False for local dev over HTTP
+    cookie_samesite: str = "lax"  # "lax" prevents CSRF on cross-site POST
+
+    @model_validator(mode="after")
+    def validate_settings(self) -> "Settings":
+        """Validate critical settings at startup."""
+        # Reject default SECRET_KEY in production; auto-generate in debug
+        insecure_keys = {"change-me-to-secure-random-string", ""}
+        if self.secret_key in insecure_keys:
+            if self.debug:
+                self.secret_key = secrets.token_urlsafe(32)
+                warnings.warn(
+                    "SECRET_KEY is using default value. "
+                    "Generated random key for this session. "
+                    "Set SECRET_KEY in .env for production.",
+                    stacklevel=2,
+                )
+            else:
+                raise ValueError(
+                    "SECRET_KEY must be set to a secure random value in production. "
+                    'Generate one with: python -c "import secrets; print(secrets.token_urlsafe(32))"'
+                )
+        # Auto-disable secure cookies in debug mode (HTTP)
+        if self.debug:
+            self.cookie_secure = False
+        return self
     testing: bool = False  # Testing mode (dev only): disables rate limiting, uses mocked services
 
     # Database - uses absolute path relative to this config file location

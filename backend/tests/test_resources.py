@@ -4,28 +4,14 @@ import pytest
 from fastapi.testclient import TestClient
 from sqlmodel import Session
 
+from tests.conftest import TEST_PASSWORD, create_verified_user, login_and_get_token
+
 
 @pytest.fixture
-def auth_headers(client: TestClient, session: Session) -> dict[str, str]:  # noqa: ARG001
-    """Create authenticated user and return auth headers.
-
-    Args:
-        client: Test client
-        session: Database session
-
-    Returns:
-        Authorization headers
-    """
-    # Register user
-    response = client.post(
-        "/api/v1/auth/register",
-        json={
-            "email": "user@curtin.edu.au",
-            "full_name": "Test User",
-            "password": "testpass123",
-        },
-    )
-    token = response.json()["access_token"]
+def auth_headers(client: TestClient, session: Session) -> dict[str, str]:
+    """Create authenticated user and return auth headers."""
+    create_verified_user(session, email="user@curtin.edu.au")
+    token = login_and_get_token(client, "user@curtin.edu.au")
     return {"Authorization": f"Bearer {token}"}
 
 
@@ -374,16 +360,11 @@ def test_update_resource_not_owner(
     )
     resource_id = create_response.json()["id"]
 
-    # Register second user
-    response = client.post(
-        "/api/v1/auth/register",
-        json={
-            "email": "other@curtin.edu.au",
-            "full_name": "Other User",
-            "password": "otherpass123",
-        },
-    )
-    other_token = response.json()["access_token"]
+    # Create second user
+    from tests.conftest import create_verified_user, login_and_get_token
+
+    create_verified_user(session, email="other@curtin.edu.au", full_name="Other User")
+    other_token = login_and_get_token(client, "other@curtin.edu.au")
     other_headers = {"Authorization": f"Bearer {other_token}"}
 
     # Try to update with second user

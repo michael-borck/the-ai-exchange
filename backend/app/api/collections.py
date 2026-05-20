@@ -2,10 +2,11 @@
 
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, Request, status
 from sqlmodel import Session, select
 
 from app.api.auth import get_current_user
+from app.core.rate_limiter import LIMIT_READ, LIMIT_WRITE, limiter
 from app.models import (
     Collection,
     CollectionCreate,
@@ -19,9 +20,12 @@ router = APIRouter(prefix="/api/v1/collections", tags=["collections"])
 
 
 @router.get("", response_model=list[CollectionResponse])
+@limiter.limit(LIMIT_READ)
 def list_collections(
+    request: Request,  # noqa: ARG001 - required by slowapi for rate limiting
     skip: int = 0,
     limit: int = 50,
+    current_user: User = Depends(get_current_user),  # noqa: ARG001 - auth gate
     session: Session = Depends(get_session),
 ) -> list[CollectionResponse]:
     """List available collections.
@@ -42,8 +46,11 @@ def list_collections(
 
 
 @router.get("/{collection_id}", response_model=CollectionResponse)
+@limiter.limit(LIMIT_READ)
 def get_collection(
+    request: Request,  # noqa: ARG001 - required by slowapi for rate limiting
     collection_id: UUID,
+    current_user: User = Depends(get_current_user),  # noqa: ARG001 - auth gate
     session: Session = Depends(get_session),
 ) -> CollectionResponse:
     """Get a specific collection by ID.
@@ -71,7 +78,9 @@ def get_collection(
 
 
 @router.post("", response_model=CollectionResponse, status_code=status.HTTP_201_CREATED)
+@limiter.limit(LIMIT_WRITE)
 def create_collection(
+    request: Request,  # noqa: ARG001 - required by slowapi for rate limiting
     collection_data: CollectionCreate,
     current_user: User = Depends(get_current_user),
     session: Session = Depends(get_session),
@@ -102,7 +111,9 @@ def create_collection(
 
 
 @router.patch("/{collection_id}", response_model=CollectionResponse)
+@limiter.limit(LIMIT_WRITE)
 def update_collection(
+    request: Request,  # noqa: ARG001 - required by slowapi for rate limiting
     collection_id: UUID,
     collection_data: CollectionUpdate,
     current_user: User = Depends(get_current_user),
@@ -156,7 +167,9 @@ def update_collection(
 
 
 @router.delete("/{collection_id}", status_code=status.HTTP_204_NO_CONTENT)
+@limiter.limit(LIMIT_WRITE)
 def delete_collection(
+    request: Request,  # noqa: ARG001 - required by slowapi for rate limiting
     collection_id: UUID,
     current_user: User = Depends(get_current_user),
     session: Session = Depends(get_session),
@@ -192,8 +205,11 @@ def delete_collection(
 
 
 @router.post("/{collection_id}/subscribe", response_model=CollectionResponse)
+@limiter.limit(LIMIT_WRITE)
 def subscribe_to_collection(
+    request: Request,  # noqa: ARG001 - required by slowapi for rate limiting
     collection_id: UUID,
+    current_user: User = Depends(get_current_user),  # noqa: ARG001 - auth gate
     session: Session = Depends(get_session),
 ) -> CollectionResponse:
     """Subscribe to a collection (increment subscriber count).
@@ -226,8 +242,11 @@ def subscribe_to_collection(
 
 
 @router.get("/{collection_id}/prompts", response_model=list[UUID])
+@limiter.limit(LIMIT_READ)
 def get_collection_prompts(
+    request: Request,  # noqa: ARG001 - required by slowapi for rate limiting
     collection_id: UUID,
+    current_user: User = Depends(get_current_user),  # noqa: ARG001 - auth gate
     session: Session = Depends(get_session),
 ) -> list[UUID]:
     """Get prompt IDs in a collection.
@@ -255,8 +274,11 @@ def get_collection_prompts(
 
 
 @router.get("/{collection_id}/resources", response_model=list[UUID])
+@limiter.limit(LIMIT_READ)
 def get_collection_resources(
+    request: Request,  # noqa: ARG001 - required by slowapi for rate limiting
     collection_id: UUID,
+    current_user: User = Depends(get_current_user),  # noqa: ARG001 - auth gate
     session: Session = Depends(get_session),
 ) -> list[UUID]:
     """Get resource IDs in a collection.

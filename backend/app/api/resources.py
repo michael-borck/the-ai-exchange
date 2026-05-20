@@ -2,11 +2,12 @@
 
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, HTTPException, Query, status
+from fastapi import APIRouter, Depends, HTTPException, Query, Request, status
 from sqlmodel import Session, select
 
 from app.api.auth import get_current_user
 from app.core.config import settings
+from app.core.rate_limiter import LIMIT_READ, LIMIT_WRITE, limiter
 from app.models import (
     Resource,
     ResourceAnalytics,
@@ -45,7 +46,9 @@ class TagSuggestion:
 
 
 @router.get("", response_model=list[ResourceWithAuthor])
+@limiter.limit(LIMIT_READ)
 def list_resources(
+    request: Request,  # noqa: ARG001 - required by slowapi for rate limiting
     type_filter: ResourceType | None = Query(None, alias="type"),
     tag: str | None = Query(None),
     search: str | None = Query(None),
@@ -58,6 +61,7 @@ def list_resources(
     sort_by: str = Query("newest", pattern="^(newest|popular|most_tried)$"),
     skip: int = Query(0, ge=0),
     limit: int = Query(10, ge=1, le=1000),
+    current_user: User = Depends(get_current_user),  # noqa: ARG001 - auth gate
     session: Session = Depends(get_session),
 ) -> list[ResourceWithAuthor]:
     """Get list of resources with advanced filtering and author information.
@@ -190,8 +194,11 @@ def list_resources(
 
 
 @router.get("/{resource_id}", response_model=ResourceWithAuthor)
+@limiter.limit(LIMIT_READ)
 def get_resource(
+    request: Request,  # noqa: ARG001 - required by slowapi for rate limiting
     resource_id: UUID,
+    current_user: User = Depends(get_current_user),  # noqa: ARG001 - auth gate
     session: Session = Depends(get_session),
 ) -> ResourceWithAuthor:
     """Get a specific resource with author information.
@@ -259,8 +266,11 @@ def get_resource(
 
 
 @router.get("/{resource_id}/solutions", response_model=list[ResourceResponse])
+@limiter.limit(LIMIT_READ)
 def get_resource_solutions(
+    request: Request,  # noqa: ARG001 - required by slowapi for rate limiting
     resource_id: UUID,
+    current_user: User = Depends(get_current_user),  # noqa: ARG001 - auth gate
     session: Session = Depends(get_session),
 ) -> list[ResourceResponse]:
     """Get all solutions for a request.
@@ -300,7 +310,9 @@ def get_resource_solutions(
 
 
 @router.post("", response_model=ResourceResponse, status_code=status.HTTP_201_CREATED)
+@limiter.limit(LIMIT_WRITE)
 def create_resource(
+    request: Request,  # noqa: ARG001 - required by slowapi for rate limiting
     resource_data: ResourceCreate,
     current_user: User = Depends(get_current_user),
     session: Session = Depends(get_session),
@@ -334,13 +346,16 @@ def create_resource(
                 detail="Solutions can only be added to requests",
             )
 
+    # Sanitize user-submitted text to prevent stored XSS
+    from app.core.sanitize import sanitize_html
+
     # Create resource
     # Auto-populate user_area from current user's area
     new_resource = Resource(
         user_id=current_user.id,
         type=resource_data.type,
-        title=resource_data.title,
-        content_text=resource_data.content_text,
+        title=sanitize_html(resource_data.title),
+        content_text=sanitize_html(resource_data.content_text),
         is_anonymous=resource_data.is_anonymous,
         parent_id=resource_data.parent_id,
         content_meta=resource_data.content_meta,
@@ -397,7 +412,9 @@ def create_resource(
 
 
 @router.patch("/{resource_id}", response_model=ResourceResponse)
+@limiter.limit(LIMIT_WRITE)
 def update_resource(
+    request: Request,  # noqa: ARG001 - required by slowapi for rate limiting
     resource_id: UUID,
     resource_update: ResourceUpdate,
     current_user: User = Depends(get_current_user),
@@ -455,7 +472,9 @@ def update_resource(
 
 
 @router.delete("/{resource_id}", status_code=status.HTTP_204_NO_CONTENT)
+@limiter.limit(LIMIT_WRITE)
 def delete_resource(
+    request: Request,  # noqa: ARG001 - required by slowapi for rate limiting
     resource_id: UUID,
     current_user: User = Depends(get_current_user),
     session: Session = Depends(get_session),

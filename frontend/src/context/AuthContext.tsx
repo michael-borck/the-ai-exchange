@@ -11,7 +11,7 @@ interface AuthContextType {
   user: User | null;
   isLoading: boolean;
   isAuthenticated: boolean;
-  logout: () => void;
+  logout: () => Promise<void>;
   setUser: (user: User | null) => void;
 }
 
@@ -22,19 +22,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [isLoading, setIsLoading] = useState(true);
   const navigate = useNavigate();
 
-  // Check if user is already logged in on mount
+  // Check if user is already logged in on mount (cookie-based auth)
   useEffect(() => {
     const initializeAuth = async () => {
-      const token = localStorage.getItem("access_token");
-      if (token) {
-        try {
-          const userData = await apiClient.getMe();
-          setUser(userData);
-        } catch (error) {
-          // Token might be expired or invalid
-          apiClient.logout();
-          setUser(null);
-        }
+      try {
+        const userData = await apiClient.getMe();
+        setUser(userData);
+      } catch {
+        // No valid session — user is not logged in
+        setUser(null);
       }
       setIsLoading(false);
     };
@@ -55,8 +51,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     };
   }, [navigate]);
 
-  const logout = () => {
-    apiClient.logout();
+  const logout = async () => {
+    await apiClient.logout();
     setUser(null);
   };
 

@@ -1,5 +1,6 @@
 """Security utilities for authentication and authorization."""
 
+import uuid
 from datetime import UTC, datetime, timedelta
 from typing import Any
 
@@ -17,7 +18,7 @@ ALGORITHM = settings.algorithm
 
 
 def hash_password(password: str) -> str:
-    """Hash a password using bcrypt.
+    """Hash a password using Argon2.
 
     Args:
         password: Plain text password
@@ -45,7 +46,7 @@ def create_access_token(
     data: dict[str, Any],
     expires_delta: timedelta | None = None,
 ) -> str:
-    """Create a JWT access token.
+    """Create a JWT access token with a unique JTI for revocation support.
 
     Args:
         data: Data to encode in the token
@@ -63,7 +64,11 @@ def create_access_token(
             minutes=settings.access_token_expire_minutes
         )
 
-    to_encode.update({"exp": expire})
+    to_encode.update({
+        "exp": expire,
+        "jti": str(uuid.uuid4()),
+        "type": "access",
+    })
     encoded_jwt = jwt.encode(
         to_encode,
         settings.secret_key,
@@ -94,7 +99,7 @@ def decode_token(token: str) -> dict[str, Any] | None:
 
 
 def create_refresh_token(data: dict[str, Any]) -> str:
-    """Create a JWT refresh token.
+    """Create a JWT refresh token with a unique JTI for rotation support.
 
     Args:
         data: Data to encode in the token
@@ -106,7 +111,11 @@ def create_refresh_token(data: dict[str, Any]) -> str:
     expire = datetime.now(UTC) + timedelta(
         days=settings.refresh_token_expire_days
     )
-    to_encode.update({"exp": expire, "type": "refresh"})
+    to_encode.update({
+        "exp": expire,
+        "jti": str(uuid.uuid4()),
+        "type": "refresh",
+    })
 
     encoded_jwt = jwt.encode(
         to_encode,

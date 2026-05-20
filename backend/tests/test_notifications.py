@@ -5,50 +5,22 @@ from fastapi.testclient import TestClient
 from sqlmodel import Session
 
 from app.services.email_service import clear_email_log, get_email_log
+from tests.conftest import create_verified_user, login_and_get_token
 
 
 @pytest.fixture
-def requester_headers(client: TestClient) -> dict[str, str]:
-    """Create requester user and return auth headers.
-
-    Args:
-        client: Test client
-
-    Returns:
-        Authorization headers for requester
-    """
-    response = client.post(
-        "/api/v1/auth/register",
-        json={
-            "email": "requester@curtin.edu.au",
-            "full_name": "Question Asker",
-            "password": "pass123",
-        },
-    )
-    token = response.json()["access_token"]
+def requester_headers(client: TestClient, session: Session) -> dict[str, str]:
+    """Create requester user and return auth headers."""
+    create_verified_user(session, email="requester@curtin.edu.au", full_name="Question Asker")
+    token = login_and_get_token(client, "requester@curtin.edu.au")
     return {"Authorization": f"Bearer {token}"}
 
 
 @pytest.fixture
-def subscriber_headers(client: TestClient, requester_headers: dict[str, str]) -> dict[str, str]:  # noqa: ARG001
-    """Create subscriber user and return auth headers.
-
-    Args:
-        client: Test client
-        requester_headers: Requester headers (ensures proper user creation order)
-
-    Returns:
-        Authorization headers for subscriber
-    """
-    response = client.post(
-        "/api/v1/auth/register",
-        json={
-            "email": "subscriber@curtin.edu.au",
-            "full_name": "Solution Giver",
-            "password": "pass123",
-        },
-    )
-    token = response.json()["access_token"]
+def subscriber_headers(client: TestClient, session: Session, requester_headers: dict[str, str]) -> dict[str, str]:  # noqa: ARG001
+    """Create subscriber user and return auth headers."""
+    create_verified_user(session, email="subscriber@curtin.edu.au", full_name="Solution Giver")
+    token = login_and_get_token(client, "subscriber@curtin.edu.au")
     return {"Authorization": f"Bearer {token}"}
 
 
@@ -272,15 +244,8 @@ def test_multiple_subscribers_basic(
     # Create multiple subscribers
     subscribers = []
     for i in range(3):
-        response = client.post(
-            "/api/v1/auth/register",
-            json={
-                "email": f"subscriber{i}@curtin.edu.au",
-                "full_name": f"Subscriber {i}",
-                "password": "pass123",
-            },
-        )
-        token = response.json()["access_token"]
+        create_verified_user(session, email=f"subscriber{i}@curtin.edu.au", full_name=f"Subscriber {i}")
+        token = login_and_get_token(client, f"subscriber{i}@curtin.edu.au")
         subscribers.append({"token": token, "email": f"subscriber{i}@curtin.edu.au"})
 
     # All subscribe to same tag

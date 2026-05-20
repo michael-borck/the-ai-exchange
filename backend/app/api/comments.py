@@ -2,10 +2,11 @@
 
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, Request, status
 from sqlmodel import Session, select
 
 from app.api.auth import get_current_user
+from app.core.rate_limiter import LIMIT_READ, LIMIT_WRITE, limiter
 from app.models import Comment, CommentCreate, CommentResponse, CommentUpdate, Resource, User
 from app.services.database import get_session
 
@@ -13,8 +14,11 @@ router = APIRouter(prefix="/api/v1/resources", tags=["comments"])
 
 
 @router.get("/{resource_id}/comments", response_model=list[CommentResponse])
+@limiter.limit(LIMIT_READ)
 def get_resource_comments(
+    request: Request,  # noqa: ARG001 - required by slowapi for rate limiting
     resource_id: UUID,
+    current_user: User = Depends(get_current_user),  # noqa: ARG001 - auth gate
     session: Session = Depends(get_session),
 ) -> list[CommentResponse]:
     """Get all comments for a resource (with threading support).
@@ -46,7 +50,9 @@ def get_resource_comments(
 
 
 @router.post("/{resource_id}/comments", response_model=CommentResponse, status_code=status.HTTP_201_CREATED)
+@limiter.limit(LIMIT_WRITE)
 def create_comment(
+    request: Request,  # noqa: ARG001 - required by slowapi for rate limiting
     resource_id: UUID,
     comment_data: CommentCreate,
     current_user: User = Depends(get_current_user),
@@ -85,11 +91,13 @@ def create_comment(
                 detail="Parent comment not found",
             )
 
-    # Create comment
+    # Sanitize and create comment
+    from app.core.sanitize import sanitize_html
+
     comment = Comment(
         resource_id=resource_id,
         user_id=current_user.id,
-        content=comment_data.content,
+        content=sanitize_html(comment_data.content),
         parent_comment_id=comment_data.parent_comment_id,
     )
 
@@ -101,7 +109,9 @@ def create_comment(
 
 
 @router.patch("/comments/{comment_id}", response_model=CommentResponse)
+@limiter.limit(LIMIT_WRITE)
 def update_comment(
+    request: Request,  # noqa: ARG001 - required by slowapi for rate limiting
     comment_id: UUID,
     comment_data: CommentUpdate,
     current_user: User = Depends(get_current_user),
@@ -145,7 +155,9 @@ def update_comment(
 
 
 @router.delete("/comments/{comment_id}", status_code=status.HTTP_204_NO_CONTENT)
+@limiter.limit(LIMIT_WRITE)
 def delete_comment(
+    request: Request,  # noqa: ARG001 - required by slowapi for rate limiting
     comment_id: UUID,
     current_user: User = Depends(get_current_user),
     session: Session = Depends(get_session),
@@ -179,8 +191,11 @@ def delete_comment(
 
 
 @router.post("/comments/{comment_id}/helpful", response_model=CommentResponse)
+@limiter.limit(LIMIT_WRITE)
 def mark_comment_helpful(
+    request: Request,  # noqa: ARG001 - required by slowapi for rate limiting
     comment_id: UUID,
+    current_user: User = Depends(get_current_user),  # noqa: ARG001 - auth gate
     session: Session = Depends(get_session),
 ) -> CommentResponse:
     """Mark a comment as helpful (increment count).

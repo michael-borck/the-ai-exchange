@@ -68,11 +68,11 @@ export interface User {
   created_at: string;
 }
 
-export interface TokenResponse extends User {
-  access_token: string;
-  refresh_token: string;
-  token_type: string;
-}
+// Auth response — tokens are now in httpOnly cookies, not in the response body
+export type AuthResponse = User;
+
+// Legacy alias kept for backward compatibility
+export type TokenResponse = AuthResponse;
 
 export interface LoginRequest {
   email: string;

@@ -1,5 +1,6 @@
 /**
- * Homepage - Landing page with discovery features
+ * Homepage - Anonymous visitors see a marketing landing page (no Curtin IP exposed).
+ * Authenticated users see the discovery dashboard with recent and popular ideas.
  */
 
 import { useNavigate } from "react-router-dom";
@@ -8,6 +9,7 @@ import {
   Button,
   Heading,
   HStack,
+  Icon,
   Input,
   SimpleGrid,
   Text,
@@ -28,7 +30,6 @@ import { useMemo } from "react";
 interface DisciplineCard {
   name: string;
   count: number;
-  icon?: string;
 }
 
 function DisciplineGridItem({ specialty }: { specialty: DisciplineCard }) {
@@ -55,71 +56,178 @@ function DisciplineGridItem({ specialty }: { specialty: DisciplineCard }) {
   );
 }
 
-export default function HomePage() {
+function AnonLanding() {
   const navigate = useNavigate();
-  useAuth();
 
-  // Fetch all resources
+  const features = [
+    {
+      title: "Real use cases from colleagues",
+      body: "See how Marketing and Management staff are actually using AI in teaching, research, and admin work.",
+    },
+    {
+      title: "Prompts you can adapt",
+      body: "Tested prompts, expected time saved, and what to watch out for — shared by people you work with.",
+    },
+    {
+      title: "Find collaborators",
+      body: "Discover who's tried what, ask follow-up questions, and build on each other's ideas.",
+    },
+  ];
+
+  return (
+    <Layout>
+      <VStack spacing={16} align="stretch" pb={12}>
+        {/* Hero */}
+        <VStack spacing={8} align="center" textAlign="center" pt={16}>
+          <VStack spacing={4} maxW="3xl">
+            <Heading size="2xl" fontWeight="bold" lineHeight="1.1">
+              How your colleagues are actually using AI
+            </Heading>
+            <Text color="whiteAlpha.700" fontSize="xl" lineHeight="1.5">
+              A private space for the School of Marketing and Management to share real AI use cases,
+              prompts, and lessons learned. Curtin staff and approved collaborators only.
+            </Text>
+          </VStack>
+
+          <HStack spacing={4} pt={2}>
+            <Button size="lg" colorScheme="brand" onClick={() => navigate("/register")}>
+              Register with your Curtin email
+            </Button>
+            <Button
+              size="lg"
+              variant="outline"
+              colorScheme="brand"
+              onClick={() => navigate("/login")}
+            >
+              Sign in
+            </Button>
+          </HStack>
+
+          <Text fontSize="sm" color="whiteAlpha.500" pt={2}>
+            Browsing ideas requires a Curtin (or whitelisted) account.
+          </Text>
+        </VStack>
+
+        {/* What's inside */}
+        <VStack align="stretch" spacing={6}>
+          <Heading size="lg" textAlign="center">
+            What you'll find inside
+          </Heading>
+          <SimpleGrid columns={{ base: 1, md: 3 }} spacing={6}>
+            {features.map((f) => (
+              <Box
+                key={f.title}
+                bg="dark.card"
+                border="1px"
+                borderColor="dark.border"
+                borderRadius="md"
+                p={6}
+              >
+                <VStack align="flex-start" spacing={3}>
+                  <Heading size="sm">{f.title}</Heading>
+                  <Text fontSize="sm" color="whiteAlpha.700" lineHeight="1.5">
+                    {f.body}
+                  </Text>
+                </VStack>
+              </Box>
+            ))}
+          </SimpleGrid>
+        </VStack>
+
+        {/* How it works */}
+        <VStack align="stretch" spacing={6}>
+          <Heading size="lg" textAlign="center">
+            How it works
+          </Heading>
+          <SimpleGrid columns={{ base: 1, md: 3 }} spacing={6}>
+            {[
+              { step: "1", title: "Register", body: "Use your @curtin.edu.au email — access is automatic." },
+              { step: "2", title: "Browse", body: "See real use cases, prompts, and time-saved estimates." },
+              { step: "3", title: "Share", body: "Post your own — anonymously if you'd rather." },
+            ].map((s) => (
+              <Box key={s.step} textAlign="center" p={4}>
+                <Heading size="3xl" color="brand.400" mb={3}>
+                  {s.step}
+                </Heading>
+                <Heading size="sm" mb={2}>
+                  {s.title}
+                </Heading>
+                <Text fontSize="sm" color="whiteAlpha.700">
+                  {s.body}
+                </Text>
+              </Box>
+            ))}
+          </SimpleGrid>
+        </VStack>
+
+        {/* Final CTA */}
+        <Center>
+          <VStack spacing={3}>
+            <Button size="lg" colorScheme="brand" onClick={() => navigate("/register")}>
+              Get started
+            </Button>
+            <Text fontSize="sm" color="whiteAlpha.500">
+              Already have an account?{" "}
+              <Button variant="link" colorScheme="brand" onClick={() => navigate("/login")}>
+                Sign in
+              </Button>
+            </Text>
+          </VStack>
+        </Center>
+      </VStack>
+    </Layout>
+  );
+}
+
+function AuthedHome() {
+  const navigate = useNavigate();
   const { data: allResources = [], isLoading } = useResources({});
 
-  // Calculate disciplines dynamically from resources
   const disciplines = useMemo(() => {
     const disciplineMap = new Map<string, number>();
-
     allResources.forEach((resource) => {
       if (resource.specialty) {
         disciplineMap.set(resource.specialty, (disciplineMap.get(resource.specialty) || 0) + 1);
       }
     });
-
-    // Convert to array and sort by count (descending), limit to top 8
     return Array.from(disciplineMap.entries())
       .map(([name, count]) => ({ name, count }))
       .sort((a, b) => b.count - a.count)
       .slice(0, 8);
   }, [allResources]);
 
-  // Get recent contributions (newest first)
-  const recentResources = useMemo(() => {
-    return [...allResources]
-      .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
-      .slice(0, 3)
-      .map((resource) => ({
-        id: resource.id,
-        title: resource.title,
-        author: resource.author_name || "Faculty Member",
-        specialty: resource.specialty,
-        tools: flattenTools(resource.tools_used),
-        quickSummary: resource.quick_summary || resource.content_text?.substring(0, 100),
-        timeSaved: resource.time_saved_value,
-        views: resource.analytics?.view_count || 0,
-        tried: resource.analytics?.tried_count || 0,
-        saves: resource.analytics?.save_count || 0,
-        created_at: resource.created_at,
-        user_id: resource.user_id,
-      }));
-  }, [allResources]);
+  const mapResource = (resource: (typeof allResources)[number]) => ({
+    id: resource.id,
+    title: resource.title,
+    author: resource.author_name || "Faculty Member",
+    specialty: resource.specialty,
+    tools: flattenTools(resource.tools_used),
+    quickSummary: resource.quick_summary || resource.content_text?.substring(0, 100),
+    timeSaved: resource.time_saved_value,
+    views: resource.analytics?.view_count || 0,
+    tried: resource.analytics?.tried_count || 0,
+    saves: resource.analytics?.save_count || 0,
+    created_at: resource.created_at,
+    user_id: resource.user_id,
+  });
 
-  // Get most popular resources (most viewed)
-  const mostPopularResources = useMemo(() => {
-    return [...allResources]
-      .sort((a, b) => (b.analytics?.view_count || 0) - (a.analytics?.view_count || 0))
-      .slice(0, 3)
-      .map((resource) => ({
-        id: resource.id,
-        title: resource.title,
-        author: resource.author_name || "Faculty Member",
-        specialty: resource.specialty,
-        tools: flattenTools(resource.tools_used),
-        quickSummary: resource.quick_summary || resource.content_text?.substring(0, 100),
-        timeSaved: resource.time_saved_value,
-        views: resource.analytics?.view_count || 0,
-        tried: resource.analytics?.tried_count || 0,
-        saves: resource.analytics?.save_count || 0,
-        created_at: resource.created_at,
-        user_id: resource.user_id,
-      }));
-  }, [allResources]);
+  const recentResources = useMemo(
+    () =>
+      [...allResources]
+        .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
+        .slice(0, 3)
+        .map(mapResource),
+    [allResources]
+  );
+
+  const mostPopularResources = useMemo(
+    () =>
+      [...allResources]
+        .sort((a, b) => (b.analytics?.view_count || 0) - (a.analytics?.view_count || 0))
+        .slice(0, 3)
+        .map(mapResource),
+    [allResources]
+  );
 
   return (
     <Layout>
@@ -138,7 +246,7 @@ export default function HomePage() {
 
           <InputGroup maxW="md">
             <InputLeftElement pointerEvents="none">
-              <SearchIcon color="gray.400" />
+              <Icon as={SearchIcon} color="gray.400" />
             </InputLeftElement>
             <Input
               placeholder="Search ideas, tools, area, or faculty"
@@ -279,4 +387,20 @@ export default function HomePage() {
       </VStack>
     </Layout>
   );
+}
+
+export default function HomePage() {
+  const { isAuthenticated, isLoading } = useAuth();
+
+  if (isLoading) {
+    return (
+      <Layout>
+        <Center py={20}>
+          <Spinner size="lg" />
+        </Center>
+      </Layout>
+    );
+  }
+
+  return isAuthenticated ? <AuthedHome /> : <AnonLanding />;
 }

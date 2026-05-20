@@ -1,11 +1,12 @@
 """Subscription and notification preference endpoints."""
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, Request, status
 from pydantic import BaseModel
 from sqlmodel import Session, select
 
 from app.api.auth import get_current_user
 from app.core.config import settings
+from app.core.rate_limiter import LIMIT_READ, LIMIT_WRITE, limiter
 from app.models import NotificationPreferences, Subscription, SubscriptionResponse, User
 from app.services.database import get_session
 
@@ -29,7 +30,9 @@ class NotificationPrefs(BaseModel):
 
 
 @router.post("/subscribe", response_model=SubscriptionResponse, status_code=status.HTTP_201_CREATED)
+@limiter.limit(LIMIT_WRITE)
 def subscribe(
+    request: Request,  # noqa: ARG001 - required by slowapi for rate limiting
     subscribe_req: SubscribeRequest,
     current_user: User = Depends(get_current_user),
     session: Session = Depends(get_session),
@@ -75,7 +78,9 @@ def subscribe(
 
 
 @router.delete("/unsubscribe/{tag}", status_code=status.HTTP_204_NO_CONTENT)
+@limiter.limit(LIMIT_WRITE)
 def unsubscribe(
+    request: Request,  # noqa: ARG001 - required by slowapi for rate limiting
     tag: str,
     current_user: User = Depends(get_current_user),
     session: Session = Depends(get_session),
@@ -108,7 +113,9 @@ def unsubscribe(
 
 
 @router.get("", response_model=list[SubscriptionResponse])
+@limiter.limit(LIMIT_READ)
 def get_subscriptions(
+    request: Request,  # noqa: ARG001 - required by slowapi for rate limiting
     current_user: User = Depends(get_current_user),
     session: Session = Depends(get_session),
 ) -> list[SubscriptionResponse]:
@@ -129,7 +136,9 @@ def get_subscriptions(
 
 
 @router.patch("/notify-prefs", response_model=NotificationPreferences)
+@limiter.limit(LIMIT_WRITE)
 def update_notification_prefs(
+    request: Request,  # noqa: ARG001 - required by slowapi for rate limiting
     prefs: NotificationPrefs,
     current_user: User = Depends(get_current_user),
     session: Session = Depends(get_session),

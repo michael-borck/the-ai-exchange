@@ -91,7 +91,7 @@ export const AdminConfigManager = () => {
 
         // Fetch safe settings snapshot
         const snapshotRes = await fetch("/api/v1/admin/config/snapshot", {
-          headers: { Authorization: `Bearer ${localStorage.getItem("access_token")}` },
+          credentials: "include",
         });
 
         if (!snapshotRes.ok) throw new Error("Failed to fetch config snapshot");
@@ -111,7 +111,7 @@ export const AdminConfigManager = () => {
 
         // Fetch secrets status
         const secretsRes = await fetch("/api/v1/admin/config/secrets/status", {
-          headers: { Authorization: `Bearer ${localStorage.getItem("access_token")}` },
+          credentials: "include",
         });
 
         if (!secretsRes.ok) throw new Error("Failed to fetch secrets status");
@@ -192,8 +192,8 @@ export const AdminConfigManager = () => {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${localStorage.getItem("access_token")}`,
         },
+        credentials: "include",
         body: JSON.stringify(payload),
       });
 
@@ -253,8 +253,8 @@ export const AdminConfigManager = () => {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${localStorage.getItem("access_token")}`,
         },
+        credentials: "include",
         body: JSON.stringify({
           secret_name: secretName.toLowerCase().replace(/_/g, "_"),
           value: secretValues[secretName],

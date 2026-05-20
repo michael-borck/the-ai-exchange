@@ -78,8 +78,16 @@ export default function RegisterPage() {
       return;
     }
 
-    if (password.length < 8) {
-      setPasswordError("Password must be at least 8 characters");
+    // Password complexity validation (mirrors backend rules)
+    const passwordErrors: string[] = [];
+    if (password.length < 10) passwordErrors.push("at least 10 characters");
+    if (!/[A-Z]/.test(password)) passwordErrors.push("one uppercase letter");
+    if (!/[a-z]/.test(password)) passwordErrors.push("one lowercase letter");
+    if (!/\d/.test(password)) passwordErrors.push("one digit");
+    if (!/[!@#$%^&*(),.?":{}|<>\-_=+\[\]\\;'/~`]/.test(password))
+      passwordErrors.push("one special character");
+    if (passwordErrors.length > 0) {
+      setPasswordError(`Password must contain: ${passwordErrors.join(", ")}`);
       return;
     }
 

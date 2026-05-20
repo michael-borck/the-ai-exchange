@@ -2,10 +2,11 @@
 
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, Request, status
 from sqlmodel import Session, select
 
 from app.api.auth import get_current_user
+from app.core.rate_limiter import LIMIT_READ, LIMIT_WRITE, limiter
 from app.models import (
     Prompt,
     PromptCreate,
@@ -21,32 +22,23 @@ router = APIRouter(prefix="/api/v1/prompts", tags=["prompts"])
 
 
 @router.get("", response_model=list[PromptResponse])
+@limiter.limit(LIMIT_READ)
 def list_prompts(
+    request: Request,  # noqa: ARG001 - required by slowapi for rate limiting
     skip: int = 0,
     limit: int = 50,
     sharing_level: str | None = None,
     session: Session = Depends(get_session),
-    current_user: User | None = Depends(get_current_user),
+    current_user: User = Depends(get_current_user),
 ) -> list[PromptResponse]:
-    """List available prompts with filtering.
-
-    Args:
-        skip: Number of items to skip
-        limit: Maximum items to return
-        sharing_level: Filter by sharing level (PRIVATE, DEPARTMENT, SCHOOL, PUBLIC)
-        session: Database session
-        current_user: Current user (optional for public prompts)
-
-    Returns:
-        List of available prompts
-    """
+    """List available prompts with filtering."""
     query = select(Prompt)
 
     # Filter by sharing level
     if sharing_level:
         try:
             level = SharingLevel(sharing_level)
-            if level == SharingLevel.PRIVATE and current_user:
+            if level == SharingLevel.PRIVATE:
                 # Only show user's own private prompts
                 query = query.where(
                     (Prompt.sharing_level == SharingLevel.PRIVATE) & (Prompt.user_id == current_user.id)
@@ -64,24 +56,14 @@ def list_prompts(
 
 
 @router.get("/{prompt_id}", response_model=PromptResponse)
+@limiter.limit(LIMIT_READ)
 def get_prompt(
+    request: Request,  # noqa: ARG001 - required by slowapi for rate limiting
     prompt_id: UUID,
     session: Session = Depends(get_session),
-    current_user: User | None = Depends(get_current_user),
+    current_user: User = Depends(get_current_user),
 ) -> PromptResponse:
-    """Get a specific prompt by ID.
-
-    Args:
-        prompt_id: Prompt ID to retrieve
-        session: Database session
-        current_user: Current user (for access control)
-
-    Returns:
-        Prompt details
-
-    Raises:
-        HTTPException: If prompt not found or not authorized
-    """
+    """Get a specific prompt by ID."""
     prompt = session.exec(select(Prompt).where(Prompt.id == prompt_id)).first()
     if not prompt:
         raise HTTPException(
@@ -90,7 +72,7 @@ def get_prompt(
         )
 
     # Check access permissions
-    if prompt.sharing_level == SharingLevel.PRIVATE and (not current_user or prompt.user_id != current_user.id):
+    if prompt.sharing_level == SharingLevel.PRIVATE and prompt.user_id != current_user.id:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Not authorized to access this prompt",
@@ -100,7 +82,9 @@ def get_prompt(
 
 
 @router.post("", response_model=PromptResponse, status_code=status.HTTP_201_CREATED)
+@limiter.limit(LIMIT_WRITE)
 def create_prompt(
+    request: Request,  # noqa: ARG001 - required by slowapi for rate limiting
     prompt_data: PromptCreate,
     current_user: User = Depends(get_current_user),
     session: Session = Depends(get_session),
@@ -132,7 +116,9 @@ def create_prompt(
 
 
 @router.patch("/{prompt_id}", response_model=PromptResponse)
+@limiter.limit(LIMIT_WRITE)
 def update_prompt(
+    request: Request,  # noqa: ARG001 - required by slowapi for rate limiting
     prompt_id: UUID,
     prompt_data: PromptUpdate,
     current_user: User = Depends(get_current_user),
@@ -186,7 +172,9 @@ def update_prompt(
 
 
 @router.delete("/{prompt_id}", status_code=status.HTTP_204_NO_CONTENT)
+@limiter.limit(LIMIT_WRITE)
 def delete_prompt(
+    request: Request,  # noqa: ARG001 - required by slowapi for rate limiting
     prompt_id: UUID,
     current_user: User = Depends(get_current_user),
     session: Session = Depends(get_session),
@@ -220,7 +208,9 @@ def delete_prompt(
 
 
 @router.post("/{prompt_id}/fork", response_model=PromptResponse, status_code=status.HTTP_201_CREATED)
+@limiter.limit(LIMIT_WRITE)
 def fork_prompt(
+    request: Request,  # noqa: ARG001 - required by slowapi for rate limiting
     prompt_id: UUID,
     current_user: User = Depends(get_current_user),
     session: Session = Depends(get_session),
@@ -270,7 +260,9 @@ def fork_prompt(
 
 
 @router.get("/{prompt_id}/usage", response_model=PromptUsageResponse)
+@limiter.limit(LIMIT_READ)
 def get_prompt_usage(
+    request: Request,  # noqa: ARG001 - required by slowapi for rate limiting
     prompt_id: UUID,
     current_user: User = Depends(get_current_user),
     session: Session = Depends(get_session),

@@ -2,10 +2,11 @@
 
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, Request, status
 from sqlmodel import Session, select
 
 from app.api.auth import get_current_user
+from app.core.rate_limiter import LIMIT_READ, LIMIT_WRITE, limiter
 from app.models import (
     AnalyticsBySpecialtyResponse,
     SpecialtyStats,
@@ -61,8 +62,11 @@ def get_or_create_analytics(
 
 
 @router.post("/resources/{resource_id}/view", response_model=ResourceViewTracked, status_code=status.HTTP_200_OK)
+@limiter.limit(LIMIT_WRITE)
 def track_resource_view(
+    request: Request,  # noqa: ARG001 - required by slowapi for rate limiting
     resource_id: UUID,
+    current_user: User = Depends(get_current_user),  # noqa: ARG001 - auth gate
     session: Session = Depends(get_session),
 ) -> ResourceViewTracked:
     """Track a view of a resource.
@@ -105,7 +109,9 @@ def track_resource_view(
 
 
 @router.post("/resources/{resource_id}/tried", response_model=ResourceTriedTracked)
+@limiter.limit(LIMIT_WRITE)
 def track_resource_tried(
+    request: Request,  # noqa: ARG001 - required by slowapi for rate limiting
     resource_id: UUID,
     current_user: User = Depends(get_current_user),
     session: Session = Depends(get_session),
@@ -165,7 +171,9 @@ def track_resource_tried(
 
 
 @router.post("/resources/{resource_id}/save", response_model=ResourceSaveToggled)
+@limiter.limit(LIMIT_WRITE)
 def toggle_resource_save(
+    request: Request,  # noqa: ARG001 - required by slowapi for rate limiting
     resource_id: UUID,
     current_user: User = Depends(get_current_user),
     session: Session = Depends(get_session),
@@ -230,8 +238,11 @@ def toggle_resource_save(
 
 
 @router.get("/resources/{resource_id}/analytics", response_model=ResourceAnalyticsResponse)
+@limiter.limit(LIMIT_READ)
 def get_resource_analytics(
+    request: Request,  # noqa: ARG001 - required by slowapi for rate limiting
     resource_id: UUID,
+    current_user: User = Depends(get_current_user),  # noqa: ARG001 - auth gate
     session: Session = Depends(get_session),
 ) -> ResourceAnalyticsResponse:
     """Get analytics for a resource (author can see all details).
@@ -344,7 +355,6 @@ def get_user_saved_resources(
                 user={
                     "id": str(user.id),
                     "full_name": user.full_name,
-                    "email": user.email,
                 } if user else None,
                 saved_at=saved_record.saved_at,
             )
@@ -396,7 +406,6 @@ def get_user_tried_resources(
                 user={
                     "id": str(user.id),
                     "full_name": user.full_name,
-                    "email": user.email,
                 } if user else None,
                 saved_at=tried_record.tried_at,
             )
@@ -520,24 +529,16 @@ def get_analytics_by_specialty(
 
 
 @router.get("/resources/{resource_id}/users-tried-it", response_model=list[UserTriedInfo])
+@limiter.limit(LIMIT_READ)
 def get_users_who_tried_resource(
+    request: Request,  # noqa: ARG001 - required by slowapi for rate limiting
     resource_id: UUID,
+    current_user: User = Depends(get_current_user),  # noqa: ARG001 - auth gate
     session: Session = Depends(get_session),
 ) -> list[UserTriedInfo]:
     """Get list of users who marked a resource as tried.
 
-    This enables peer discovery - users can connect with others who have
-    actually tried the implementation rather than just the creator.
-
-    Args:
-        resource_id: Resource ID
-        session: Database session
-
-    Returns:
-        List of users who tried the resource with basic info
-
-    Raises:
-        HTTPException: If resource not found
+    Returns full_name only (no email) so user PII isn't exposed via the API.
     """
     # Verify resource exists
     resource = session.exec(select(Resource).where(Resource.id == resource_id)).first()
@@ -554,7 +555,7 @@ def get_users_who_tried_resource(
         .order_by(UserTriedResource.tried_at.desc())  # type: ignore[attr-defined]
     ).all()
 
-    # Get user details
+    # Get user details (email intentionally omitted — see SECURITY_REVIEW.md)
     result = []
     for tried_record in tried_records:
         user = session.get(User, tried_record.user_id)
@@ -562,7 +563,6 @@ def get_users_who_tried_resource(
             result.append(UserTriedInfo(
                 id=user.id,
                 full_name=user.full_name,
-                email=user.email,
                 tried_at=tried_record.tried_at,
             ))
 

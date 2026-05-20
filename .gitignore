@@ -60,3 +60,7 @@ logs/
 data/
 .env.docker
 !.env.docker.example
+
+# Accidental pip stdout capture (e.g. `pip install foo >=1.0` with a stray space
+# creates a file literally named `=1.0` in the cwd)
+=*

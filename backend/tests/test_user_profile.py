@@ -2,27 +2,16 @@
 
 import pytest
 from fastapi.testclient import TestClient
+from sqlmodel import Session
+
+from tests.conftest import create_verified_user, login_and_get_token
 
 
 @pytest.fixture
-def auth_headers(client: TestClient) -> dict[str, str]:
-    """Create authenticated user and return auth headers.
-
-    Args:
-        client: Test client
-
-    Returns:
-        Authorization headers
-    """
-    response = client.post(
-        "/api/v1/auth/register",
-        json={
-            "email": "user@curtin.edu.au",
-            "full_name": "Test User",
-            "password": "testpass123",
-        },
-    )
-    token = response.json()["access_token"]
+def auth_headers(client: TestClient, session: Session) -> dict[str, str]:
+    """Create authenticated user and return auth headers."""
+    create_verified_user(session, email="user@curtin.edu.au", full_name="Test User")
+    token = login_and_get_token(client, "user@curtin.edu.au")
     return {"Authorization": f"Bearer {token}"}
 
 

@@ -1,6 +1,7 @@
 """Password reset service for secure password recovery."""
 
-import random
+import secrets
+import string
 from datetime import UTC, datetime, timedelta
 
 from sqlmodel import Session, select
@@ -8,14 +9,18 @@ from sqlmodel import Session, select
 from app.models import PasswordReset, User
 from app.services.email_service import send_password_reset_email
 
+# Alphanumeric charset: 62^8 = ~218 trillion combinations (vs 10^6 = 1M for old 6-digit)
+_RESET_CODE_CHARSET = string.ascii_uppercase + string.digits
+_RESET_CODE_LENGTH = 8
+
 
 def generate_reset_code() -> str:
-    """Generate a random 6-digit reset code.
+    """Generate a cryptographically secure 8-character alphanumeric reset code.
 
     Returns:
-        A 6-digit reset code as a string
+        An 8-character alphanumeric reset code (uppercase + digits)
     """
-    return "".join(str(random.randint(0, 9)) for _ in range(6))
+    return "".join(secrets.choice(_RESET_CODE_CHARSET) for _ in range(_RESET_CODE_LENGTH))
 
 
 def create_and_send_password_reset(

@@ -6,52 +6,22 @@ from sqlmodel import Session
 
 from app.core.security import hash_password
 from app.models import User, UserRole
+from tests.conftest import TEST_PASSWORD, create_verified_user, login_and_get_token
 
 
 @pytest.fixture
-def admin_headers(client: TestClient, session: Session) -> dict[str, str]:  # noqa: ARG001
-    """Create admin user and return auth headers.
-
-    Args:
-        client: Test client
-        session: Database session
-
-    Returns:
-        Authorization headers for admin
-    """
-    # Register first user (becomes admin)
-    response = client.post(
-        "/api/v1/auth/register",
-        json={
-            "email": "admin@curtin.edu.au",
-            "full_name": "Admin User",
-            "password": "adminpass123",
-        },
-    )
-    token = response.json()["access_token"]
+def admin_headers(client: TestClient, session: Session) -> dict[str, str]:
+    """Create admin user and return auth headers."""
+    create_verified_user(session, email="admin@curtin.edu.au", full_name="Admin User", role=UserRole.ADMIN)
+    token = login_and_get_token(client, "admin@curtin.edu.au")
     return {"Authorization": f"Bearer {token}"}
 
 
 @pytest.fixture
-def staff_headers(client: TestClient, admin_headers: dict[str, str]) -> dict[str, str]:  # noqa: ARG001
-    """Create staff user and return auth headers.
-
-    Args:
-        client: Test client
-        admin_headers: Admin headers (ensures admin is created first)
-
-    Returns:
-        Authorization headers for staff
-    """
-    response = client.post(
-        "/api/v1/auth/register",
-        json={
-            "email": "staff@curtin.edu.au",
-            "full_name": "Staff User",
-            "password": "staffpass123",
-        },
-    )
-    token = response.json()["access_token"]
+def staff_headers(client: TestClient, session: Session, admin_headers: dict[str, str]) -> dict[str, str]:  # noqa: ARG001
+    """Create staff user and return auth headers."""
+    create_verified_user(session, email="staff@curtin.edu.au", full_name="Staff User")
+    token = login_and_get_token(client, "staff@curtin.edu.au")
     return {"Authorization": f"Bearer {token}"}
 
 
