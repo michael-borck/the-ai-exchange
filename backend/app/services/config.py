@@ -1,9 +1,10 @@
 """Configuration service for managing configurable values."""
 
 import logging
-import yaml
 from pathlib import Path
 from uuid import UUID
+
+import yaml
 from sqlmodel import Session, select
 
 from app.models import ConfigurableValue, ConfigValueType
@@ -22,7 +23,7 @@ class ConfigService:
         if not config_path.exists():
             raise FileNotFoundError(f"Config file not found: {config_path}")
 
-        with open(config_path, "r") as f:
+        with open(config_path) as f:
             return yaml.safe_load(f)
 
     @staticmethod

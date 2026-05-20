@@ -4,7 +4,7 @@ from fastapi import APIRouter, Depends
 from sqlmodel import Session
 
 from app.core.config import settings
-from app.models import ConfigValueType, ConfigurableValue
+from app.models import ConfigurableValue, ConfigValueType
 from app.services.config import ConfigService
 from app.services.database import get_session
 

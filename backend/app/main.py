@@ -1,7 +1,6 @@
 """FastAPI application entry point for The AI Exchange."""
 
 import logging
-import os
 from collections.abc import AsyncGenerator
 from contextlib import asynccontextmanager
 from pathlib import Path
@@ -13,7 +12,7 @@ from fastapi.responses import FileResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 from slowapi.errors import RateLimitExceeded
 from slowapi.middleware import SlowAPIMiddleware
-from sqlmodel import SQLModel
+from sqlmodel import Session, SQLModel
 from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.responses import Response as StarletteResponse
 
@@ -35,9 +34,8 @@ from app.api import (
 from app.core.config import settings
 from app.core.rate_limiter import limiter
 from app.services.config import ConfigService
-from app.services.database import engine, get_session
+from app.services.database import engine
 from app.services.migrations import run_pending_migrations
-from sqlmodel import Session
 
 # Maximum request body size: 1 MB
 MAX_REQUEST_BODY_BYTES = 1_048_576

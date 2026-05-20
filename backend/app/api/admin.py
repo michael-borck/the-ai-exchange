@@ -10,8 +10,8 @@ from app.api.auth import get_current_user
 from app.core.config import settings
 from app.models import (
     ConfigRequestStatus,
-    ConfigValueType,
     ConfigurableValue,
+    ConfigValueType,
     Resource,
     ResourceResponse,
     User,

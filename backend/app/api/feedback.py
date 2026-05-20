@@ -6,9 +6,9 @@ from fastapi import APIRouter, Depends, Request, status
 from pydantic import BaseModel
 from sqlmodel import Session
 
+from app.api.auth import get_current_user
 from app.core.config import settings
 from app.core.rate_limiter import limiter
-from app.api.auth import get_current_user
 from app.models import User
 from app.services.database import get_session
 from app.services.email_service import EmailNotification, send_email

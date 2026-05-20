@@ -16,8 +16,8 @@ from app.core.rate_limiter import (
     LIMIT_FORGOT_PASSWORD,
     LIMIT_LOGIN,
     LIMIT_REGISTER,
-    LIMIT_RESET_PASSWORD,
     LIMIT_RESEND_VERIFICATION,
+    LIMIT_RESET_PASSWORD,
     limiter,
 )
 from app.core.security import (
@@ -30,7 +30,6 @@ from app.core.security import (
 from app.models import (
     AuditLog,
     EmailVerificationRequest,
-    EmailVerificationResponse,
     ForgotPasswordRequest,
     ForgotPasswordResponse,
     LoginAttempt,
@@ -380,10 +379,11 @@ def register(
     Raises:
         HTTPException: If email already exists or domain not allowed
     """
-    from app.models import EmailVerification
-    from app.services.email_service import send_verification_email
     import secrets
     import string
+
+    from app.models import EmailVerification
+    from app.services.email_service import send_verification_email
 
     # Check if user already exists
     existing_user = session.exec(

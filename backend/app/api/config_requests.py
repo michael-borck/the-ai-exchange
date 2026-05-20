@@ -1,12 +1,12 @@
 """API endpoints for user configuration requests (e.g., requesting new specialties)."""
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends
 from pydantic import BaseModel
 from sqlmodel import Session, select
 
+from app.api.auth import get_current_user
 from app.core.config import settings
 from app.models import ConfigRequestStatus, ConfigValueType, UserConfigRequest
-from app.api.auth import get_current_user
 from app.services.database import get_session
 
 router = APIRouter(prefix=f"{settings.api_v1_str}/config/requests", tags=["config-requests"])

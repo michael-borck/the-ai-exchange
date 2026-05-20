@@ -9,7 +9,6 @@ from app.api.auth import get_current_user
 from app.core.rate_limiter import LIMIT_READ, LIMIT_WRITE, limiter
 from app.models import (
     AnalyticsBySpecialtyResponse,
-    SpecialtyStats,
     PlatformAnalyticsResponse,
     PlatformStats,
     Resource,
@@ -20,6 +19,7 @@ from app.models import (
     ResourceTriedTracked,
     ResourceViewTracked,
     SavedResourceItem,
+    SpecialtyStats,
     TopResource,
     User,
     UserRole,
