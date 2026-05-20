@@ -542,10 +542,12 @@ def review_config_request(
             detail="Request not found",
         )
 
+    from datetime import UTC, datetime
+
     user_request.status = review_data.status
     user_request.admin_notes = review_data.admin_notes
     user_request.reviewed_by = current_user.id
-    user_request.reviewed_at = select(UserConfigRequest)
+    user_request.reviewed_at = datetime.now(UTC)
 
     if review_data.status == ConfigRequestStatus.APPROVED_MERGED:
         if review_data.admin_response_key:

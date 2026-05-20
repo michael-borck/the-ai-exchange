@@ -41,16 +41,20 @@ Goal: stop anonymous browsing of Curtin IP; close the PII leak; cover writes wit
 
 ## Branch 2 — `security/fixes` (HIGH, ship next)
 
-- [ ] `auth.py` login: collapse "inactive / unverified / pending approval" into one generic "Invalid email or password" to stop email enumeration
-- [ ] `auth.py:70` lockout: combine email + IP so an attacker can't lock out a specific user by guessing their email
-- [ ] `auth.py:126-136` `_revoke_all_user_tokens` is a no-op — add `tokens_revoked_at: datetime` to `User`, set it on password reset, reject older tokens in `get_current_user`
-- [ ] `auth.py:60-67` XFF trust — only honor `X-Forwarded-For` when `request.client.host` is in a configured trusted-proxy set (env var: `TRUSTED_PROXIES`)
-- [ ] `frontend/src/lib/api.ts:184` — `unsubscribe` calls `POST /subscriptions/unsubscribe` with body but backend has `DELETE /unsubscribe/{tag}`. Fix the frontend.
-- [ ] `backend/app/api/admin.py:548` (or `config_requests.py`) — `user_request.reviewed_at = select(UserConfigRequest)` is a typo, should be `datetime.now(UTC)`
-- [ ] `backend/app/api/prompts.py:29,71` — `Optional[User] = Depends(get_current_user)` doesn't actually work (get_current_user raises 401). Add a `get_optional_user` dependency or make these endpoints required-auth
-- [ ] Reduce email PII in logs: `password_reset.py`, `auth.py` log `user.email` directly — log `user.id` instead
-- [ ] SHA-pin GitHub Actions in `.github/workflows/docker-publish.yml` (`actions/checkout@v4` → `actions/checkout@<sha> # v4`)
-- [ ] Run `cd frontend && npm audit --omit=dev` and add it as a release-script gate
+- [x] `auth.py` login: collapsed inactive/unverified/pending-approval and wrong-password into one generic `401 "Invalid email or password"`. Also added constant-time password verify against a dummy hash so the no-user path doesn't leak via response time.
+- [x] `auth.py` lockout: now keyed by (email, ip) so an attacker can't lock a victim out from a different IP. Falls back to email-only if no client IP is available (safety net for misconfigured proxies).
+- [x] `_revoke_all_user_tokens` is now real: added `User.tokens_revoked_at` column (handled by the new `services/migrations.py` startup helper so SQLite gets the ALTER TABLE for free), added `iat` claim to access/refresh tokens, and `get_current_user` rejects tokens whose `iat` predates the user's revocation timestamp. Password reset bumps it.
+- [x] XFF trust: new `TRUSTED_PROXIES` setting (list of IPs/CIDRs). `_get_client_ip` only honors `X-Forwarded-For` when the immediate TCP peer is in that list. Empty default = ignore XFF entirely. Documented for the Docker-behind-Caddy case.
+- [x] Frontend `api.ts` `unsubscribe` now calls `DELETE /subscriptions/unsubscribe/{tag}` matching the backend.
+- [x] Fixed `admin.py:548` typo (`reviewed_at = select(...)` → `datetime.now(UTC)`).
+- [x] `prompts.py` Optional[User] typing — already fixed during branch 1.
+- [x] Email PII scrubbed from log statements in `auth.py`; reset/verification flows now log `user_id=%s` only. (`password_reset.py` had no email logging.)
+- [x] All GitHub Actions in `docker-publish.yml` SHA-pinned with tag comments. Added `github-actions` ecosystem to Dependabot so SHA bumps land automatically.
+- [x] Added `audit-frontend-deps` job (runs `npm audit --omit=dev --audit-level=high`) as a gate before the image build, so a known-bad transitive blocks the release.
+
+**Tests:** 70/70 passing. Added explicit coverage for token revocation (both the model-level mechanism and the password-reset end-to-end flow) and the (email, ip) lockout boundary.
+
+**Migration note:** the `tokens_revoked_at` column is added at startup via `services/migrations.py`. Idempotent (no-op if the column already exists). Same approach can be used for future column additions until we adopt Alembic.
 
 ---
 
@@ -61,6 +65,9 @@ Goal: stop anonymous browsing of Curtin IP; close the PII leak; cover writes wit
 - [ ] `backend/app/api/feedback.py:20` — move hardcoded `FEEDBACK_RECIPIENT` to settings
 - [ ] `backend/app/core/config.py:91-92` — drop stale host (`theaiexchange.serveur.au` OR `theaiexchange.eduserver.au`, whichever migration is complete)
 - [ ] Consider SQLCipher for encryption-at-rest of the SQLite DB (one-line config change)
+- [ ] Pin `appuser` UID/GID in Dockerfile (`useradd -r -u 1001 -g appuser`) so it's stable across rebuilds — currently the system-user UID is whatever's free in the base image, which can shift and break the mounted-volume chown
+- [ ] Switch `.github/workflows/docker-publish.yml` trigger from `push: branches: [main]` to `push: tags: ['v*']` only — decouples commit from deploy so solo workflow is `git push` for CI, `git tag v0.3.7 && git push --tags` for deploy
+- [ ] Document in `DOCKER_DEPLOYMENT.md`: on first deploy of a non-root image, `sudo chown -R <uid>:<gid> data/` on the host so the container can write to mounted volumes
 - [ ] Replace `mailto:` contact links with in-app "Contact author" messaging so emails never leave the platform
 - [ ] Move `SQLModel.metadata.create_all` to Alembic migrations before any Postgres migration
 

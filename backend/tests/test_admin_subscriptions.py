@@ -161,7 +161,8 @@ def test_update_user_status(
     data = response.json()
     assert data["is_active"] is False
 
-    # Verify user cannot login
+    # Verify user cannot login (gets the same generic 401 as wrong password —
+    # admin deactivation should not be revealed via login response).
     login_response = client.post(
         "/api/v1/auth/login",
         json={
@@ -169,7 +170,7 @@ def test_update_user_status(
             "password": "pass123",
         },
     )
-    assert login_response.status_code == 403
+    assert login_response.status_code == 401
 
 
 def test_approve_user(

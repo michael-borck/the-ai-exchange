@@ -36,6 +36,7 @@ from app.core.config import settings
 from app.core.rate_limiter import limiter
 from app.services.config import ConfigService
 from app.services.database import engine, get_session
+from app.services.migrations import run_pending_migrations
 from sqlmodel import Session
 
 # Maximum request body size: 1 MB
@@ -93,6 +94,9 @@ async def lifespan(_app: FastAPI) -> AsyncGenerator[None, None]:
     logger.info("Starting up The AI Exchange API...")
     SQLModel.metadata.create_all(engine)
     logger.info("Database tables created/verified")
+
+    # Apply any pending schema migrations (add columns etc — see services/migrations.py)
+    run_pending_migrations(engine)
 
     # Seed configurable values from defaults.yaml
     logger.info("Seeding configurable values...")

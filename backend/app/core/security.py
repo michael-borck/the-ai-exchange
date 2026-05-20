@@ -56,15 +56,15 @@ def create_access_token(
         Encoded JWT token
     """
     to_encode = data.copy()
+    now = datetime.now(UTC)
 
     if expires_delta:
-        expire = datetime.now(UTC) + expires_delta
+        expire = now + expires_delta
     else:
-        expire = datetime.now(UTC) + timedelta(
-            minutes=settings.access_token_expire_minutes
-        )
+        expire = now + timedelta(minutes=settings.access_token_expire_minutes)
 
     to_encode.update({
+        "iat": now,
         "exp": expire,
         "jti": str(uuid.uuid4()),
         "type": "access",
@@ -108,10 +108,10 @@ def create_refresh_token(data: dict[str, Any]) -> str:
         Encoded JWT refresh token
     """
     to_encode = data.copy()
-    expire = datetime.now(UTC) + timedelta(
-        days=settings.refresh_token_expire_days
-    )
+    now = datetime.now(UTC)
+    expire = now + timedelta(days=settings.refresh_token_expire_days)
     to_encode.update({
+        "iat": now,
         "exp": expire,
         "jti": str(uuid.uuid4()),
         "type": "refresh",

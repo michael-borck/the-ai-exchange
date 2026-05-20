@@ -176,6 +176,11 @@ class User(SQLModel, table=True):
         default_factory=lambda: datetime.now(UTC),
         sa_column=Column(DateTime(timezone=True)),
     )
+    tokens_revoked_at: datetime | None = Field(
+        default=None,
+        sa_column=Column(DateTime(timezone=True), nullable=True),
+        description="Tokens issued before this timestamp are rejected. Bumped on password reset and other security events.",
+    )
 
     def __repr__(self) -> str:
         """String representation."""

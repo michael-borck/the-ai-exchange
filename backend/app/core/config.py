@@ -98,6 +98,12 @@ class Settings(BaseSettings):
         "http://localhost:3000",
     ]
 
+    # Trusted proxies — IPs or CIDR ranges allowed to set X-Forwarded-For.
+    # Empty means: don't trust XFF from anyone, use request.client.host directly.
+    # For a Docker-behind-Caddy/nginx setup, include the proxy's network, e.g.
+    # ["127.0.0.1", "172.16.0.0/12"] for loopback + the default Docker bridge range.
+    trusted_proxies: list[str] = []
+
     # LLM Configuration (optional)
     llm_provider: str | None = None  # openai, claude, gemini, openrouter, ollama
     llm_api_key: str | None = None

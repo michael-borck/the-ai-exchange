@@ -181,7 +181,7 @@ class ApiClient {
   }
 
   async unsubscribe(tag: string): Promise<void> {
-    await this.axiosInstance.post("/subscriptions/unsubscribe", { tag });
+    await this.axiosInstance.delete(`/subscriptions/unsubscribe/${encodeURIComponent(tag)}`);
   }
 
   // Generic HTTP methods for other endpoints

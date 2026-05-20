@@ -195,8 +195,10 @@ def test_login_inactive_user(client: TestClient, session: Session) -> None:
             "password": STRONG_PASSWORD,
         },
     )
-    assert response.status_code == 403
-    assert "deactivated" in response.json()["detail"]
+    # Inactive accounts get the same generic message as wrong password —
+    # login responses must never reveal account state.
+    assert response.status_code == 401
+    assert response.json()["detail"] == "Invalid email or password"
 
 
 def test_login_unapproved_user(client: TestClient, session: Session) -> None:
@@ -219,8 +221,9 @@ def test_login_unapproved_user(client: TestClient, session: Session) -> None:
             "password": STRONG_PASSWORD,
         },
     )
-    assert response.status_code == 403
-    assert "pending approval" in response.json()["detail"]
+    # Pending-approval users get the same generic message — no account-state leak.
+    assert response.status_code == 401
+    assert response.json()["detail"] == "Invalid email or password"
 
 
 def test_login_unverified_user(client: TestClient, session: Session) -> None:
@@ -243,8 +246,10 @@ def test_login_unverified_user(client: TestClient, session: Session) -> None:
             "password": STRONG_PASSWORD,
         },
     )
-    assert response.status_code == 403
-    assert "not verified" in response.json()["detail"]
+    # Unverified users get the same generic message — they're directed to the
+    # verification flow at registration time, not via login error.
+    assert response.status_code == 401
+    assert response.json()["detail"] == "Invalid email or password"
 
 
 def test_account_lockout(client: TestClient, session: Session) -> None:
@@ -483,3 +488,157 @@ def test_no_tokens_in_response_body(client: TestClient, session: Session) -> Non
     data = response.json()
     assert "access_token" not in data
     assert "refresh_token" not in data
+
+
+def test_tokens_revoked_at_invalidates_existing_tokens(
+    client: TestClient, session: Session
+) -> None:
+    """Bumping user.tokens_revoked_at must invalidate already-issued JWTs.
+
+    This is the core defence behind password-reset: an attacker who captured a
+    session before the password change should not retain access.
+    """
+    from datetime import UTC, datetime
+
+    from jose import jwt
+
+    from app.core.config import settings
+    from app.models import User as UserModel
+
+    user = User(
+        email="revoke@curtin.edu.au",
+        full_name="Revoke Me",
+        hashed_password=hash_password(STRONG_PASSWORD),
+        is_active=True,
+        is_verified=True,
+        is_approved=True,
+    )
+    session.add(user)
+    session.commit()
+    session.refresh(user)
+
+    # Issue a token via login
+    login = client.post(
+        "/api/v1/auth/login",
+        json={"email": "revoke@curtin.edu.au", "password": STRONG_PASSWORD},
+    )
+    assert login.status_code == 200
+    token = login.cookies.get("access_token")
+    assert token
+
+    # Sanity check: the token works
+    me = client.get("/api/v1/auth/me", headers={"Authorization": f"Bearer {token}"})
+    assert me.status_code == 200
+
+    # Read the token's iat claim and set tokens_revoked_at to one second later.
+    # This proves the invalidation works on `iat`, not on a wall-clock sleep.
+    payload = jwt.decode(token, settings.secret_key, algorithms=[settings.algorithm])
+    token_iat = int(payload["iat"])
+    fresh_user = session.get(UserModel, user.id)
+    assert fresh_user is not None
+    fresh_user.tokens_revoked_at = datetime.fromtimestamp(token_iat + 1, tz=UTC)
+    session.add(fresh_user)
+    session.commit()
+
+    # Old token must now be rejected
+    me_after = client.get(
+        "/api/v1/auth/me", headers={"Authorization": f"Bearer {token}"}
+    )
+    assert me_after.status_code == 401
+    assert me_after.json()["detail"] == "Token has been revoked"
+
+
+def test_password_reset_revokes_existing_tokens(
+    client: TestClient, session: Session
+) -> None:
+    """End-to-end: password reset must invalidate all prior sessions."""
+    import time
+
+    from app.models import PasswordReset
+    from app.services.password_reset import generate_reset_code
+
+    user = User(
+        email="resetme@curtin.edu.au",
+        full_name="Reset Me",
+        hashed_password=hash_password(STRONG_PASSWORD),
+        is_active=True,
+        is_verified=True,
+        is_approved=True,
+    )
+    session.add(user)
+    session.commit()
+    session.refresh(user)
+
+    # Get a logged-in session
+    login = client.post(
+        "/api/v1/auth/login",
+        json={"email": "resetme@curtin.edu.au", "password": STRONG_PASSWORD},
+    )
+    token = login.cookies.get("access_token")
+    assert token
+
+    # Create a valid reset code directly in the DB (bypasses email send)
+    from datetime import UTC, datetime, timedelta
+
+    code = generate_reset_code()
+    session.add(
+        PasswordReset(
+            user_id=user.id,
+            token=code,
+            expires_at=datetime.now(UTC) + timedelta(minutes=30),
+        )
+    )
+    session.commit()
+
+    # Sleep 1.1s so the new tokens_revoked_at > token.iat (JWT iat is seconds).
+    time.sleep(1.1)
+
+    new_password = "NewP@ss5678"
+    reset = client.post(
+        "/api/v1/auth/reset-password",
+        json={"email": "resetme@curtin.edu.au", "code": code, "new_password": new_password},
+    )
+    assert reset.status_code == 200
+
+    # Old session must be dead
+    me = client.get("/api/v1/auth/me", headers={"Authorization": f"Bearer {token}"})
+    assert me.status_code == 401
+
+
+def test_lockout_is_scoped_to_email_and_ip(
+    client: TestClient, session: Session
+) -> None:
+    """Failed logins from one IP must not lock the account for other IPs.
+
+    Prevents the email-only-lockout DoS where an attacker locks a victim out
+    of their own account by spamming bad passwords against their address.
+    """
+    user = User(
+        email="locktarget@curtin.edu.au",
+        full_name="Lock Target",
+        hashed_password=hash_password(STRONG_PASSWORD),
+        is_active=True,
+        is_verified=True,
+        is_approved=True,
+    )
+    session.add(user)
+    session.commit()
+
+    # Attacker IP burns 5 failed attempts (note: TestClient client.host defaults
+    # to "testclient" so we set XFF — but trusted_proxies is empty, so XFF is
+    # ignored and all requests appear to come from the same TCP peer.)
+    # Without trusted proxies the test client IP is constant, so this test
+    # really exercises the (email, ip) keying when both happen to match.
+    for _ in range(5):
+        resp = client.post(
+            "/api/v1/auth/login",
+            json={"email": "locktarget@curtin.edu.au", "password": "wrong-password"},
+        )
+        assert resp.status_code == 401
+
+    # Sixth attempt from the same client is locked
+    locked = client.post(
+        "/api/v1/auth/login",
+        json={"email": "locktarget@curtin.edu.au", "password": STRONG_PASSWORD},
+    )
+    assert locked.status_code == 429

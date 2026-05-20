@@ -1,5 +1,6 @@
 """Authentication routes for user login and registration."""
 
+import ipaddress
 import logging
 from datetime import UTC, datetime, timedelta
 from uuid import UUID
@@ -47,6 +48,11 @@ from app.models import (
 # Account lockout settings
 MAX_FAILED_ATTEMPTS = 5
 LOCKOUT_WINDOW_MINUTES = 15
+
+# Pre-computed hash used to keep login response time constant when the email
+# isn't registered. Avoids timing-based account enumeration. Value is the hash
+# of an arbitrary string nobody can log in with.
+_DUMMY_PASSWORD_HASH = hash_password("not-a-real-password-constant-time-only")
 from app.services.database import get_session
 from app.services.password_reset import (
     create_and_send_password_reset,
@@ -57,22 +63,64 @@ from app.services.password_reset import (
 router = APIRouter(prefix=f"{settings.api_v1_str}/auth", tags=["auth"])
 
 
+def _is_trusted_proxy(client_ip: str | None) -> bool:
+    """True if the immediate connection came from a configured trusted proxy."""
+    if client_ip is None or not settings.trusted_proxies:
+        return False
+    try:
+        addr = ipaddress.ip_address(client_ip)
+    except ValueError:
+        return False
+    for entry in settings.trusted_proxies:
+        try:
+            if "/" in entry:
+                if addr in ipaddress.ip_network(entry, strict=False):
+                    return True
+            elif addr == ipaddress.ip_address(entry):
+                return True
+        except ValueError:
+            continue  # malformed entry, skip
+    return False
+
+
 def _get_client_ip(request: Request) -> str | None:
-    """Extract client IP, respecting X-Forwarded-For from trusted reverse proxy."""
-    forwarded_for = request.headers.get("x-forwarded-for")
-    if forwarded_for:
-        # X-Forwarded-For can contain a chain: "client, proxy1, proxy2"
-        # The leftmost is the original client IP
-        return forwarded_for.split(",")[0].strip()
-    return request.client.host if request.client else None
+    """Extract the real client IP.
+
+    Only honors X-Forwarded-For when the immediate caller (request.client.host)
+    is a configured trusted proxy. Otherwise an attacker can spoof XFF to
+    bypass rate limits / lockouts / audit attribution.
+    """
+    immediate = request.client.host if request.client else None
+    if _is_trusted_proxy(immediate):
+        forwarded_for = request.headers.get("x-forwarded-for")
+        if forwarded_for:
+            # XFF chain: "client, proxy1, proxy2" — leftmost is the original client
+            return forwarded_for.split(",")[0].strip()
+    return immediate
 
 
-def _check_account_lockout(session: Session, email: str) -> None:
-    """Raise 429 if too many recent failed login attempts for this email."""
+def _check_account_lockout(
+    session: Session, email: str, ip_address: str | None
+) -> None:
+    """Raise 429 if too many recent failed logins for this (email, ip) pair.
+
+    Locking by email alone lets an attacker DoS a victim by submitting bad
+    passwords against their address. Locking by (email, ip) means a legitimate
+    user's normal IP gets locked after 5 fails, but the victim's other devices
+    keep working and an attacker can't lock them out from elsewhere.
+    """
+    if ip_address is None:
+        # No client IP (test client, misconfigured proxy) — fall back to email-only
+        # to preserve the safety net rather than disabling lockout entirely.
+        ip_filter = True  # always-true so the email filter alone applies
+    else:
+        ip_filter = LoginAttempt.ip_address == ip_address
+
     cutoff = datetime.now(UTC) - timedelta(minutes=LOCKOUT_WINDOW_MINUTES)
     recent_failures = session.exec(
         select(LoginAttempt).where(
             (LoginAttempt.email == email.lower())
+            & ip_filter
             & (LoginAttempt.success == False)  # noqa: E712
             & (LoginAttempt.attempted_at >= cutoff)
         )
@@ -124,16 +172,18 @@ def _blacklist_token(session: Session, jti: str, user_id: UUID, expires_at: date
 
 
 def _revoke_all_user_tokens(session: Session, user_id: UUID) -> None:
-    """Blacklist all outstanding tokens for a user by bumping a version counter.
+    """Invalidate every outstanding token for a user by bumping a per-user timestamp.
 
-    Since we can't enumerate all tokens, we store a per-user revocation timestamp.
-    The get_current_user check will reject tokens issued before this time.
-    For now, we rely on short access-token lifetimes (30 min) and explicit
-    blacklisting of the current token on logout/password-change.
+    `get_current_user` rejects any token whose `iat` claim is older than the
+    user's `tokens_revoked_at`. Call this on password reset and any other
+    event that should kill existing sessions.
     """
-    # No-op placeholder — individual token blacklisting covers the critical paths.
-    # A full implementation would store a per-user "tokens_revoked_at" timestamp.
-    pass
+    user = session.get(User, user_id)
+    if user is None:
+        return
+    user.tokens_revoked_at = datetime.now(UTC)
+    session.add(user)
+    session.commit()
 
 
 def _set_auth_cookies(response: Response, access_token: str, refresh_token: str) -> None:
@@ -244,7 +294,7 @@ def get_current_user(
             detail="Invalid or expired token",
         )
 
-    # Check if token has been revoked
+    # Check if token has been revoked (individual blacklist)
     jti = payload.get("jti")
     if jti and _is_token_blacklisted(session, jti):
         raise HTTPException(
@@ -274,6 +324,27 @@ def get_current_user(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="User not found",
         )
+
+    # Reject tokens issued before the user's last revocation event (password reset etc).
+    # `iat` is added by create_access_token / create_refresh_token in seconds-since-epoch.
+    if user.tokens_revoked_at is not None:
+        iat_raw = payload.get("iat")
+        if iat_raw is None:
+            # Pre-iat token issued before this protection existed — reject it.
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Token has been revoked",
+            )
+        token_issued = datetime.fromtimestamp(int(iat_raw), tz=UTC)
+        # SQLite strips tzinfo on read; treat any naive value as UTC for compare.
+        revoked_at = user.tokens_revoked_at
+        if revoked_at.tzinfo is None:
+            revoked_at = revoked_at.replace(tzinfo=UTC)
+        if token_issued < revoked_at:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Token has been revoked",
+            )
 
     if not user.is_active:
         raise HTTPException(
@@ -375,7 +446,7 @@ def register(
 
     # Audit log
     client_ip = _get_client_ip(request)
-    _audit_log(session, "user_registered", user_id=new_user.id, detail=f"email={new_user.email}", ip_address=client_ip)
+    _audit_log(session, "user_registered", user_id=new_user.id, ip_address=client_ip)
 
     # Generate 8-char alphanumeric verification code
     charset = string.ascii_uppercase + string.digits
@@ -395,7 +466,7 @@ def register(
     try:
         email_sent = send_verification_email(new_user, verification_code)
     except Exception as e:
-        logger.error(f"Failed to send verification email to {new_user.email}: {e}")
+        logger.error("Failed to send verification email to user_id=%s: %s", new_user.id, e)
 
     if email_sent:
         return UserRegistrationResponse(
@@ -404,7 +475,7 @@ def register(
             email_sent=True,
         )
     else:
-        logger.warning(f"Verification email failed for {new_user.email}")
+        logger.warning("Verification email failed for user_id=%s", new_user.id)
         return UserRegistrationResponse(
             email=new_user.email,
             message="Account created, but we couldn't send the verification email. Please contact an administrator.",
@@ -532,36 +603,55 @@ def login(
     client_ip = _get_client_ip(request)
 
     # Check for account lockout before processing
-    _check_account_lockout(session, login_data.email)
+    _check_account_lockout(session, login_data.email, client_ip)
 
     # Find user by email (lowercase for consistency)
     user = session.exec(select(User).where(User.email == login_data.email.lower())).first()
 
-    if not user or not verify_password(login_data.password, user.hashed_password):
+    # Run password verify even when the user doesn't exist so the response time
+    # doesn't reveal whether the email is registered (timing-based enumeration).
+    if user is None:
+        # Cost-equivalent dummy verify against a known-bad hash so the bcrypt/argon2
+        # work is performed regardless. Discard the result.
+        verify_password(login_data.password, _DUMMY_PASSWORD_HASH)
+        password_ok = False
+    else:
+        password_ok = verify_password(login_data.password, user.hashed_password)
+
+    # Single generic failure mode for: missing user, wrong password, inactive,
+    # unverified, unapproved. Specific guidance lives in the dedicated flows
+    # (resend-verification, forgot-password, admin approval) so login doesn't
+    # leak account state.
+    login_blocked = (
+        user is None
+        or not password_ok
+        or not user.is_active
+        or not user.is_verified
+        or not user.is_approved
+    )
+    if login_blocked:
         _record_login_attempt(session, login_data.email, success=False, ip_address=client_ip)
-        _audit_log(session, "login_failed", detail=f"email={login_data.email.lower()}", ip_address=client_ip)
+        # Audit log distinguishes the real reason (server-side only, never returned)
+        if user is None:
+            reason = "no_such_user"
+        elif not password_ok:
+            reason = "bad_password"
+        elif not user.is_active:
+            reason = "inactive"
+        elif not user.is_verified:
+            reason = "unverified"
+        else:
+            reason = "unapproved"
+        _audit_log(
+            session,
+            "login_failed",
+            user_id=user.id if user else None,
+            detail=f"reason={reason}",
+            ip_address=client_ip,
+        )
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Invalid email or password",
-        )
-
-    if not user.is_active:
-        _audit_log(session, "login_blocked_inactive", user_id=user.id, ip_address=client_ip)
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="User account is deactivated",
-        )
-
-    if not user.is_verified:
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="User account is not verified. Please check your email for verification code.",
-        )
-
-    if not user.is_approved:
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="User account is pending approval by admin",
         )
 
     # Record successful login
@@ -820,20 +910,20 @@ def forgot_password(
     ).first()
 
     if not user:
-        logger.warning(f"Password reset requested for unknown email: {forgot_request.email.lower()}")
+        logger.warning("Password reset requested for unknown email")
     elif not user.is_active:
-        logger.warning(f"Password reset requested for inactive user: {user.email}")
+        logger.warning("Password reset requested for inactive user_id=%s", user.id)
     elif not user.is_approved:
-        logger.warning(f"Password reset requested for unapproved user: {user.email}")
+        logger.warning("Password reset requested for unapproved user_id=%s", user.id)
     else:
         # Create and send password reset code
-        logger.info(f"Sending password reset email to {user.email}")
+        logger.info("Sending password reset email to user_id=%s", user.id)
         success, _ = create_and_send_password_reset(session, user)
 
         if success:
-            logger.info(f"Password reset email sent successfully to {user.email}")
+            logger.info("Password reset email sent to user_id=%s", user.id)
         else:
-            logger.error(f"Failed to send password reset email to {user.email}")
+            logger.error("Failed to send password reset email to user_id=%s", user.id)
             raise HTTPException(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 detail="Failed to send reset code. Please try again later.",
@@ -889,9 +979,9 @@ def reset_password(
 
         # Audit log
         client_ip = _get_client_ip(request)
-        _audit_log(session, "password_reset", user_id=user.id, detail=f"email={user.email}", ip_address=client_ip)
+        _audit_log(session, "password_reset", user_id=user.id, ip_address=client_ip)
 
-        # Blacklist any active tokens for this user so old sessions are invalidated
+        # Invalidate all existing sessions for this user
         _revoke_all_user_tokens(session, user.id)
 
         return ResetPasswordResponse(
@@ -971,7 +1061,7 @@ def resend_verification(
     try:
         send_verification_email(user, verification_code)
     except Exception as e:
-        logger.error(f"Failed to send verification email to {user.email}: {e}")
+        logger.error("Failed to send verification email to user_id=%s: %s", user.id, e)
 
     return ResendVerificationResponse(
         message="If an unverified account with this email exists, a new verification code has been sent. Please check your inbox and Junk/Spam folder."
