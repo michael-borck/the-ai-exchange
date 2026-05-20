@@ -28,7 +28,6 @@ from app.core.security import (
     verify_password,
 )
 from app.models import (
-    AuditLog,
     EmailVerificationRequest,
     ForgotPasswordRequest,
     ForgotPasswordResponse,
@@ -52,6 +51,7 @@ LOCKOUT_WINDOW_MINUTES = 15
 # isn't registered. Avoids timing-based account enumeration. Value is the hash
 # of an arbitrary string nobody can log in with.
 _DUMMY_PASSWORD_HASH = hash_password("not-a-real-password-constant-time-only")
+from app.services.audit import audit_log
 from app.services.database import get_session
 from app.services.password_reset import (
     create_and_send_password_reset,
@@ -137,21 +137,6 @@ def _record_login_attempt(
     """Record a login attempt for lockout tracking."""
     attempt = LoginAttempt(email=email.lower(), success=success, ip_address=ip_address)
     session.add(attempt)
-    session.commit()
-
-
-def _audit_log(
-    session: Session,
-    action: str,
-    user_id: UUID | None = None,
-    detail: str | None = None,
-    ip_address: str | None = None,
-) -> None:
-    """Write an audit log entry."""
-    entry = AuditLog(
-        user_id=user_id, action=action, detail=detail, ip_address=ip_address
-    )
-    session.add(entry)
     session.commit()
 
 
@@ -446,7 +431,7 @@ def register(
 
     # Audit log
     client_ip = _get_client_ip(request)
-    _audit_log(session, "user_registered", user_id=new_user.id, ip_address=client_ip)
+    audit_log(session, "user_registered", user_id=new_user.id, ip_address=client_ip)
 
     # Generate 8-char alphanumeric verification code
     charset = string.ascii_uppercase + string.digits
@@ -642,7 +627,7 @@ def login(
             reason = "unverified"
         else:
             reason = "unapproved"
-        _audit_log(
+        audit_log(
             session,
             "login_failed",
             user_id=user.id if user else None,
@@ -656,7 +641,7 @@ def login(
 
     # Record successful login
     _record_login_attempt(session, login_data.email, success=True, ip_address=client_ip)
-    _audit_log(session, "login_success", user_id=user.id, ip_address=client_ip)
+    audit_log(session, "login_success", user_id=user.id, ip_address=client_ip)
 
     # Create tokens
     access_token = create_access_token(
@@ -979,7 +964,7 @@ def reset_password(
 
         # Audit log
         client_ip = _get_client_ip(request)
-        _audit_log(session, "password_reset", user_id=user.id, ip_address=client_ip)
+        audit_log(session, "password_reset", user_id=user.id, ip_address=client_ip)
 
         # Invalidate all existing sessions for this user
         _revoke_all_user_tokens(session, user.id)

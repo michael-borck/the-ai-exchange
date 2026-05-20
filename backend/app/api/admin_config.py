@@ -9,12 +9,16 @@ from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, Request, status
 from pydantic import BaseModel
+from sqlmodel import Session
 
-from app.api.auth import get_current_user
+from app.api.auth import _get_client_ip, get_current_user
 from app.core.config import settings
+from app.core.rate_limiter import LIMIT_READ, LIMIT_WRITE, limiter
 from app.models import User, UserRole
+from app.services.audit import audit_log
+from app.services.database import get_session
 
 router = APIRouter(prefix="/api/v1/admin/config", tags=["admin-config"])
 
@@ -127,7 +131,11 @@ def _require_admin(user: User = Depends(get_current_user)) -> User:
 
 
 @router.get("/snapshot", response_model=ConfigSnapshot)
-def get_config_snapshot(admin: User = Depends(_require_admin)) -> ConfigSnapshot:
+@limiter.limit(LIMIT_READ)
+def get_config_snapshot(
+    request: Request,  # noqa: ARG001 - required by slowapi for rate limiting
+    admin: User = Depends(_require_admin),
+) -> ConfigSnapshot:
     """Get current configuration (safe values only, no secrets).
 
     Returns:
@@ -288,7 +296,11 @@ def get_config_snapshot(admin: User = Depends(_require_admin)) -> ConfigSnapshot
 
 
 @router.get("/secrets/status", response_model=list[SecretStatus])
-def get_secrets_status(admin: User = Depends(_require_admin)) -> list[SecretStatus]:
+@limiter.limit(LIMIT_READ)
+def get_secrets_status(
+    request: Request,  # noqa: ARG001 - required by slowapi for rate limiting
+    admin: User = Depends(_require_admin),
+) -> list[SecretStatus]:
     """Get status of all secrets (configured or not, never show value).
 
     Returns:
@@ -337,8 +349,12 @@ def get_secrets_status(admin: User = Depends(_require_admin)) -> list[SecretStat
 
 
 @router.post("/update")
+@limiter.limit(LIMIT_WRITE)
 def update_config(
-    config: EditableConfig, admin: User = Depends(_require_admin)
+    request: Request,
+    config: EditableConfig,
+    admin: User = Depends(_require_admin),
+    session: Session = Depends(get_session),
 ) -> dict[str, str | list[str]]:
     """Update editable configuration values.
 
@@ -431,12 +447,23 @@ def update_config(
         response["backup_file"] = str(backup_file)
         response["backup_note"] = f"Backup created at: {backup_file.name}"
 
+    audit_log(
+        session,
+        "admin_config_update",
+        user_id=admin.id,
+        detail=f"keys={sorted(updates.keys())}",
+        ip_address=_get_client_ip(request),
+    )
     return response
 
 
 @router.post("/secrets/update")
+@limiter.limit(LIMIT_WRITE)
 def update_secret(
-    update: SecretUpdate, admin: User = Depends(_require_admin)
+    request: Request,
+    update: SecretUpdate,
+    admin: User = Depends(_require_admin),
+    session: Session = Depends(get_session),
 ) -> dict[str, str]:
     """Update a secret value (write-only, never displayed).
 
@@ -506,4 +533,11 @@ def update_secret(
         response["backup_file"] = str(backup_file)
         response["backup_note"] = f"Backup created at: {backup_file.name}"
 
+    audit_log(
+        session,
+        "admin_secret_update",
+        user_id=admin.id,
+        detail=f"secret={env_key}",
+        ip_address=_get_client_ip(request),
+    )
     return response

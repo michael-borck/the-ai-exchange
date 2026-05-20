@@ -2,12 +2,13 @@
 
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, HTTPException, Query, status
+from fastapi import APIRouter, Depends, HTTPException, Query, Request, status
 from pydantic import BaseModel
 from sqlmodel import Session, select
 
-from app.api.auth import get_current_user
+from app.api.auth import _get_client_ip, get_current_user
 from app.core.config import settings
+from app.core.rate_limiter import LIMIT_READ, LIMIT_WRITE, limiter
 from app.models import (
     ConfigRequestStatus,
     ConfigurableValue,
@@ -19,6 +20,7 @@ from app.models import (
     UserResponse,
     UserRole,
 )
+from app.services.audit import audit_log
 from app.services.config import ConfigService
 from app.services.database import get_session
 
@@ -46,7 +48,9 @@ def check_admin(current_user: User) -> User:
 
 
 @router.get("/users", response_model=list[UserResponse])
+@limiter.limit(LIMIT_READ)
 def list_users(
+    request: Request,  # noqa: ARG001 - required by slowapi for rate limiting
     skip: int = Query(0, ge=0),
     limit: int = Query(10, ge=1, le=100),
     current_user: User = Depends(get_current_user),
@@ -73,7 +77,9 @@ def list_users(
 
 
 @router.get("/users/{user_id}", response_model=UserResponse)
+@limiter.limit(LIMIT_READ)
 def get_user(
+    request: Request,  # noqa: ARG001 - required by slowapi for rate limiting
     user_id: UUID,
     current_user: User = Depends(get_current_user),
     session: Session = Depends(get_session),
@@ -116,7 +122,9 @@ class StatusUpdate(BaseModel):
 
 
 @router.patch("/users/{user_id}/role", response_model=UserResponse)
+@limiter.limit(LIMIT_WRITE)
 def update_user_role(
+    request: Request,
     user_id: UUID,
     role_update: RoleUpdate,
     current_user: User = Depends(get_current_user),
@@ -150,11 +158,20 @@ def update_user_role(
     session.commit()
     session.refresh(user)
 
+    audit_log(
+        session,
+        "admin_user_role_change",
+        user_id=current_user.id,
+        detail=f"target_user={user.id} new_role={user.role}",
+        ip_address=_get_client_ip(request),
+    )
     return user
 
 
 @router.patch("/users/{user_id}/status", response_model=UserResponse)
+@limiter.limit(LIMIT_WRITE)
 def update_user_status(
+    request: Request,
     user_id: UUID,
     status_update: StatusUpdate,
     current_user: User = Depends(get_current_user),
@@ -188,11 +205,20 @@ def update_user_status(
     session.commit()
     session.refresh(user)
 
+    audit_log(
+        session,
+        "admin_user_status_change",
+        user_id=current_user.id,
+        detail=f"target_user={user.id} is_active={user.is_active}",
+        ip_address=_get_client_ip(request),
+    )
     return user
 
 
 @router.patch("/users/{user_id}/approve", response_model=UserResponse)
+@limiter.limit(LIMIT_WRITE)
 def approve_user(
+    request: Request,
     user_id: UUID,
     current_user: User = Depends(get_current_user),
     session: Session = Depends(get_session),
@@ -224,11 +250,20 @@ def approve_user(
     session.commit()
     session.refresh(user)
 
+    audit_log(
+        session,
+        "admin_user_approve",
+        user_id=current_user.id,
+        detail=f"target_user={user.id}",
+        ip_address=_get_client_ip(request),
+    )
     return user
 
 
 @router.patch("/users/{user_id}/verify", response_model=UserResponse)
+@limiter.limit(LIMIT_WRITE)
 def verify_user(
+    request: Request,
     user_id: UUID,
     current_user: User = Depends(get_current_user),
     session: Session = Depends(get_session),
@@ -260,11 +295,20 @@ def verify_user(
     session.commit()
     session.refresh(user)
 
+    audit_log(
+        session,
+        "admin_user_verify",
+        user_id=current_user.id,
+        detail=f"target_user={user.id}",
+        ip_address=_get_client_ip(request),
+    )
     return user
 
 
 @router.delete("/users/{user_id}", status_code=status.HTTP_204_NO_CONTENT)
+@limiter.limit(LIMIT_WRITE)
 def delete_user(
+    request: Request,
     user_id: UUID,
     current_user: User = Depends(get_current_user),
     session: Session = Depends(get_session),
@@ -294,12 +338,23 @@ def delete_user(
         session.delete(resource)
 
     # Delete user
+    deleted_email = user.email
     session.delete(user)
     session.commit()
 
+    audit_log(
+        session,
+        "admin_user_delete",
+        user_id=current_user.id,
+        detail=f"target_user={user_id} email={deleted_email} resources_deleted={len(resources)}",
+        ip_address=_get_client_ip(request),
+    )
+
 
 @router.patch("/resources/{resource_id}/verify", response_model=ResourceResponse)
+@limiter.limit(LIMIT_WRITE)
 def verify_resource(
+    request: Request,
     resource_id: UUID,
     current_user: User = Depends(get_current_user),
     session: Session = Depends(get_session),
@@ -331,11 +386,20 @@ def verify_resource(
     session.commit()
     session.refresh(resource)
 
+    audit_log(
+        session,
+        "admin_resource_verify",
+        user_id=current_user.id,
+        detail=f"resource={resource.id}",
+        ip_address=_get_client_ip(request),
+    )
     return resource
 
 
 @router.patch("/resources/{resource_id}/hide", response_model=ResourceResponse)
+@limiter.limit(LIMIT_WRITE)
 def hide_resource(
+    request: Request,
     resource_id: UUID,
     current_user: User = Depends(get_current_user),
     session: Session = Depends(get_session),
@@ -367,11 +431,20 @@ def hide_resource(
     session.commit()
     session.refresh(resource)
 
+    audit_log(
+        session,
+        "admin_resource_hide",
+        user_id=current_user.id,
+        detail=f"resource={resource.id}",
+        ip_address=_get_client_ip(request),
+    )
     return resource
 
 
 @router.patch("/resources/{resource_id}/unhide", response_model=ResourceResponse)
+@limiter.limit(LIMIT_WRITE)
 def unhide_resource(
+    request: Request,
     resource_id: UUID,
     current_user: User = Depends(get_current_user),
     session: Session = Depends(get_session),
@@ -403,6 +476,13 @@ def unhide_resource(
     session.commit()
     session.refresh(resource)
 
+    audit_log(
+        session,
+        "admin_resource_unhide",
+        user_id=current_user.id,
+        detail=f"resource={resource.id}",
+        ip_address=_get_client_ip(request),
+    )
     return resource
 
 
@@ -434,7 +514,9 @@ class ConfigValueResponseSchema(BaseModel):
 
 
 @router.get("/config/values", response_model=list[ConfigValueResponseSchema])
+@limiter.limit(LIMIT_READ)
 def list_config_values(
+    request: Request,  # noqa: ARG001 - required by slowapi for rate limiting
     config_type: ConfigValueType | None = Query(None),
     is_active: bool | None = Query(None),
     current_user: User = Depends(get_current_user),
@@ -455,7 +537,9 @@ def list_config_values(
 
 
 @router.patch("/config/values/{value_id}", response_model=ConfigValueResponseSchema)
+@limiter.limit(LIMIT_WRITE)
 def update_config_value(
+    request: Request,
     value_id: UUID,
     update_data: ConfigValueUpdateRequest,
     current_user: User = Depends(get_current_user),
@@ -479,11 +563,20 @@ def update_config_value(
         is_active=update_data.is_active,
     )
 
+    audit_log(
+        session,
+        "admin_config_value_update",
+        user_id=current_user.id,
+        detail=f"value_id={value_id} key={value.key}",
+        ip_address=_get_client_ip(request),
+    )
     return updated
 
 
 @router.get("/config/requests")
+@limiter.limit(LIMIT_READ)
 def list_config_requests(
+    request: Request,  # noqa: ARG001 - required by slowapi for rate limiting
     status_filter: ConfigRequestStatus | None = Query(None),
     current_user: User = Depends(get_current_user),
     session: Session = Depends(get_session),
@@ -526,7 +619,9 @@ class ConfigRequestApprovalRequest(BaseModel):
 
 
 @router.patch("/config/requests/{request_id}")
+@limiter.limit(LIMIT_WRITE)
 def review_config_request(
+    request: Request,
     request_id: UUID,
     review_data: ConfigRequestApprovalRequest,
     current_user: User = Depends(get_current_user),
@@ -568,6 +663,13 @@ def review_config_request(
     session.commit()
     session.refresh(user_request)
 
+    audit_log(
+        session,
+        "admin_config_request_review",
+        user_id=current_user.id,
+        detail=f"request_id={request_id} status={user_request.status}",
+        ip_address=_get_client_ip(request),
+    )
     return {
         "id": str(user_request.id),
         "status": user_request.status,
