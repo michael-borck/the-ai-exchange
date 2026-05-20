@@ -1,17 +1,56 @@
 """Application configuration from environment variables."""
 
+import json
 import secrets
 import warnings
 from pathlib import Path
+from typing import Annotated, Any
 
-from pydantic import model_validator
+from pydantic import field_validator, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
+from pydantic_settings.sources import NoDecode
+
+
+def _parse_list_field(v: Any) -> Any:
+    """Accept either a JSON array or a comma-separated string for list[str] env vars.
+
+    pydantic-settings v2 defaults to JSON parsing for `list[str]` fields, which
+    means `FOO="a,b,c"` in a .env file blows up with JSONDecodeError. This
+    validator normalises both forms so the .env file can stay in the more
+    readable comma-separated style that .env.example documents.
+    """
+    if v is None or isinstance(v, list):
+        return v
+    if isinstance(v, str):
+        stripped = v.strip()
+        if not stripped:
+            return []
+        if stripped.startswith("["):
+            # Looks like JSON — try that first, fall through to comma-split on failure.
+            try:
+                return json.loads(stripped)
+            except json.JSONDecodeError:
+                pass
+        return [item.strip() for item in stripped.split(",") if item.strip()]
+    return v
 
 
 class Settings(BaseSettings):
     """Application settings from environment variables."""
 
     model_config = SettingsConfigDict(env_file=".env", case_sensitive=False)
+
+    @field_validator(
+        "allowed_domains",
+        "email_whitelist",
+        "allowed_hosts",
+        "allowed_origins",
+        "trusted_proxies",
+        mode="before",
+    )
+    @classmethod
+    def _split_csv_lists(cls, v: Any) -> Any:
+        return _parse_list_field(v)
 
     # General
     project_name: str = "The AI Exchange - SoMM"
@@ -55,8 +94,11 @@ class Settings(BaseSettings):
     database_url: str = f"sqlite:///{Path(__file__).parent.parent.parent / 'ai_exchange.db'}"
 
     # Authentication
-    allowed_domains: list[str] = ["curtin.edu.au"]
-    email_whitelist: list[str] = []  # Specific emails allowed (comma-separated, overwrites domain check)
+    # The Annotated[..., NoDecode] disables pydantic-settings' default JSON
+    # decoding for these list fields so the field validator above can accept
+    # the comma-separated format documented in .env.example.
+    allowed_domains: Annotated[list[str], NoDecode] = ["curtin.edu.au"]
+    email_whitelist: Annotated[list[str], NoDecode] = []
     algorithm: str = "HS256"  # JWT algorithm (HS256, HS512, RS256, etc.)
     access_token_expire_minutes: int = 30
     refresh_token_expire_days: int = 7
@@ -87,7 +129,7 @@ class Settings(BaseSettings):
     validate_certs: bool = True
 
     # Trusted Hosts
-    allowed_hosts: list[str] = [
+    allowed_hosts: Annotated[list[str], NoDecode] = [
         "localhost",
         "127.0.0.1",
         "testserver",
@@ -95,7 +137,7 @@ class Settings(BaseSettings):
     ]
 
     # CORS
-    allowed_origins: list[str] = [
+    allowed_origins: Annotated[list[str], NoDecode] = [
         "http://localhost:5173",
         "http://localhost:3000",
     ]
@@ -103,8 +145,8 @@ class Settings(BaseSettings):
     # Trusted proxies — IPs or CIDR ranges allowed to set X-Forwarded-For.
     # Empty means: don't trust XFF from anyone, use request.client.host directly.
     # For a Docker-behind-Caddy/nginx setup, include the proxy's network, e.g.
-    # ["127.0.0.1", "172.16.0.0/12"] for loopback + the default Docker bridge range.
-    trusted_proxies: list[str] = []
+    # "127.0.0.1,172.16.0.0/12" for loopback + the default Docker bridge range.
+    trusted_proxies: Annotated[list[str], NoDecode] = []
 
     # LLM Configuration (optional)
     llm_provider: str | None = None  # openai, claude, gemini, openrouter, ollama

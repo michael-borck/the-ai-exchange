@@ -62,8 +62,15 @@ class ApiClient {
       (response) => response,
       (error) => {
         if (error.response?.status === 401) {
-          // Notify React auth state via custom event
-          window.dispatchEvent(new CustomEvent("auth:session-expired"));
+          // Skip the "session expired" redirect for the bootstrap auth probe
+          // (`GET /auth/me`). For anonymous visitors, a 401 there is the
+          // expected state, not a session expiry — firing the event would
+          // bounce them to /login on every fresh load of the landing page.
+          const url: string = error.config?.url || "";
+          const isAuthProbe = url.endsWith("/auth/me");
+          if (!isAuthProbe) {
+            window.dispatchEvent(new CustomEvent("auth:session-expired"));
+          }
         }
         return Promise.reject(error);
       }
