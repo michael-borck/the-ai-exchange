@@ -64,6 +64,9 @@ class Settings(BaseSettings):
     # Email Configuration - Flexible Provider Support
     email_provider: str = "dev"  # Options: dev, gmail, sendgrid, custom, curtin
 
+    # Where in-app feedback submissions get sent
+    feedback_recipient: str = "michael.borck@curtin.edu.au"
+
     # Common SMTP Settings (for custom and curtin providers)
     smtp_server: str = "smtp.curtin.edu.au"
     smtp_port: int = 587
@@ -88,7 +91,6 @@ class Settings(BaseSettings):
         "localhost",
         "127.0.0.1",
         "testserver",
-        "theaiexchange.serveur.au",
         "theaiexchange.eduserver.au",
     ]
 

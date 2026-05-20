@@ -58,18 +58,20 @@ Goal: stop anonymous browsing of Curtin IP; close the PII leak; cover writes wit
 
 ---
 
-## Branch 3 — `chore/cleanup` (LOW, ship when convenient)
+## Branch 3 — `chore/cleanup` (DONE)
 
 - [x] Delete `backend/=6.0.0` (pip output captured as filename — leftover from `pip install bleach >=6.0.0` with a stray space); also added `=*` to `.gitignore` to prevent recurrence
-- [ ] Delete or move `test_email.py` from repo root into `backend/scripts/`
-- [ ] `backend/app/api/feedback.py:20` — move hardcoded `FEEDBACK_RECIPIENT` to settings
-- [ ] `backend/app/core/config.py:91-92` — drop stale host (`theaiexchange.serveur.au` OR `theaiexchange.eduserver.au`, whichever migration is complete)
-- [ ] Consider SQLCipher for encryption-at-rest of the SQLite DB (one-line config change)
-- [ ] Pin `appuser` UID/GID in Dockerfile (`useradd -r -u 1001 -g appuser`) so it's stable across rebuilds — currently the system-user UID is whatever's free in the base image, which can shift and break the mounted-volume chown
-- [ ] Switch `.github/workflows/docker-publish.yml` trigger from `push: branches: [main]` to `push: tags: ['v*']` only — decouples commit from deploy so solo workflow is `git push` for CI, `git tag v0.3.7 && git push --tags` for deploy
-- [ ] Document in `DOCKER_DEPLOYMENT.md`: on first deploy of a non-root image, `sudo chown -R <uid>:<gid> data/` on the host so the container can write to mounted volumes
-- [ ] Replace `mailto:` contact links with in-app "Contact author" messaging so emails never leave the platform
-- [ ] Move `SQLModel.metadata.create_all` to Alembic migrations before any Postgres migration
+- [x] Moved `test_email.py` from repo root to `backend/scripts/test_email.py` (alongside existing `manage_users.py` and `load_mock_data.py`).
+- [x] `FEEDBACK_RECIPIENT` now lives in `settings.feedback_recipient` (env var `FEEDBACK_RECIPIENT`, defaults to current address); documented in `.env.example`.
+- [x] Dropped `theaiexchange.serveur.au` from `allowed_hosts` and `.env.example` — `eduserver.au` confirmed as the live host.
+- [x] Dockerfile `appuser` pinned to UID/GID **999** (matching the system-assigned UID already in use on the VPS, so no host re-chown is needed at deploy time). Future image rebuilds will keep the same UID.
+- [x] `.github/workflows/docker-publish.yml` now triggers on `push: tags: ['v*']` only. Push to main no longer auto-deploys. New flow: `git push` for code, `git tag v0.3.7 && git push --tags` for release.
+
+### Deferred (not 5-minute cleanup — opening as future work)
+
+- **In-app "Contact author" replacing `mailto:` links** — 7 `mailto:` references remain in `frontend/src/pages/{SupportPage,LegalPage,ResourceDetailPage}.tsx`. The Support/Legal ones are admin contact addresses (low risk, already public). The 3 in `ResourceDetailPage.tsx` expose non-anonymous author emails. Replacing these needs a backend `POST /resources/{id}/contact-author` endpoint, a contact form modal, rate limiting on outbound messages, and (probably) a per-user "allow contact" toggle. That's a feature, not a cleanup. Author still controls exposure today via the existing `is_anonymous` flag on each resource.
+- **SQLCipher for at-rest DB encryption** — one-line config in code, but the prod migration is non-trivial: open the existing plaintext DB, attach an encrypted one, copy schema + data, swap files atomically. Worth doing if the threat model includes "attacker reads the SQLite file off the host disk." For an internal Curtin tool already gated behind auth + non-root container + host filesystem perms, the marginal gain is small. Revisit when scope grows.
+- **Alembic migrations** — the `services/migrations.py` startup helper covers SQLite `ADD COLUMN` cleanly and we're nowhere near hitting its limits (renames, drops, multi-DB targets, data backfills). Adopt Alembic before any Postgres cutover.
 
 ---
 

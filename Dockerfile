@@ -53,8 +53,12 @@ RUN npm install && \
 # ============================================
 WORKDIR /app/backend
 
-# Create non-root user and set ownership
-RUN groupadd -r appuser && useradd -r -g appuser -d /app -s /sbin/nologin appuser \
+# Create non-root user and set ownership.
+# UID/GID pinned to 999 so the host-side chown on the data volume stays stable
+# across rebuilds. (Without -u/-g, useradd -r picks any free system UID, which
+# can shift between base-image updates and break mounted volumes.)
+RUN groupadd -r -g 999 appuser \
+    && useradd -r -u 999 -g appuser -d /app -s /sbin/nologin appuser \
     && chown -R appuser:appuser /app
 
 # Switch to non-root user

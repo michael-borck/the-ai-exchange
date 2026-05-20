@@ -17,8 +17,6 @@ logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix=f"{settings.api_v1_str}/feedback", tags=["feedback"])
 
-FEEDBACK_RECIPIENT = "michael.borck@curtin.edu.au"
-
 
 class FeedbackRequest(BaseModel):
     """Feedback submission request."""
@@ -82,7 +80,7 @@ def submit_feedback(
 </html>"""
 
     notification = EmailNotification(
-        recipient_email=FEEDBACK_RECIPIENT,
+        recipient_email=settings.feedback_recipient,
         subject=subject,
         html_body=html_body,
         text_body=text_body,

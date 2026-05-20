@@ -1,8 +1,11 @@
 name: Docker Publish
 
+# Tag-only deploy: regular pushes to main no longer trigger a build/deploy.
+# To release: `git tag v0.3.7 && git push --tags`. This decouples commit from
+# deploy so you can iterate freely on main without Watchtower swapping the
+# production image on every push.
 on:
   push:
-    branches: [main]
     tags: ['v*']
 
 permissions:
