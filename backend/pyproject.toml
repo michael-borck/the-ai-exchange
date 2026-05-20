@@ -40,7 +40,7 @@ dev = [
     "pytest==7.4.3",
     "pytest-cov==4.1.0",
     "pytest-asyncio==0.21.1",
-    "mypy==1.7.0",
+    "mypy==2.1.0",
     "ruff==0.1.8",
     "types-python-jose>=3.3.4",
     "types-passlib>=1.7.7",
