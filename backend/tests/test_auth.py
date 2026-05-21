@@ -304,10 +304,8 @@ def test_get_current_user_with_cookie(client: TestClient, session: Session) -> N
 
     # Get current user using the cookie from login response
     token_cookie = login_response.cookies["access_token"]
-    response = client.get(
-        "/api/v1/auth/me",
-        cookies={"access_token": token_cookie},
-    )
+    client.cookies.set("access_token", token_cookie)
+    response = client.get("/api/v1/auth/me")
     assert response.status_code == 200
     data = response.json()
     assert data["email"] == "user@curtin.edu.au"
@@ -388,10 +386,8 @@ def test_logout_clears_cookies(client: TestClient, session: Session) -> None:
     )
 
     # Logout
-    response = client.post(
-        "/api/v1/auth/logout",
-        cookies={"access_token": login_response.cookies["access_token"]},
-    )
+    client.cookies.set("access_token", login_response.cookies["access_token"])
+    response = client.post("/api/v1/auth/logout")
     assert response.status_code == 200
     assert "Logged out" in response.json()["message"]
 
@@ -417,10 +413,10 @@ def test_logout_revokes_token(client: TestClient, session: Session) -> None:
     token = login_response.cookies["access_token"]
 
     # Logout (blacklists the token)
-    client.post(
-        "/api/v1/auth/logout",
-        cookies={"access_token": token},
-    )
+    client.cookies.set("access_token", token)
+    client.post("/api/v1/auth/logout")
+    # Logout cleared the cookie jar; check the blacklist via the header path.
+    client.cookies.clear()
 
     # Try to use the old token — should be rejected
     response = client.get(
@@ -452,19 +448,16 @@ def test_refresh_rotates_tokens(client: TestClient, session: Session) -> None:
     old_refresh = login_response.cookies["refresh_token"]
 
     # Refresh
-    refresh_response = client.post(
-        "/api/v1/auth/refresh",
-        cookies={"refresh_token": old_refresh},
-    )
+    client.cookies.set("refresh_token", old_refresh)
+    refresh_response = client.post("/api/v1/auth/refresh")
     assert refresh_response.status_code == 200
     assert refresh_response.json()["email"] == "user@curtin.edu.au"
     assert "access_token" in refresh_response.cookies
 
-    # Old refresh token should be blacklisted
-    reuse_response = client.post(
-        "/api/v1/auth/refresh",
-        cookies={"refresh_token": old_refresh},
-    )
+    # Old refresh token should be blacklisted. Rotation replaced the jar's
+    # refresh_token, so restore the old one to prove reuse is rejected.
+    client.cookies.set("refresh_token", old_refresh)
+    reuse_response = client.post("/api/v1/auth/refresh")
     assert reuse_response.status_code == 401
 
 
