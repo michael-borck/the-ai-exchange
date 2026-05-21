@@ -4,7 +4,7 @@ import pytest
 from fastapi.testclient import TestClient
 from sqlmodel import Session
 
-from tests.conftest import TEST_PASSWORD, create_verified_user, login_and_get_token
+from tests.conftest import create_verified_user, login_and_get_token
 
 
 @pytest.fixture
