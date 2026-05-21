@@ -780,6 +780,63 @@ def refresh_tokens(
     )
 
 
+def get_current_user_optional(
+    authorization: str | None = Header(None),
+    access_token: str | None = Cookie(None),
+    session: Session = Depends(get_session),
+) -> User | None:
+    """Return the current user, or None if there is no valid session.
+
+    Mirrors get_current_user but swallows the 401 cases so callers can
+    distinguish "no session" from "valid auth required". Used by
+    /auth/session for the SPA bootstrap probe — anonymous visitors should
+    not produce a network 401 every time they load the landing page.
+    """
+    try:
+        return get_current_user(
+            authorization=authorization,
+            access_token=access_token,
+            session=session,
+        )
+    except HTTPException:
+        return None
+
+
+class SessionResponse(BaseModel):
+    """Response for /auth/session — null user means anonymous."""
+
+    user: UserResponse | None
+
+
+@router.get("/session", response_model=SessionResponse)
+def get_session_state(
+    current_user: User | None = Depends(get_current_user_optional),
+) -> SessionResponse:
+    """Bootstrap session probe. Always returns 200; user is null if anonymous.
+
+    The SPA calls this on mount to decide whether to render the authed shell
+    or the marketing landing. Returning 200 (instead of 401) keeps the browser
+    console clean for anonymous visitors.
+    """
+    if current_user is None:
+        return SessionResponse(user=None)
+    return SessionResponse(
+        user=UserResponse(
+            id=current_user.id,
+            email=current_user.email,
+            full_name=current_user.full_name,
+            role=current_user.role,
+            professional_roles=current_user.professional_roles,
+            is_active=current_user.is_active,
+            is_verified=current_user.is_verified,
+            is_approved=current_user.is_approved,
+            specialties=current_user.specialties,
+            notification_prefs=current_user.notification_prefs,
+            created_at=current_user.created_at,
+        )
+    )
+
+
 @router.get("/me", response_model=UserResponse)
 def get_me(
     current_user: User = Depends(get_current_user),

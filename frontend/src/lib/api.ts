@@ -93,6 +93,16 @@ class ApiClient {
     return response.data;
   }
 
+  // Bootstrap probe used by AuthProvider on mount. Always returns 200;
+  // anonymous visitors get `{ user: null }` instead of a 401. Keeps the
+  // browser console clean on the marketing landing page.
+  async getSession(): Promise<User | null> {
+    const response = await this.axiosInstance.get<{ user: User | null }>(
+      "/auth/session"
+    );
+    return response.data.user;
+  }
+
   async updateMe(data: UserUpdateRequest): Promise<User> {
     const response = await this.axiosInstance.patch<User>("/auth/me", data);
     return response.data;

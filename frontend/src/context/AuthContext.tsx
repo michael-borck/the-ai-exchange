@@ -26,10 +26,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     const initializeAuth = async () => {
       try {
-        const userData = await apiClient.getMe();
+        // Use /auth/session (always 200) instead of /auth/me (401 for anon)
+        // so the marketing landing doesn't log a network error on every load.
+        const userData = await apiClient.getSession();
         setUser(userData);
       } catch {
-        // No valid session — user is not logged in
+        // Network/server error — treat as anonymous
         setUser(null);
       }
       setIsLoading(false);
