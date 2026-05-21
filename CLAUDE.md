@@ -92,12 +92,19 @@ npm run test     # Run Vitest
 - Ensures code quality and catches errors
 - Configuration in `frontend/.eslintrc.cjs`
 
-**Testing:** `Vitest`
+**Testing:** `Vitest` (unit) + `Playwright` (e2e)
 ```bash
-npm run test           # Run tests
+npm run test           # Run Vitest unit tests
 npm run test:ui       # Run with UI
 npm run test:coverage # Run with coverage report
+
+npm run test:e2e      # Run Playwright e2e suite (builds frontend, seeds a
+                      # throwaway DB, starts the backend, runs e2e/*.spec.ts)
+npm run test:e2e:ui   # Playwright UI mode
 ```
+The e2e suite (`frontend/e2e/`) drives the real app: the backend serves the
+built SPA on one origin. `e2e/global-setup.ts` builds + seeds + starts the
+backend (via `backend/scripts/seed_e2e.py`); `global-teardown.ts` stops it.
 
 ---
 
@@ -551,5 +558,22 @@ If you need to ask questions or provide feedback:
 
 ---
 
-**Last Updated:** November 18, 2025
+## Health Stack
+
+Tools the `/health` check runs for this project:
+
+- typecheck (backend): `cd backend && .venv/bin/mypy app --strict`
+- lint (backend): `cd backend && .venv/bin/ruff check app/`
+- test (backend): `cd backend && .venv/bin/pytest tests`
+- typecheck (frontend): `cd frontend && npx tsc --noEmit`
+- lint (frontend): `cd frontend && npx eslint . --ext ts,tsx`
+- test (frontend): `cd frontend && npm run test:e2e`
+
+Engineering principle: when a problem is found, fix it on the spot or add it
+to the TODOs / `docs/SECURITY_REVIEW.md`. Never dismiss issues as
+"pre-existing" or out of scope.
+
+---
+
+**Last Updated:** May 21, 2026
 **Maintained By:** Claude Code & Michael Borck

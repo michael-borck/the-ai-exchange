@@ -95,3 +95,34 @@ To support `WHERE email = ?` you'd need deterministic encryption (same plaintext
 2. **Stop showing emails on cards** — already done for anon users in `ResourceCard`; extend to API responses (Branch 1 items above).
 3. **In-app messaging instead of `mailto:`** so contact details never need to be returned to the client (Branch 3).
 4. **Don't log emails** (Branch 2).
+
+---
+
+## Sweep follow-ups (2026-05-21)
+
+Full-codebase sweep + known-issue backlog. What landed (see git log
+`5d27875..HEAD`): admin rate limits + audit logging, real fix for the
+`/auth/me` 401 console noise (`/auth/session`), Docker healthcheck path,
+frontend dev-dep CVE bumps, composite `(type,key)` constraint + migration for
+`ConfigurableValue` (fixes fresh-DB seed crash), `uv sync --frozen` Docker
+builds with a regenerated lockfile, all 46 mypy --strict errors cleared (incl.
+a real `current_user["id"]` TypeError in `config_requests.py`), all ruff
+errors cleared, route-level code splitting, and a 13-test Playwright e2e suite
+(frontend previously had zero tests). `@tanstack/react-query` pinned to exact
+`5.100.11` after confirming it was NOT in the May 2026 TanStack supply-chain
+compromise (the Query family was unaffected).
+
+### Tracked residuals (not yet fixed — do NOT treat as "won't fix")
+
+- **68 third-party deprecation warnings** in the test run — `slowapi`
+  (`asyncio.iscoroutinefunction`), SQLModel (Pydantic class-config), `passlib`
+  (`argon2.__version__`). All in dependencies, not our code. Clear them by
+  upgrading those libs, or quiet the noise with a `filterwarnings` entry in
+  `pyproject.toml [tool.pytest.ini_options]`. Our own warnings are all fixed.
+- **7 moderate npm advisories** — `vite-node` / `esbuild` dev-server chain.
+  Dev-only and already blocked from prod by the CI `npm audit --omit=dev
+  --audit-level=high` gate. Clearing them needs a `vite` 5 → 6 major upgrade
+  (verify the build + plugin compatibility before merging).
+- **`ui-vendor` chunk ~176 KB gzipped** — Chakra UI + emotion + framer-motion.
+  This is the floor for using Chakra; route-splitting already removed the
+  app-code overhead. Shrinking further means replacing Chakra (large effort).
