@@ -59,3 +59,18 @@ def run_pending_migrations(engine: Engine) -> None:
     """
     # Branch 2: real token revocation after password reset / security event
     add_column_if_missing(engine, "user", "tokens_revoked_at", "DATETIME")
+
+    # Branch QA: backfill JSON columns added after initial schema. SQLite stores
+    # JSON as TEXT; defaults match the SQLModel field defaults so existing rows
+    # stay valid. Devs with pre-existing local DBs hit
+    # `OperationalError: no such column: user.professional_roles` without this.
+    add_column_if_missing(
+        engine, "user", "professional_roles", "TEXT DEFAULT '[\"Educator\"]'"
+    )
+    add_column_if_missing(engine, "user", "specialties", "TEXT DEFAULT '[]'")
+    add_column_if_missing(
+        engine,
+        "user",
+        "notification_prefs",
+        "TEXT DEFAULT '{\"notify_requests\":true,\"notify_solutions\":false}'",
+    )
