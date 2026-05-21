@@ -51,6 +51,96 @@ def add_column_if_missing(
         return True
 
 
+def migrate_configvalue_composite_unique(engine: Engine) -> bool:
+    """Rebuild `configurablevalue` with a composite (type, key) UNIQUE constraint.
+
+    Older databases were created when the model declared `key` UNIQUE on its
+    own. defaults.yaml now ships the same key under two types (e.g. "other" is
+    both a specialty and a resource_type), which the single-column constraint
+    rejects — crashing seed_database. SQLite can't drop a column-level UNIQUE
+    in place, so we rename the old table, recreate from the current model
+    definition (which carries the composite constraint), copy rows, and drop
+    the old table.
+
+    Idempotent: no-op once `uq_configvalue_type_key` exists, or if the table
+    doesn't exist yet (create_all builds it correctly for fresh DBs).
+
+    Returns True if a rebuild happened, False otherwise.
+    """
+    if engine.dialect.name != "sqlite":
+        raise RuntimeError(
+            f"migrate_configvalue_composite_unique only supports SQLite; got "
+            f"{engine.dialect.name}. Use Alembic for Postgres/MySQL."
+        )
+
+    # Local import avoids a module-level cycle (migrations is imported early).
+    from app.models import ConfigurableValue
+
+    with engine.connect() as conn:
+        table_exists = conn.execute(
+            text(
+                "SELECT 1 FROM sqlite_master "
+                "WHERE type='table' AND name='configurablevalue'"
+            )
+        ).first()
+        if not table_exists:
+            return False  # fresh DB — create_all already made it correctly
+
+        # SQLite implements a UniqueConstraint as an unnamed sqlite_autoindex,
+        # so we detect the composite constraint by its COLUMNS, not its name.
+        # If any unique index already covers exactly (type, key), we're migrated.
+        indexes = conn.execute(text("PRAGMA index_list(configurablevalue)")).fetchall()
+        for row in indexes:
+            idx_name, is_unique = row[1], row[2]
+            if not is_unique:
+                continue
+            cols = {
+                info[2]
+                for info in conn.execute(
+                    text(f"PRAGMA index_info({idx_name})")
+                ).fetchall()
+            }
+            if cols == {"type", "key"}:
+                return False  # composite constraint present — already migrated
+
+        conn.execute(
+            text("ALTER TABLE configurablevalue RENAME TO _configurablevalue_old")
+        )
+        # Renaming keeps the old table's explicitly-named indexes (ix_*) with
+        # their original names; they'd collide when we recreate the table. Drop
+        # them now. (sqlite_autoindex_* entries belong to the old UNIQUE
+        # constraint and disappear when the old table is dropped.)
+        old_indexes = conn.execute(
+            text("PRAGMA index_list(_configurablevalue_old)")
+        ).fetchall()
+        for row in old_indexes:
+            name = row[1]
+            if not name.startswith("sqlite_autoindex"):
+                conn.execute(text(f"DROP INDEX {name}"))
+        conn.commit()
+
+    # Recreate from the current model (composite UNIQUE + indexes included).
+    # __table__ is added by the SQLModel metaclass; not visible to mypy.
+    ConfigurableValue.__table__.create(engine)  # type: ignore[attr-defined]
+
+    with engine.connect() as conn:
+        conn.execute(
+            text(
+                "INSERT INTO configurablevalue "
+                "(id, type, key, label, description, category, is_active, "
+                "created_at, updated_at) "
+                "SELECT id, type, key, label, description, category, is_active, "
+                "created_at, updated_at FROM _configurablevalue_old"
+            )
+        )
+        conn.execute(text("DROP TABLE _configurablevalue_old"))
+        conn.commit()
+        logger.info(
+            "migrations: rebuilt configurablevalue with composite (type,key) unique"
+        )
+    return True
+
+
 def run_pending_migrations(engine: Engine) -> None:
     """Apply all pending schema migrations.
 
@@ -74,3 +164,8 @@ def run_pending_migrations(engine: Engine) -> None:
         "notification_prefs",
         "TEXT DEFAULT '{\"notify_requests\":true,\"notify_solutions\":false}'",
     )
+
+    # Branch QA: drop the legacy single-column UNIQUE on configurablevalue.key
+    # in favour of a composite (type, key) constraint so the same key can recur
+    # across types (e.g. "other"). Fixes seed crashes on older databases.
+    migrate_configvalue_composite_unique(engine)
