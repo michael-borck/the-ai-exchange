@@ -121,7 +121,7 @@ export default function ResourcesPage() {
 
       return true;
     });
-  }, [allResources, search, filters]);
+  }, [allResources, search, filters, isLoggedIn]);
 
   // Sort resources
   const sortedResources = useMemo(() => {

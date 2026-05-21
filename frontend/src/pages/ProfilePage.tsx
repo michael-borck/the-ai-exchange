@@ -75,7 +75,7 @@ function SavedIdeasSection() {
         </Text>
       </Box>
       <SimpleGrid columns={{ base: 1, md: 2, lg: 3 }} spacing={4}>
-        {savedResources.map((resource: any) => (
+        {savedResources.map((resource) => (
           <Box
             key={resource.id}
             bg="dark.card"
@@ -144,7 +144,7 @@ function TriedResourcesSection() {
         </Text>
       </Box>
       <SimpleGrid columns={{ base: 1, md: 2, lg: 3 }} spacing={4}>
-        {triedResources.map((resource: any) => (
+        {triedResources.map((resource) => (
           <Box
             key={resource.id}
             bg="dark.card"

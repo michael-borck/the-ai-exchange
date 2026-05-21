@@ -25,7 +25,25 @@ import { useAuth } from "@/hooks/useAuth";
 import { useResources } from "@/hooks/useResources";
 import { ResourceCard } from "@/components/ResourceCard";
 import { flattenTools } from "@/lib/tools";
+import { Resource } from "@/types/index";
 import { useMemo } from "react";
+
+// Pure transform — kept at module scope so it's a stable reference and
+// doesn't need to be a useMemo dependency (avoids react-hooks/exhaustive-deps).
+const mapResource = (resource: Resource) => ({
+  id: resource.id,
+  title: resource.title,
+  author: resource.author_name || "Faculty Member",
+  specialty: resource.specialty,
+  tools: flattenTools(resource.tools_used),
+  quickSummary: resource.quick_summary || resource.content_text?.substring(0, 100),
+  timeSaved: resource.time_saved_value,
+  views: resource.analytics?.view_count || 0,
+  tried: resource.analytics?.tried_count || 0,
+  saves: resource.analytics?.save_count || 0,
+  created_at: resource.created_at,
+  user_id: resource.user_id,
+});
 
 interface DisciplineCard {
   name: string;
@@ -141,8 +159,16 @@ function AnonLanding() {
           </Heading>
           <SimpleGrid columns={{ base: 1, md: 3 }} spacing={6}>
             {[
-              { step: "1", title: "Register", body: "Use your @curtin.edu.au email — access is automatic." },
-              { step: "2", title: "Browse", body: "See real use cases, prompts, and time-saved estimates." },
+              {
+                step: "1",
+                title: "Register",
+                body: "Use your @curtin.edu.au email — access is automatic.",
+              },
+              {
+                step: "2",
+                title: "Browse",
+                body: "See real use cases, prompts, and time-saved estimates.",
+              },
               { step: "3", title: "Share", body: "Post your own — anonymously if you'd rather." },
             ].map((s) => (
               <Box key={s.step} textAlign="center" p={4}>
@@ -195,21 +221,6 @@ function AuthedHome() {
       .sort((a, b) => b.count - a.count)
       .slice(0, 8);
   }, [allResources]);
-
-  const mapResource = (resource: (typeof allResources)[number]) => ({
-    id: resource.id,
-    title: resource.title,
-    author: resource.author_name || "Faculty Member",
-    specialty: resource.specialty,
-    tools: flattenTools(resource.tools_used),
-    quickSummary: resource.quick_summary || resource.content_text?.substring(0, 100),
-    timeSaved: resource.time_saved_value,
-    views: resource.analytics?.view_count || 0,
-    tried: resource.analytics?.tried_count || 0,
-    saves: resource.analytics?.save_count || 0,
-    created_at: resource.created_at,
-    user_id: resource.user_id,
-  });
 
   const recentResources = useMemo(
     () =>

@@ -20,6 +20,7 @@ import {
 } from "@chakra-ui/react";
 import { useLogin } from "@/hooks/useAuth";
 import { useAuth } from "@/context/AuthContext";
+import axios from "axios";
 import { getErrorMessage } from "@/lib/api";
 import PasswordResetFlow from "@/components/PasswordResetFlow";
 
@@ -69,10 +70,9 @@ export default function LoginPage() {
 
       // Check if error is due to unverified account
       if (
-        error instanceof Object &&
-        "response" in error &&
-        (error.response as any)?.status === 403 &&
-        (error.response as any)?.data?.detail?.includes("not verified")
+        axios.isAxiosError(error) &&
+        error.response?.status === 403 &&
+        error.response?.data?.detail?.includes("not verified")
       ) {
         toast({
           title: "Account not verified",

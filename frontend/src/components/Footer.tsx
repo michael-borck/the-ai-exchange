@@ -39,7 +39,10 @@ export function Footer() {
           </WrapItem>
           <WrapItem>•</WrapItem>
           <WrapItem>
-            <Link onClick={() => handleNavClick("/support?tab=feedback")} _hover={{ color: "brand.300" }}>
+            <Link
+              onClick={() => handleNavClick("/support?tab=feedback")}
+              _hover={{ color: "brand.300" }}
+            >
               Feedback
             </Link>
           </WrapItem>

@@ -53,7 +53,9 @@ export default function ExportPage() {
       id: resource.id,
       title: resource.title,
       author_email: resource.author_email || "Anonymous",
-      creator_role: (resource as any).user?.professional_role || "Educator",
+      creator_role:
+        (resource as typeof resource & { user?: { professional_role?: string } }).user
+          ?.professional_role || "Educator",
       time_saved: resource.time_saved_value ?? null,
       tools: flattenTools(resource.tools_used).join(", "),
       views: resource.analytics?.view_count ?? 0,
@@ -61,23 +63,23 @@ export default function ExportPage() {
       tried: resource.analytics?.tried_count ?? 0,
     }));
 
-    // Sort
+    // Sort. Columns are either strings (case-insensitive locale compare) or
+    // numbers (nulls treated as 0). Both operands always come from the same
+    // column, so the branch types line up.
     const sorted = [...rows].sort((a, b) => {
-      let aVal: any = a[sortField];
-      let bVal: any = b[sortField];
+      const rawA = a[sortField];
+      const rawB = b[sortField];
 
-      // Handle null values
-      if (aVal === null || aVal === undefined) aVal = 0;
-      if (bVal === null || bVal === undefined) bVal = 0;
-
-      // String comparison
-      if (typeof aVal === "string") {
-        aVal = aVal.toLowerCase();
-        bVal = bVal.toLowerCase();
+      let cmp: number;
+      if (typeof rawA === "string" && typeof rawB === "string") {
+        cmp = rawA.toLowerCase().localeCompare(rawB.toLowerCase());
+      } else {
+        const numA = typeof rawA === "number" ? rawA : 0;
+        const numB = typeof rawB === "number" ? rawB : 0;
+        cmp = numA - numB;
       }
 
-      const comparison = aVal < bVal ? -1 : aVal > bVal ? 1 : 0;
-      return sortOrder === "asc" ? comparison : -comparison;
+      return sortOrder === "asc" ? cmp : -cmp;
     });
 
     return sorted;

@@ -20,27 +20,32 @@ const API_BASE_URL = "/api/v1";
 /**
  * Extract error message from API error response
  */
-function getErrorMessage(error: any): string {
-  // Handle FastAPI validation errors (422)
-  if (error.response?.data?.detail && Array.isArray(error.response.data.detail)) {
-    const messages = error.response.data.detail.map(
-      (err: any) => `${err.loc?.[1] || "Field"}: ${err.msg}`
-    );
-    return messages.join(", ");
-  }
+interface ApiValidationError {
+  loc?: (string | number)[];
+  msg?: string;
+}
 
-  // Handle string detail messages
-  if (error.response?.data?.detail && typeof error.response.data.detail === "string") {
-    return error.response.data.detail;
-  }
-
-  // Handle other error responses
-  if (error.response?.data?.message) {
-    return error.response.data.message;
+function getErrorMessage(error: unknown): string {
+  if (axios.isAxiosError(error)) {
+    const detail = error.response?.data?.detail;
+    // Handle FastAPI validation errors (422)
+    if (Array.isArray(detail)) {
+      return detail
+        .map((err: ApiValidationError) => `${err.loc?.[1] || "Field"}: ${err.msg}`)
+        .join(", ");
+    }
+    // Handle string detail messages
+    if (typeof detail === "string") {
+      return detail;
+    }
+    // Handle other error responses
+    if (error.response?.data?.message) {
+      return error.response.data.message;
+    }
   }
 
   // Handle network/client errors
-  if (error.message) {
+  if (error instanceof Error) {
     return error.message;
   }
 
@@ -97,9 +102,7 @@ class ApiClient {
   // anonymous visitors get `{ user: null }` instead of a 401. Keeps the
   // browser console clean on the marketing landing page.
   async getSession(): Promise<User | null> {
-    const response = await this.axiosInstance.get<{ user: User | null }>(
-      "/auth/session"
-    );
+    const response = await this.axiosInstance.get<{ user: User | null }>("/auth/session");
     return response.data.user;
   }
 
@@ -206,11 +209,11 @@ class ApiClient {
     return this.axiosInstance.get<T>(url);
   }
 
-  async post<T>(url: string, data?: any): Promise<{ data: T }> {
+  async post<T>(url: string, data?: unknown): Promise<{ data: T }> {
     return this.axiosInstance.post<T>(url, data);
   }
 
-  async patch<T>(url: string, data?: any): Promise<{ data: T }> {
+  async patch<T>(url: string, data?: unknown): Promise<{ data: T }> {
     return this.axiosInstance.patch<T>(url, data);
   }
 

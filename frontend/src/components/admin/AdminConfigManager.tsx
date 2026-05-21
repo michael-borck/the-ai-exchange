@@ -41,9 +41,14 @@ import {
 import { ViewIcon, ViewOffIcon } from "@chakra-ui/icons";
 import { useAuth } from "@/hooks/useAuth";
 
+// Config values are heterogeneous: text settings, numbers, booleans, and
+// comma-separated lists (allowed_domains etc.). This union captures all of
+// them without resorting to `any`.
+type ConfigValue = string | number | boolean | string[];
+
 interface SafeSetting {
   name: string;
-  value: any;
+  value: ConfigValue;
   description: string;
   editable: boolean;
   category: string;
@@ -77,7 +82,7 @@ export const AdminConfigManager = () => {
   const [saving, setSaving] = useState(false);
 
   // Form state for editable settings
-  const [editableValues, setEditableValues] = useState<Record<string, any>>({});
+  const [editableValues, setEditableValues] = useState<Record<string, ConfigValue>>({});
 
   // Form state for secrets
   const [secretValues, setSecretValues] = useState<Record<string, string>>({});
@@ -99,7 +104,7 @@ export const AdminConfigManager = () => {
         setConfigSnapshot(snapshot);
 
         // Initialize editable values from snapshot
-        const editableInit: Record<string, any> = {};
+        const editableInit: Record<string, ConfigValue> = {};
         (Object.values(snapshot) as SafeSettingGroup[]).forEach((group) => {
           (Object.values(group) as SafeSetting[]).forEach((setting) => {
             if (setting.editable) {
@@ -142,7 +147,7 @@ export const AdminConfigManager = () => {
   }, [toast]);
 
   // Handle editable setting change
-  const handleEditableChange = (key: string, value: any) => {
+  const handleEditableChange = (key: string, value: ConfigValue) => {
     setEditableValues((prev) => ({
       ...prev,
       [key]: value,
@@ -162,12 +167,12 @@ export const AdminConfigManager = () => {
     try {
       setSaving(true);
 
-      const payload: Record<string, any> = {};
+      const payload: Record<string, ConfigValue> = {};
 
       // Convert values to appropriate types based on original values
       Object.entries(editableValues).forEach(([key, value]) => {
         if (key === "access_token_expire_minutes" || key === "refresh_token_expire_days") {
-          payload[key] = parseInt(value, 10);
+          payload[key] = parseInt(String(value), 10);
         } else if (key === "debug" || key === "testing") {
           payload[key] = value === true || value === "true";
         } else if (
@@ -407,8 +412,8 @@ export const AdminConfigManager = () => {
                   <Textarea
                     value={
                       Array.isArray(editableValues[key])
-                        ? editableValues[key].join(", ")
-                        : editableValues[key]
+                        ? (editableValues[key] as string[]).join(", ")
+                        : String(editableValues[key] ?? "")
                     }
                     onChange={(e) => handleEditableChange(key, e.target.value)}
                     placeholder="Comma-separated values"
@@ -417,13 +422,13 @@ export const AdminConfigManager = () => {
                 ) : typeof setting.value === "number" ? (
                   <Input
                     type="number"
-                    value={editableValues[key] || ""}
+                    value={String(editableValues[key] ?? "")}
                     onChange={(e) => handleEditableChange(key, e.target.value)}
                   />
                 ) : (
                   <Input
                     type="text"
-                    value={editableValues[key] || ""}
+                    value={String(editableValues[key] ?? "")}
                     onChange={(e) => handleEditableChange(key, e.target.value)}
                   />
                 )}

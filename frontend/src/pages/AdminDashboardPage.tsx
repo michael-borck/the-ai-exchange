@@ -227,7 +227,7 @@ export default function AdminDashboardPage() {
                     </Center>
                   ) : analyticsData?.top_resources && analyticsData.top_resources.length > 0 ? (
                     <VStack align="stretch" spacing={3}>
-                      {analyticsData.top_resources.map((resource: any, idx: number) => (
+                      {analyticsData.top_resources.map((resource, idx) => (
                         <Box
                           key={resource.resource_id}
                           bg="dark.card"
@@ -282,47 +282,39 @@ export default function AdminDashboardPage() {
                     </Center>
                   ) : specialtyData?.by_specialty ? (
                     <SimpleGrid columns={{ base: 1, md: 2 }} gap={4}>
-                      {Object.entries(specialtyData.by_specialty).map(
-                        ([specialty, stats]: [string, any]) => (
-                          <Box
-                            key={specialty}
-                            bg="dark.card"
-                            p={4}
-                            borderRadius="lg"
-                            boxShadow="sm"
-                          >
-                            <Text fontWeight="semibold" mb={3}>
-                              {specialty}
-                            </Text>
-                            <SimpleGrid columns={{ base: 3 }} gap={3}>
-                              <Box>
-                                <Text fontSize="xs" color="whiteAlpha.600">
-                                  Resources
-                                </Text>
-                                <Text fontWeight="bold" fontSize="lg">
-                                  {stats.count}
-                                </Text>
-                              </Box>
-                              <Box>
-                                <Text fontSize="xs" color="whiteAlpha.600">
-                                  Views
-                                </Text>
-                                <Text fontWeight="bold" fontSize="lg">
-                                  {stats.total_views}
-                                </Text>
-                              </Box>
-                              <Box>
-                                <Text fontSize="xs" color="whiteAlpha.600">
-                                  Saves
-                                </Text>
-                                <Text fontWeight="bold" fontSize="lg">
-                                  {stats.total_saves}
-                                </Text>
-                              </Box>
-                            </SimpleGrid>
-                          </Box>
-                        )
-                      )}
+                      {Object.entries(specialtyData.by_specialty).map(([specialty, stats]) => (
+                        <Box key={specialty} bg="dark.card" p={4} borderRadius="lg" boxShadow="sm">
+                          <Text fontWeight="semibold" mb={3}>
+                            {specialty}
+                          </Text>
+                          <SimpleGrid columns={{ base: 3 }} gap={3}>
+                            <Box>
+                              <Text fontSize="xs" color="whiteAlpha.600">
+                                Resources
+                              </Text>
+                              <Text fontWeight="bold" fontSize="lg">
+                                {stats.count}
+                              </Text>
+                            </Box>
+                            <Box>
+                              <Text fontSize="xs" color="whiteAlpha.600">
+                                Views
+                              </Text>
+                              <Text fontWeight="bold" fontSize="lg">
+                                {stats.total_views}
+                              </Text>
+                            </Box>
+                            <Box>
+                              <Text fontSize="xs" color="whiteAlpha.600">
+                                Saves
+                              </Text>
+                              <Text fontWeight="bold" fontSize="lg">
+                                {stats.total_saves}
+                              </Text>
+                            </Box>
+                          </SimpleGrid>
+                        </Box>
+                      ))}
                     </SimpleGrid>
                   ) : null}
                 </Box>

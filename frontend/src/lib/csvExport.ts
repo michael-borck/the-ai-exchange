@@ -41,7 +41,7 @@ function resourcesToCSV(resources: Resource[]): string {
   }));
 
   // Escape CSV values
-  const escapeCSVValue = (value: any): string => {
+  const escapeCSVValue = (value: unknown): string => {
     if (value === null || value === undefined) {
       return "";
     }

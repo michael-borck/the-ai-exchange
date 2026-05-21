@@ -101,7 +101,12 @@ export function Layout({ children }: LayoutProps) {
           >
             Login
           </Button>
-          <Button width="full" colorScheme="brand" color="white" onClick={() => handleNavClick("/register")}>
+          <Button
+            width="full"
+            colorScheme="brand"
+            color="white"
+            onClick={() => handleNavClick("/register")}
+          >
             Sign Up
           </Button>
         </>
