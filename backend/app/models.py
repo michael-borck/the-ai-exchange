@@ -7,7 +7,7 @@ from typing import Any
 from uuid import UUID, uuid4
 
 from pydantic import field_validator
-from sqlalchemy import JSON
+from sqlalchemy import JSON, UniqueConstraint
 from sqlmodel import Column, DateTime, Field, SQLModel, Text
 
 
@@ -45,9 +45,14 @@ class ConfigRequestStatus(str, Enum):
 class ConfigurableValue(SQLModel, table=True):
     """Configurable values for specialties, roles, and resource types."""
 
+    # Composite uniqueness on (type, key) — same key can recur across types
+    # (e.g. "other" appears in both specialties and resource_types). The old
+    # unique-on-key constraint crashed seed_database on a fresh DB.
+    __table_args__ = (UniqueConstraint("type", "key", name="uq_configvalue_type_key"),)
+
     id: UUID = Field(default_factory=uuid4, primary_key=True)
     type: ConfigValueType = Field(index=True)
-    key: str = Field(index=True, unique=True)
+    key: str = Field(index=True)
     label: str
     description: str | None = Field(default=None)
     category: str | None = Field(default=None)

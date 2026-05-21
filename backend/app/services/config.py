@@ -124,8 +124,13 @@ class ConfigService:
             session.commit()
             logger.info("Commit successful")
         except Exception as e:
+            # Rollback the failed batch and re-raise so callers know seeding
+            # failed. Returning silently here causes main.py to log
+            # "Configurable values seeded successfully" even though the table
+            # is empty — masks the real bug.
             logger.error(f"Failed to commit values to database: {e}")
-            return
+            session.rollback()
+            raise
 
         # Verify seeding
         try:
