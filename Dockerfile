@@ -30,10 +30,13 @@ COPY . .
 # ============================================
 WORKDIR /app/backend
 
-# Create and activate virtual environment, install dependencies
-RUN uv venv .venv && \
-    . .venv/bin/activate && \
-    uv pip install .
+# Install dependencies from the locked versions for a reproducible,
+# supply-chain-safe build. `uv sync` creates .venv and installs exactly what
+# uv.lock pins — unlike `uv pip install .`, which re-resolves the `>=` ranges
+# fresh at build time and could drift into newer (or compromised) versions.
+# --frozen fails the build if uv.lock is stale vs pyproject.toml (enforces
+# lock discipline); --no-dev skips test/lint tooling.
+RUN uv sync --frozen --no-dev
 
 # Create necessary directories for data persistence
 RUN mkdir -p /app/data/db /app/data/uploads /app/data/logs && \
