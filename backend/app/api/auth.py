@@ -9,8 +9,6 @@ from fastapi import APIRouter, Cookie, Depends, Header, HTTPException, Request, 
 from pydantic import BaseModel
 from sqlmodel import Session, select
 
-logger = logging.getLogger(__name__)
-
 from app.core.config import settings
 from app.core.rate_limiter import (
     LIMIT_FORGOT_PASSWORD,
@@ -42,6 +40,15 @@ from app.models import (
     UserResponse,
     UserRole,
 )
+from app.services.audit import audit_log
+from app.services.database import get_session
+from app.services.password_reset import (
+    create_and_send_password_reset,
+    mark_reset_code_used,
+    verify_reset_code,
+)
+
+logger = logging.getLogger(__name__)
 
 # Account lockout settings
 MAX_FAILED_ATTEMPTS = 5
@@ -51,13 +58,6 @@ LOCKOUT_WINDOW_MINUTES = 15
 # isn't registered. Avoids timing-based account enumeration. Value is the hash
 # of an arbitrary string nobody can log in with.
 _DUMMY_PASSWORD_HASH = hash_password("not-a-real-password-constant-time-only")
-from app.services.audit import audit_log
-from app.services.database import get_session
-from app.services.password_reset import (
-    create_and_send_password_reset,
-    mark_reset_code_used,
-    verify_reset_code,
-)
 
 router = APIRouter(prefix=f"{settings.api_v1_str}/auth", tags=["auth"])
 
@@ -108,7 +108,7 @@ def _check_account_lockout(
     user's normal IP gets locked after 5 fails, but the victim's other devices
     keep working and an attacker can't lock them out from elsewhere.
     """
-    if ip_address is None:
+    if ip_address is None:  # noqa: SIM108 - branches carry distinct explanatory comments
         # No client IP (test client, misconfigured proxy) — fall back to email-only
         # to preserve the safety net rather than disabling lockout entirely.
         ip_filter = True  # always-true so the email filter alone applies

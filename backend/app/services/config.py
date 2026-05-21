@@ -150,7 +150,9 @@ class ConfigService:
         query = select(ConfigurableValue).where(ConfigurableValue.type == config_type)
 
         if active_only:
-            query = query.where(ConfigurableValue.is_active == True)
+            # SQLAlchemy needs `== True` to emit `WHERE is_active = 1`;
+            # truthiness/`is True` won't generate SQL. E712 is a false positive.
+            query = query.where(ConfigurableValue.is_active == True)  # noqa: E712
 
         return list(session.exec(query).all())
 
@@ -201,10 +203,9 @@ class ConfigService:
     @staticmethod
     def validate_specialties(session: Session, specialty_keys: list[str]) -> bool:
         """Validate that all specialties in a list exist and are active."""
-        for key in specialty_keys:
-            if not ConfigService.validate_specialty(session, key):
-                return False
-        return True
+        return all(
+            ConfigService.validate_specialty(session, key) for key in specialty_keys
+        )
 
     @staticmethod
     def create_value(

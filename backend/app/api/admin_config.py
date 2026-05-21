@@ -134,7 +134,7 @@ def _require_admin(user: User = Depends(get_current_user)) -> User:
 @limiter.limit(LIMIT_READ)
 def get_config_snapshot(
     request: Request,  # noqa: ARG001 - required by slowapi for rate limiting
-    admin: User = Depends(_require_admin),
+    admin: User = Depends(_require_admin),  # noqa: ARG001 - auth gate
 ) -> ConfigSnapshot:
     """Get current configuration (safe values only, no secrets).
 
@@ -299,7 +299,7 @@ def get_config_snapshot(
 @limiter.limit(LIMIT_READ)
 def get_secrets_status(
     request: Request,  # noqa: ARG001 - required by slowapi for rate limiting
-    admin: User = Depends(_require_admin),
+    admin: User = Depends(_require_admin),  # noqa: ARG001 - auth gate
 ) -> list[SecretStatus]:
     """Get status of all secrets (configured or not, never show value).
 
