@@ -435,7 +435,7 @@ def update_config(
     with open(env_file, "w") as f:
         f.write("\n".join(lines))
 
-    response = {
+    response: dict[str, str | list[str]] = {
         "status": "success",
         "message": f"Updated {len(updates)} configuration settings",
         "note": "Server restart may be required for some settings to take effect",

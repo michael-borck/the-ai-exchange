@@ -475,7 +475,7 @@ def verify_email(
     verify_request: EmailVerificationRequest,
     response: Response,
     session: Session = Depends(get_session),
-) -> TokenResponse:
+) -> AuthResponse:
     """Verify email with 6-digit code and return JWT tokens.
 
     Args:
@@ -570,7 +570,7 @@ def login(
     login_data: LoginRequest,
     response: Response,
     session: Session = Depends(get_session),
-) -> TokenResponse:
+) -> AuthResponse:
     """Login user with email and password.
 
     Includes account lockout after repeated failures and audit logging.
@@ -638,6 +638,10 @@ def login(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Invalid email or password",
         )
+
+    # login_blocked already ruled out `user is None`; assert it for the type
+    # checker so the attribute accesses below narrow cleanly.
+    assert user is not None
 
     # Record successful login
     _record_login_attempt(session, login_data.email, success=True, ip_address=client_ip)

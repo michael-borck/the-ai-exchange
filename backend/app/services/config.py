@@ -2,6 +2,7 @@
 
 import logging
 from pathlib import Path
+from typing import Any, cast
 from uuid import UUID
 
 import yaml
@@ -16,7 +17,7 @@ class ConfigService:
     """Service for managing configurable values and seeding from YAML."""
 
     @staticmethod
-    def load_defaults_yaml() -> dict:
+    def load_defaults_yaml() -> dict[str, Any]:
         """Load default configuration from YAML file."""
         config_path = Path(__file__).parent.parent.parent / "config" / "defaults.yaml"
 
@@ -24,7 +25,7 @@ class ConfigService:
             raise FileNotFoundError(f"Config file not found: {config_path}")
 
         with open(config_path) as f:
-            return yaml.safe_load(f)
+            return cast(dict[str, Any], yaml.safe_load(f))
 
     @staticmethod
     def seed_database(session: Session) -> None:
@@ -151,7 +152,7 @@ class ConfigService:
         if active_only:
             query = query.where(ConfigurableValue.is_active == True)
 
-        return session.exec(query).all()
+        return list(session.exec(query).all())
 
     @staticmethod
     def get_value_by_key(

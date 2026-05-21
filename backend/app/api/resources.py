@@ -134,8 +134,8 @@ def list_resources(
         from sqlalchemy import or_
         roles = [r.strip() for r in professional_roles.split(",")]
         # Join with User table and check if any role matches the JSON array
-        role_conditions = [User.professional_roles.contains(role) for role in roles]  # type: ignore[union-attr]
-        query = query.join(User, Resource.user_id == User.id).where(or_(*role_conditions))
+        role_conditions = [User.professional_roles.contains(role) for role in roles]
+        query = query.join(User, Resource.user_id == User.id).where(or_(*role_conditions))  # type: ignore[arg-type]
 
     if min_time_saved is not None:
         query = query.where(Resource.time_saved_value >= min_time_saved)  # type: ignore[operator]
@@ -176,8 +176,10 @@ def list_resources(
                 else None
             )
 
-            # Respect anonymity: show author name only if not anonymous
-            user_id, full_name, email, professional_roles = user_data
+            # Respect anonymity: show author name only if not anonymous.
+            # Use a distinct name from the `professional_roles` query param
+            # above so we don't clobber it (different type).
+            user_id, full_name, email, author_roles = user_data
             author_name = "Faculty Member" if resource.is_anonymous else full_name
             author_email = None if resource.is_anonymous else email
 
@@ -186,7 +188,7 @@ def list_resources(
                 author_name=author_name,
                 author_email=author_email,
                 author_id=user_id,
-                author_professional_roles=professional_roles or [],
+                author_professional_roles=author_roles or [],
             )
             result.append(resource_with_author)
 

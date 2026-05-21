@@ -1,9 +1,10 @@
 """Admin endpoints for user and resource management."""
 
+from typing import Any
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException, Query, Request, status
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 from sqlmodel import Session, select
 
 from app.api.auth import _get_client_ip, get_current_user
@@ -507,10 +508,7 @@ class ConfigValueResponseSchema(BaseModel):
     category: str | None
     is_active: bool
 
-    class Config:
-        """Pydantic config."""
-
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 @router.get("/config/values", response_model=list[ConfigValueResponseSchema])
@@ -521,7 +519,7 @@ def list_config_values(
     is_active: bool | None = Query(None),
     current_user: User = Depends(get_current_user),
     session: Session = Depends(get_session),
-):
+) -> list[ConfigValueResponseSchema]:
     """List all configurable values (admin only)."""
     check_admin(current_user)
 
@@ -544,7 +542,7 @@ def update_config_value(
     update_data: ConfigValueUpdateRequest,
     current_user: User = Depends(get_current_user),
     session: Session = Depends(get_session),
-):
+) -> ConfigValueResponseSchema:
     """Update a configurable value (admin only)."""
     check_admin(current_user)
 
@@ -580,7 +578,7 @@ def list_config_requests(
     status_filter: ConfigRequestStatus | None = Query(None),
     current_user: User = Depends(get_current_user),
     session: Session = Depends(get_session),
-):
+) -> dict[str, Any]:
     """List all user config requests (admin only)."""
     check_admin(current_user)
 
@@ -626,7 +624,7 @@ def review_config_request(
     review_data: ConfigRequestApprovalRequest,
     current_user: User = Depends(get_current_user),
     session: Session = Depends(get_session),
-):
+) -> dict[str, Any]:
     """Review and approve/reject a config request (admin only)."""
     check_admin(current_user)
 

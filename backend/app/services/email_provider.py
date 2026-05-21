@@ -3,9 +3,11 @@
 import logging
 import smtplib
 from abc import ABC, abstractmethod
+from collections.abc import Callable
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from email.utils import formataddr
+from typing import Any
 
 from app.core.config import settings
 
@@ -108,7 +110,9 @@ class SMTPEmailProvider(EmailProvider):
             msg.attach(MIMEText(text_body, "plain"))
             msg.attach(MIMEText(html_body, "html"))
 
-            # Connect and send
+            # Connect and send. SMTP_SSL is a subclass of SMTP; declare the
+            # base type so both branches type-check.
+            smtp: smtplib.SMTP
             if settings.use_ssl:
                 smtp = smtplib.SMTP_SSL(settings.smtp_server, settings.smtp_port)
             else:
@@ -203,7 +207,7 @@ class SendGridEmailProvider(EmailProvider):
                 "Content-Type": "application/json",
             }
 
-            data = {
+            data: dict[str, Any] = {
                 "personalizations": [{"to": [{"email": to_email}]}],
                 "from": {"email": from_email, "name": from_name},
                 "subject": subject,
@@ -273,7 +277,7 @@ def get_email_provider() -> EmailProvider:
     """
     provider = settings.email_provider.lower()
 
-    providers = {
+    providers: dict[str, Callable[[], EmailProvider]] = {
         "dev": DevEmailProvider,
         "gmail": GmailEmailProvider,
         "sendgrid": SendGridEmailProvider,

@@ -9,4 +9,5 @@ def sanitize_html(text: str) -> str:
     All user-submitted text content is stored as plain text.
     This prevents stored XSS even if the frontend renders unsafely.
     """
-    return bleach.clean(text, tags=[], attributes={}, strip=True)
+    # bleach.clean returns Any (no stubs); it always returns str for str input.
+    return str(bleach.clean(text, tags=[], attributes={}, strip=True))

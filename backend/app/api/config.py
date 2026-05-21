@@ -1,5 +1,7 @@
 """Configuration API endpoints for managing specialties, roles, and resource types."""
 
+from typing import Any
+
 from fastapi import APIRouter, Depends
 from sqlmodel import Session
 
@@ -20,7 +22,7 @@ class ConfigValueResponse:
         self.description = value.description
         self.category = value.category
 
-    def dict(self) -> dict:
+    def dict(self) -> dict[str, str | None]:
         return {
             "key": self.key,
             "label": self.label,
@@ -30,7 +32,7 @@ class ConfigValueResponse:
 
 
 @router.get("/specialties")
-def get_specialties(session: Session = Depends(get_session)):
+def get_specialties(session: Session = Depends(get_session)) -> dict[str, Any]:
     """Get all active specialties."""
     values = ConfigService.get_values_by_type(
         session,
@@ -44,7 +46,7 @@ def get_specialties(session: Session = Depends(get_session)):
 
 
 @router.get("/professional-roles")
-def get_professional_roles(session: Session = Depends(get_session)):
+def get_professional_roles(session: Session = Depends(get_session)) -> dict[str, Any]:
     """Get all active professional roles."""
     values = ConfigService.get_values_by_type(
         session,
@@ -58,7 +60,7 @@ def get_professional_roles(session: Session = Depends(get_session)):
 
 
 @router.get("/resource-types")
-def get_resource_types(session: Session = Depends(get_session)):
+def get_resource_types(session: Session = Depends(get_session)) -> dict[str, Any]:
     """Get all active resource types."""
     values = ConfigService.get_values_by_type(
         session,
@@ -72,7 +74,7 @@ def get_resource_types(session: Session = Depends(get_session)):
 
 
 @router.get("/all")
-def get_all_config(session: Session = Depends(get_session)):
+def get_all_config(session: Session = Depends(get_session)) -> dict[str, Any]:
     """Get all active configuration values grouped by type."""
     specialties = ConfigService.get_values_by_type(
         session,

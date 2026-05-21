@@ -4,7 +4,7 @@ import json
 import secrets
 import warnings
 from pathlib import Path
-from typing import Annotated, Any
+from typing import Annotated, Any, Literal
 
 from pydantic import field_validator, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
@@ -61,7 +61,9 @@ class Settings(BaseSettings):
     # Cookie settings
     cookie_domain: str | None = None  # None = current domain
     cookie_secure: bool = True  # Must be False for local dev over HTTP
-    cookie_samesite: str = "lax"  # "lax" prevents CSRF on cross-site POST
+    # Literal type validates the env value (rejects typos) and satisfies
+    # Response.set_cookie's samesite parameter type.
+    cookie_samesite: Literal["lax", "strict", "none"] = "lax"
 
     @model_validator(mode="after")
     def validate_settings(self) -> "Settings":

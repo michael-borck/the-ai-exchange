@@ -92,6 +92,10 @@ module = [
     "python_jose.*",
     "python_jose.jwt",
     "yake.*",
+    "yaml",
+    "yaml.*",
+    "bleach",
+    "bleach.*",
 ]
 ignore_missing_imports = true
 
