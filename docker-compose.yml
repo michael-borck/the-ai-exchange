@@ -12,20 +12,20 @@ services:
     networks:
       - caddy_default
 
+    # Load environment from backend/.env (matches deploy/docker-compose.yml
+    # which uses env_file: against deploy/.env on the VPS). Both flows now
+    # inject env vars via docker-compose rather than mounting the .env file —
+    # pydantic-settings reads from os.environ as fallback, so this Just Works.
+    env_file: ./backend/.env
+
     # Mount volumes for persistent data
     volumes:
-      # Environment file
-      - ./backend/.env:/app/backend/.env:ro
-
-      # Persistent data directories
       - ./data/db:/app/data/db
       - ./data/uploads:/app/data/uploads
       - ./data/logs:/app/data/logs
 
     labels:
       - "com.centurylinklabs.watchtower.enable=true"
-    
-    # All config is in backend/.env (mounted read-only above)
 
     # Health check
     healthcheck:
