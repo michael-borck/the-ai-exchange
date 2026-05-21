@@ -31,9 +31,20 @@ export default defineConfig({
     minify: "terser",
     rollupOptions: {
       output: {
+        // React + Chakra + emotion + framer-motion form a tightly coupled
+        // graph; splitting them apart produces circular chunks. Keep them in
+        // one cacheable ui-vendor chunk. The real payload win comes from
+        // route-level code splitting (lazy pages in App.tsx), which keeps
+        // admin/export/create code out of the anonymous landing's download.
         manualChunks: {
-          "react-vendor": ["react", "react-dom"],
-          "ui-vendor": ["@chakra-ui/react", "@emotion/react", "@emotion/styled"],
+          "ui-vendor": [
+            "react",
+            "react-dom",
+            "@chakra-ui/react",
+            "@emotion/react",
+            "@emotion/styled",
+            "framer-motion",
+          ],
           "query-vendor": ["@tanstack/react-query"],
         },
       },
