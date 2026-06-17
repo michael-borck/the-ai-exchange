@@ -1,6 +1,6 @@
 # Multi-stage Dockerfile for The AI Exchange
 # Builds frontend, serves both frontend and backend API from single container
-FROM python:3.11-slim
+FROM python:3.14-slim
 
 LABEL org.opencontainers.image.source="https://github.com/michael-borck/the-ai-exchange"
 LABEL org.opencontainers.image.description="The AI Exchange - AI use case sharing platform for SoMM"
