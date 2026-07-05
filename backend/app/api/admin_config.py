@@ -210,7 +210,7 @@ def get_config_snapshot(
             "email_provider": SafeSettingInfo(
                 name="email_provider",
                 value=settings.email_provider,
-                description="Email provider (dev, gmail, sendgrid, custom, curtin)",
+                description="Email provider (dev, gmail, sendgrid, resend, custom, curtin)",
                 editable=True,
                 category="email",
             ),
@@ -320,6 +320,7 @@ def get_secrets_status(
                         "SMTP_PASSWORD",
                         "GMAIL_APP_PASSWORD",
                         "SENDGRID_API_KEY",
+                        "RESEND_API_KEY",
                     ]:
                         if line.startswith(f"{secret}="):
                             configured_secrets.add(secret)
@@ -344,6 +345,11 @@ def get_secrets_status(
             name="SENDGRID_API_KEY",
             configured="SENDGRID_API_KEY" in configured_secrets,
             description="SendGrid API key (for SendGrid email provider)",
+        ),
+        SecretStatus(
+            name="RESEND_API_KEY",
+            configured="RESEND_API_KEY" in configured_secrets,
+            description="Resend API key (for Resend email provider)",
         ),
     ]
 
@@ -484,6 +490,7 @@ def update_secret(
         "smtp_password": "SMTP_PASSWORD",
         "gmail_app_password": "GMAIL_APP_PASSWORD",
         "sendgrid_api_key": "SENDGRID_API_KEY",
+        "resend_api_key": "RESEND_API_KEY",
     }
 
     secret_name_lower = update.secret_name.lower()

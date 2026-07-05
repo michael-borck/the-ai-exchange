@@ -106,7 +106,7 @@ class Settings(BaseSettings):
     refresh_token_expire_days: int = 7
 
     # Email Configuration - Flexible Provider Support
-    email_provider: str = "dev"  # Options: dev, gmail, sendgrid, custom, curtin
+    email_provider: str = "dev"  # Options: dev, gmail, sendgrid, resend, custom, curtin
 
     # Where in-app feedback submissions get sent
     feedback_recipient: str = "michael.borck@curtin.edu.au"
@@ -124,6 +124,9 @@ class Settings(BaseSettings):
 
     # SendGrid Configuration
     sendgrid_api_key: str | None = None
+
+    # Resend Configuration
+    resend_api_key: str | None = None
 
     # Email Settings
     use_tls: bool = True

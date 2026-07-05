@@ -225,6 +225,63 @@ class SendGridEmailProvider(EmailProvider):
             return False
 
 
+class ResendEmailProvider(EmailProvider):
+    """Resend email provider using API key (https://resend.com)."""
+
+    def send_email(
+        self,
+        to_email: str,
+        subject: str,
+        html_body: str,
+        text_body: str,
+        from_email: str | None = None,
+        from_name: str | None = None,
+    ) -> bool:
+        """Send email via Resend API."""
+        try:
+            if not HAS_REQUESTS:
+                logger.error("Resend: requests module not installed")
+                return False
+
+            if not settings.resend_api_key:
+                logger.error("Resend: RESEND_API_KEY not configured")
+                return False
+
+            from_email = from_email or settings.mail_from
+            from_name = from_name or settings.mail_from_name
+
+            data: dict[str, Any] = {
+                "from": formataddr((from_name, from_email)),
+                "to": [to_email],
+                "subject": subject,
+                "html": html_body,
+                "text": text_body,
+            }
+
+            response = requests.post(
+                "https://api.resend.com/emails",
+                json=data,
+                headers={
+                    "Authorization": f"Bearer {settings.resend_api_key}",
+                    "Content-Type": "application/json",
+                },
+                timeout=10,
+            )
+
+            if response.status_code == 200:
+                logger.info(f"Resend: Successfully sent '{subject}' to {to_email}")
+                return True
+
+            logger.error(
+                f"Resend: Failed to send '{subject}' to {to_email}: "
+                f"{response.status_code} {response.text}"
+            )
+            return False
+        except Exception as e:
+            logger.error(f"Resend: Failed to send '{subject}' to {to_email}: {e}")
+            return False
+
+
 class CurtinEmailProvider(EmailProvider):
     """Curtin University email provider (SMTP wrapper)."""
 
@@ -281,6 +338,7 @@ def get_email_provider() -> EmailProvider:
         "dev": DevEmailProvider,
         "gmail": GmailEmailProvider,
         "sendgrid": SendGridEmailProvider,
+        "resend": ResendEmailProvider,
         "custom": SMTPEmailProvider,
         "curtin": CurtinEmailProvider,
     }
