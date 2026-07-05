@@ -25,6 +25,7 @@ import { Layout } from "@/components/Layout";
 import { useAuth } from "@/hooks/useAuth";
 import { useResources } from "@/hooks/useResources";
 import { ResourceCard } from "@/components/ResourceCard";
+import { ProfileNudge } from "@/components/ProfileNudge";
 import { BRAND_GRADIENT } from "@/theme";
 import { flattenTools } from "@/lib/tools";
 import { Resource } from "@/types/index";
@@ -272,6 +273,8 @@ function AuthedHome() {
   return (
     <Layout>
       <VStack spacing={14} align="stretch">
+        <ProfileNudge />
+
         {/* Hero Section */}
         <VStack spacing={7} align="center" textAlign="center" pt={8}>
           <VStack spacing={4}>

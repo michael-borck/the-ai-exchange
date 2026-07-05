@@ -1,5 +1,9 @@
 /**
  * Register Page
+ *
+ * Deliberately minimal: name, email, password. Specialty and roles are
+ * progressive-profiling fields collected later (profile page or first post)
+ * so signup stays friction-free.
  */
 
 import React, { useState } from "react";
@@ -23,25 +27,17 @@ import {
 import { useRegister } from "@/hooks/useAuth";
 import { useAuth } from "@/context/AuthContext";
 import { getErrorMessage } from "@/lib/api";
-import { useSpecialties } from "@/hooks/useConfig";
-import { ConfigSelect } from "@/components/ConfigSelect";
-import { ProfessionalRole } from "@/types/index";
-
-const PROFESSIONAL_ROLES: ProfessionalRole[] = ["Educator", "Researcher", "Professional"];
 
 export default function RegisterPage() {
   const navigate = useNavigate();
   const toast = useToast();
   const { isAuthenticated } = useAuth();
   const registerMutation = useRegister();
-  const { data: specialties = [] } = useSpecialties();
 
   const [email, setEmail] = useState("");
   const [fullName, setFullName] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const [specialty, setSpecialty] = useState("");
-  const [selectedRoles, setSelectedRoles] = useState<ProfessionalRole[]>([]);
   const [passwordError, setPasswordError] = useState("");
   const [apiError, setApiError] = useState("");
 
@@ -52,27 +48,10 @@ export default function RegisterPage() {
     }
   }, [isAuthenticated, navigate]);
 
-  const handleRoleToggle = (role: ProfessionalRole) => {
-    setSelectedRoles((prev: ProfessionalRole[]) =>
-      prev.includes(role) ? prev.filter((r) => r !== role) : [...prev, role]
-    );
-  };
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setPasswordError("");
     setApiError("");
-
-    // Validation
-    if (!specialty) {
-      setApiError("Please select a professional specialty from the list");
-      return;
-    }
-
-    if (selectedRoles.length === 0) {
-      setApiError("Please select at least one professional role");
-      return;
-    }
 
     if (password !== confirmPassword) {
       setPasswordError("Passwords do not match");
@@ -97,8 +76,6 @@ export default function RegisterPage() {
         email,
         full_name: fullName,
         password,
-        professional_roles: selectedRoles,
-        specialties: specialty ? [specialty] : [],
       });
 
       if (response.email_sent === false) {
@@ -178,51 +155,6 @@ export default function RegisterPage() {
               </FormHelperText>
             </FormControl>
 
-            <ConfigSelect
-              label="Professional Specialty"
-              value={specialty}
-              onChange={setSpecialty}
-              options={specialties}
-              isRequired={true}
-              showOtherOption={true}
-              configType="specialty"
-              helpText="Your specialty helps others find your expertise. You can also request a new specialty if yours isn't listed."
-            />
-
-            <FormControl>
-              <FormLabel>Professional Roles (select all that apply)</FormLabel>
-              <HStack spacing={2} flexWrap="wrap">
-                {PROFESSIONAL_ROLES.map((role) => {
-                  const isSelected = selectedRoles.includes(role);
-                  return (
-                    <Box
-                      key={role}
-                      as="button"
-                      type="button"
-                      px={4}
-                      py={2}
-                      borderRadius="full"
-                      border="1px solid"
-                      borderColor={isSelected ? "brand.400" : "dark.border"}
-                      bg={isSelected ? "brand.900" : "dark.subtle"}
-                      color={isSelected ? "brand.200" : "whiteAlpha.700"}
-                      fontSize="sm"
-                      fontWeight={isSelected ? "600" : "500"}
-                      transition="all 0.15s ease"
-                      _hover={{ borderColor: "brand.300" }}
-                      aria-pressed={isSelected}
-                      onClick={() => handleRoleToggle(role)}
-                    >
-                      {role}
-                    </Box>
-                  );
-                })}
-              </HStack>
-              <FormHelperText color="whiteAlpha.600">
-                Select all roles that apply to you. This helps others find the right expertise.
-              </FormHelperText>
-            </FormControl>
-
             <FormControl isRequired>
               <FormLabel requiredIndicator={<></>}>Password</FormLabel>
               <Input
@@ -265,6 +197,10 @@ export default function RegisterPage() {
             >
               Create Account
             </Button>
+
+            <Text fontSize="xs" color="whiteAlpha.500" textAlign="center">
+              You can add your specialty and roles later from your profile.
+            </Text>
           </VStack>
         </Box>
 

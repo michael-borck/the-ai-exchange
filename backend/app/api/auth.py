@@ -405,13 +405,13 @@ def register(
     is_first_user = len(user_count) == 0
 
     # Create new user (store email as lowercase for consistency)
-    # Handle multiple professional roles - validate input
-    professional_roles = user_create.professional_roles or ["Educator"]
-    # Validate roles are from enum
+    # Roles are optional at signup (progressive profiling — users complete
+    # their profile later); keep only values that match the enum. No forced
+    # default: a fabricated "Educator" would pollute the Creator Role filter.
     valid_roles = [ProfessionalRole.EDUCATOR, ProfessionalRole.RESEARCHER, ProfessionalRole.PROFESSIONAL]
-    professional_roles = [r for r in professional_roles if r in [v.value for v in valid_roles]]
-    if not professional_roles:
-        professional_roles = ["Educator"]
+    professional_roles = [
+        r for r in (user_create.professional_roles or []) if r in [v.value for v in valid_roles]
+    ]
 
     new_user = User(
         email=email_lower,

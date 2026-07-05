@@ -173,12 +173,14 @@ export interface ResourceCreate {
   is_anonymous?: boolean;
   parent_id?: string;
   content_meta?: Record<string, unknown>;
+  specialty?: string;
 }
 
 export interface ResourceUpdate {
   title?: string;
   content_text?: string;
   content_meta?: Record<string, unknown>;
+  specialty?: string;
 }
 
 export interface Subscription {

@@ -461,3 +461,75 @@ def test_get_solutions(
     data = response.json()
     assert len(data) == 2
     assert all(item["parent_id"] == request_id for item in data)
+
+
+def test_create_resource_with_specialty(
+    client: TestClient,
+    auth_headers: dict[str, str],
+) -> None:
+    """Specialty chosen on the form is stored on the resource."""
+    response = client.post(
+        "/api/v1/resources",
+        json={
+            "type": "USE_CASE",
+            "title": "Marking rubric drafts with Claude",
+            "content_text": "Draft rubrics in half the time using a structured prompt.",
+            "is_anonymous": False,
+            "specialty": "Marketing",
+        },
+        headers=auth_headers,
+    )
+    assert response.status_code == 201
+    assert response.json()["specialty"] == "Marketing"
+
+
+def test_create_resource_specialty_falls_back_to_profile(
+    client: TestClient,
+    session: Session,
+) -> None:
+    """Without an explicit specialty, the author's profile specialty is used."""
+    user = create_verified_user(session, email="prof@curtin.edu.au")
+    user.specialties = ["Management"]
+    session.add(user)
+    session.commit()
+    token = login_and_get_token(client, "prof@curtin.edu.au")
+
+    response = client.post(
+        "/api/v1/resources",
+        json={
+            "type": "USE_CASE",
+            "title": "Meeting minutes automation",
+            "content_text": "Automate minutes with a speech-to-text pipeline.",
+            "is_anonymous": False,
+        },
+        headers={"Authorization": f"Bearer {token}"},
+    )
+    assert response.status_code == 201
+    assert response.json()["specialty"] == "Management"
+
+
+def test_update_resource_specialty(
+    client: TestClient,
+    auth_headers: dict[str, str],
+) -> None:
+    """Owners can change the specialty on an existing resource."""
+    created = client.post(
+        "/api/v1/resources",
+        json={
+            "type": "USE_CASE",
+            "title": "Slide deck outlines",
+            "content_text": "Outline lecture decks with an LLM before designing.",
+            "is_anonymous": False,
+            "specialty": "Marketing",
+        },
+        headers=auth_headers,
+    )
+    resource_id = created.json()["id"]
+
+    response = client.patch(
+        f"/api/v1/resources/{resource_id}",
+        json={"specialty": "Management"},
+        headers=auth_headers,
+    )
+    assert response.status_code == 200
+    assert response.json()["specialty"] == "Management"

@@ -6,7 +6,18 @@
  */
 
 import React from "react";
-import { Box, HStack, SimpleGrid, Text, VStack } from "@chakra-ui/react";
+import {
+  Box,
+  FormControl,
+  FormHelperText,
+  FormLabel,
+  HStack,
+  Select,
+  SimpleGrid,
+  Text,
+  VStack,
+} from "@chakra-ui/react";
+import { useSpecialties } from "@/hooks/useConfig";
 import { ResourceType } from "@/types/index";
 
 export const RESOURCE_TYPES = [
@@ -151,6 +162,44 @@ export function ResourceTypePicker({ value, onChange }: ResourceTypePickerProps)
         );
       })}
     </SimpleGrid>
+  );
+}
+
+interface AreaFieldProps {
+  value: string;
+  onChange: (value: string) => void;
+}
+
+/**
+ * Area/specialty select for resources, fed by the configurable specialties
+ * list. Stores the display label (cards and filters render it verbatim).
+ */
+export function AreaField({ value, onChange }: AreaFieldProps) {
+  const { data: specialties = [] } = useSpecialties();
+
+  // Keep legacy/custom values selectable so editing an old resource
+  // doesn't silently drop its area.
+  const hasCustomValue = value && !specialties.some((s) => s.label === value);
+
+  return (
+    <FormControl>
+      <FormLabel>Area</FormLabel>
+      <Select
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        placeholder="Select the area this relates to (optional)"
+      >
+        {specialties.map((s) => (
+          <option key={s.key} value={s.label}>
+            {s.label}
+          </option>
+        ))}
+        {hasCustomValue && <option value={value}>{value}</option>}
+      </Select>
+      <FormHelperText color="whiteAlpha.500">
+        Powers "Explore by Area" and the browse filters
+      </FormHelperText>
+    </FormControl>
   );
 }
 

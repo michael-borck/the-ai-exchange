@@ -351,6 +351,21 @@ def create_resource(
     # Sanitize user-submitted text to prevent stored XSS
     from app.core.sanitize import sanitize_html
 
+    # Area/specialty: prefer the value chosen on the form, fall back to the
+    # author's first profile specialty so older clients still categorize.
+    # Resources store the display label (cards/filters render it verbatim);
+    # profile specialties store config keys, so resolve key -> label.
+    specialty = resource_data.specialty
+    if not specialty and current_user.specialties:
+        from app.models import ConfigValueType
+        from app.services.config import ConfigService
+
+        profile_key = current_user.specialties[0]
+        config_value = ConfigService.get_value_by_key(
+            session, profile_key, ConfigValueType.SPECIALTY
+        )
+        specialty = config_value.label if config_value else profile_key
+
     # Create resource
     # Auto-populate user_area from current user's area
     new_resource = Resource(
@@ -361,6 +376,7 @@ def create_resource(
         is_anonymous=resource_data.is_anonymous,
         parent_id=resource_data.parent_id,
         content_meta=resource_data.content_meta,
+        specialty=sanitize_html(specialty) if specialty else None,
         user_area="General",  # Default area (User model has no area field yet)
     )
 
@@ -465,6 +481,11 @@ def update_resource(
 
     if resource_update.content_meta is not None:
         resource.content_meta = resource_update.content_meta
+
+    if resource_update.specialty is not None:
+        from app.core.sanitize import sanitize_html
+
+        resource.specialty = sanitize_html(resource_update.specialty) or None
 
     session.add(resource)
     session.commit()

@@ -26,7 +26,12 @@ import {
 } from "@chakra-ui/react";
 import { useAuth } from "@/hooks/useAuth";
 import { useResource, useUpdateResource } from "@/hooks/useResources";
-import { RESOURCE_TYPES, ToolCategoryChips, SectionHeading } from "@/components/ResourceFormFields";
+import {
+  RESOURCE_TYPES,
+  AreaField,
+  ToolCategoryChips,
+  SectionHeading,
+} from "@/components/ResourceFormFields";
 
 export default function EditResourcePage() {
   const navigate = useNavigate();
@@ -38,6 +43,7 @@ export default function EditResourcePage() {
 
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
+  const [area, setArea] = useState("");
   const [collaborators, setCollaborators] = useState("");
   const [selectedTools, setSelectedTools] = useState<string[]>([]);
   const [timeSavedValue, setTimeSavedValue] = useState("");
@@ -48,6 +54,7 @@ export default function EditResourcePage() {
     if (resource) {
       setTitle(resource.title);
       setContent(resource.content_text);
+      setArea(resource.specialty || "");
 
       const meta = resource.content_meta;
       if (meta) {
@@ -111,6 +118,7 @@ export default function EditResourcePage() {
         data: {
           title,
           content_text: content,
+          specialty: area,
           content_meta: Object.keys(contentMeta).length > 0 ? contentMeta : undefined,
         },
       });
@@ -209,6 +217,9 @@ export default function EditResourcePage() {
 
             <Divider />
             <SectionHeading title="Add context" />
+
+            {/* Area */}
+            <AreaField value={area} onChange={setArea} />
 
             {/* Tools Used */}
             <FormControl>

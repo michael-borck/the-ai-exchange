@@ -2,7 +2,7 @@
  * Create Resource Page
  */
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Layout } from "@/components/Layout";
 import { useAuth } from "@/hooks/useAuth";
@@ -26,27 +26,41 @@ import { useCreateResource } from "@/hooks/useResources";
 import { ResourceType } from "@/types/index";
 import {
   RESOURCE_TYPES,
+  AreaField,
   ResourceTypePicker,
   ToolCategoryChips,
   SectionHeading,
 } from "@/components/ResourceFormFields";
+import { useSpecialties } from "@/hooks/useConfig";
 
 const TITLE_GUIDE_LENGTH = 120;
 
 export default function CreateResourcePage() {
   const navigate = useNavigate();
   const toast = useToast();
-  useAuth();
+  const { user } = useAuth();
+  const { data: specialties = [] } = useSpecialties();
   const createMutation = useCreateResource();
 
   const [type, setType] = useState<ResourceType>("REQUEST");
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
+  const [area, setArea] = useState("");
+  const [areaTouched, setAreaTouched] = useState(false);
   const [collaborators, setCollaborators] = useState("");
   const [timeSavedValue, setTimeSavedValue] = useState("");
   const [selectedTools, setSelectedTools] = useState<string[]>([]);
   const [userTags, setUserTags] = useState("");
   const [isAnonymous, setIsAnonymous] = useState(false);
+
+  // Pre-select the author's profile specialty (stored as a config key)
+  // until they pick an area themselves.
+  useEffect(() => {
+    if (!areaTouched && !area && user?.specialties?.length && specialties.length) {
+      const match = specialties.find((s) => s.key === user.specialties[0]);
+      if (match) setArea(match.label);
+    }
+  }, [user, specialties, area, areaTouched]);
 
   const selectedType = RESOURCE_TYPES.find((rt) => rt.key === type);
 
@@ -91,6 +105,7 @@ export default function CreateResourcePage() {
         title,
         content_text: content,
         is_anonymous: isAnonymous,
+        specialty: area || undefined,
         content_meta: Object.keys(contentMeta).length > 0 ? contentMeta : undefined,
       });
 
@@ -181,6 +196,15 @@ export default function CreateResourcePage() {
             <SectionHeading
               title="Add context"
               hint="Optional, but this is what makes ideas discoverable."
+            />
+
+            {/* Area */}
+            <AreaField
+              value={area}
+              onChange={(v) => {
+                setArea(v);
+                setAreaTouched(true);
+              }}
             />
 
             {/* Tools Used */}
