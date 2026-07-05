@@ -166,17 +166,7 @@ export function FilterSidebar({
     (filters.minTimeSaved > 0 ? 1 : 0);
 
   return (
-    <Box
-      bg="dark.card"
-      borderRadius="lg"
-      p={6}
-      boxShadow="sm"
-      border="1px"
-      borderColor="dark.border"
-      height="fit-content"
-      position="sticky"
-      top={6}
-    >
+    <Box layerStyle="card" p={6} height="fit-content" position="sticky" top={6}>
       <VStack align="stretch" spacing={6}>
         {/* Header */}
         <HStack justify="space-between" align="center">
@@ -199,16 +189,17 @@ export function FilterSidebar({
 
         {/* Sort */}
         <VStack align="stretch" spacing={3}>
-          <Text fontSize="sm" fontWeight="semibold" color="whiteAlpha.700">
-            Sort By
-          </Text>
-          <Stack direction="column" spacing={2}>
+          <Text textStyle="eyebrow">Sort By</Text>
+          <Stack direction="column" spacing={1}>
             {(["newest", "popular", "most_tried"] as const).map((option) => (
               <Button
                 key={option}
                 size="sm"
-                variant={filters.sortBy === option ? "solid" : "ghost"}
-                colorScheme={filters.sortBy === option ? "blue" : "gray"}
+                variant="ghost"
+                bg={filters.sortBy === option ? "whiteAlpha.100" : undefined}
+                color={filters.sortBy === option ? "brand.200" : "whiteAlpha.700"}
+                _hover={{ bg: "whiteAlpha.100", color: "white" }}
+                fontWeight={filters.sortBy === option ? "600" : "500"}
                 justifyContent="flex-start"
                 onClick={() => handleSortChange(option)}
               >
@@ -226,9 +217,7 @@ export function FilterSidebar({
 
         {/* Specialty */}
         <VStack align="stretch" spacing={3}>
-          <Text fontSize="sm" fontWeight="semibold" color="whiteAlpha.700">
-            Specialty
-          </Text>
+          <Text textStyle="eyebrow">Specialty</Text>
           {isLoading ? (
             <Spinner size="sm" />
           ) : specialties.length === 0 ? (
@@ -254,9 +243,7 @@ export function FilterSidebar({
 
         {/* Professional Role */}
         <VStack align="stretch" spacing={3}>
-          <Text fontSize="sm" fontWeight="semibold" color="whiteAlpha.700">
-            Creator Role
-          </Text>
+          <Text textStyle="eyebrow">Creator Role</Text>
           <VStack align="stretch" spacing={2}>
             {(Object.keys(PROFESSIONAL_ROLES) as ProfessionalRole[]).map((role) => (
               <Checkbox
@@ -274,9 +261,7 @@ export function FilterSidebar({
 
         {/* Tools */}
         <VStack align="stretch" spacing={3}>
-          <Text fontSize="sm" fontWeight="semibold" color="whiteAlpha.700">
-            AI Tool Categories
-          </Text>
+          <Text textStyle="eyebrow">AI Tool Categories</Text>
           {isLoading ? (
             <Spinner size="sm" />
           ) : toolCategories.length === 0 ? (
@@ -303,9 +288,7 @@ export function FilterSidebar({
         {/* Quick Wins Filter */}
         <VStack align="stretch" spacing={3}>
           <VStack align="stretch" spacing={1}>
-            <Text fontSize="sm" fontWeight="semibold" color="whiteAlpha.700">
-              Minimum Time Saved
-            </Text>
+            <Text textStyle="eyebrow">Minimum Time Saved</Text>
             <Text fontSize="xs" color="whiteAlpha.600">
               {filters.minTimeSaved === 0
                 ? "Any"

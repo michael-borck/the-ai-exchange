@@ -9,6 +9,7 @@ import React, { useState } from "react";
 import {
   Box,
   FormLabel,
+  Input,
   Select,
   Textarea,
   Text,
@@ -150,20 +151,12 @@ export const ConfigSelect: React.FC<ConfigSelectProps> = ({
               <Text fontSize="sm" fontWeight="medium" mb={2}>
                 What {label.toLowerCase()} were you looking for?
               </Text>
-              <input
+              <Input
                 type="text"
-                placeholder={`e.g., Supply Chain Management`}
+                size="sm"
+                placeholder="e.g., Supply Chain Management"
                 value={customValue}
                 onChange={(e) => setCustomValue(e.target.value)}
-                style={{
-                  width: "100%",
-                  padding: "8px",
-                  borderRadius: "4px",
-                  border: "1px solid #3c3f44",
-                  backgroundColor: "#202127",
-                  color: "rgba(255, 255, 245, 0.86)",
-                  fontFamily: "inherit",
-                }}
               />
             </Box>
 

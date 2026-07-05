@@ -493,11 +493,11 @@ export default function ProfilePage() {
                                   display="flex"
                                   alignItems="center"
                                   justifyContent="space-between"
-                                  bg="blue.50"
+                                  bg="whiteAlpha.100"
                                   p={3}
                                   borderRadius="md"
                                   border={isEditing ? "1px solid" : "none"}
-                                  borderColor={isEditing ? "blue.200" : "transparent"}
+                                  borderColor={isEditing ? "brand.400" : "transparent"}
                                 >
                                   <Text fontSize="sm">{specialty}</Text>
                                   {isEditing && (

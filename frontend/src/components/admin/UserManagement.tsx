@@ -171,7 +171,7 @@ export function UserManagement() {
         </Thead>
         <Tbody>
           {users.map((user: User) => (
-            <Tr key={user.id} _hover={{ bg: "gray.50" }}>
+            <Tr key={user.id} _hover={{ bg: "whiteAlpha.100" }}>
               <Td fontSize="sm">{user.email}</Td>
               <Td fontSize="sm">{user.full_name}</Td>
               <Td>

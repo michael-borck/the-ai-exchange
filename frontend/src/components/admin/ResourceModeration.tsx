@@ -166,7 +166,7 @@ export function ResourceModeration() {
             </Thead>
             <Tbody>
               {filteredResources.map((resource) => (
-                <Tr key={resource.id} _hover={{ bg: "gray.50" }}>
+                <Tr key={resource.id} _hover={{ bg: "whiteAlpha.100" }}>
                   <Td fontSize="sm">
                     <Text maxWidth="300px" noOfLines={1}>
                       {resource.title}

@@ -410,7 +410,7 @@ export default function ResourceDetailPage() {
                               borderColor="dark.border"
                               borderRadius="md"
                               cursor="pointer"
-                              _hover={{ bg: "gray.50" }}
+                              _hover={{ bg: "whiteAlpha.100" }}
                               onClick={() => navigate(`/resources/${similar.id}`)}
                             >
                               <Text fontSize="sm" fontWeight="semibold" noOfLines={2}>

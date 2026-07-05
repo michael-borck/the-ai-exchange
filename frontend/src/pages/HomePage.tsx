@@ -7,6 +7,7 @@ import { useNavigate } from "react-router-dom";
 import {
   Box,
   Button,
+  Flex,
   Heading,
   HStack,
   Icon,
@@ -24,6 +25,7 @@ import { Layout } from "@/components/Layout";
 import { useAuth } from "@/hooks/useAuth";
 import { useResources } from "@/hooks/useResources";
 import { ResourceCard } from "@/components/ResourceCard";
+import { BRAND_GRADIENT } from "@/theme";
 import { flattenTools } from "@/lib/tools";
 import { Resource } from "@/types/index";
 import { useMemo } from "react";
@@ -45,6 +47,15 @@ const mapResource = (resource: Resource) => ({
   user_id: resource.user_id,
 });
 
+/** Heading fragment rendered with the brand gradient. */
+function GradientText({ children }: { children: React.ReactNode }) {
+  return (
+    <Text as="span" bgGradient={BRAND_GRADIENT} bgClip="text">
+      {children}
+    </Text>
+  );
+}
+
 interface DisciplineCard {
   name: string;
   count: number;
@@ -55,20 +66,17 @@ function DisciplineGridItem({ specialty }: { specialty: DisciplineCard }) {
 
   return (
     <Box
-      bg="dark.card"
-      border="1px"
-      borderColor="dark.border"
-      borderRadius="md"
-      p={4}
+      layerStyle="cardHover"
+      p={5}
       textAlign="center"
       cursor="pointer"
-      _hover={{ borderColor: "brand.400" }}
-      transition="all 0.2s"
       onClick={() => navigate(`/resources?specialty=${specialty.name}`)}
     >
-      <Heading size="md">{specialty.name}</Heading>
-      <Text color="whiteAlpha.600" fontSize="sm">
-        {specialty.count} ideas
+      <Heading size="sm" mb={1}>
+        {specialty.name}
+      </Heading>
+      <Text color="whiteAlpha.500" fontSize="sm">
+        {specialty.count} {specialty.count === 1 ? "idea" : "ideas"}
       </Text>
     </Box>
   );
@@ -79,14 +87,17 @@ function AnonLanding() {
 
   const features = [
     {
+      glyph: "◆",
       title: "Real use cases from colleagues",
       body: "See how Marketing and Management staff are actually using AI in teaching, research, and admin work.",
     },
     {
+      glyph: "❋",
       title: "Prompts you can adapt",
       body: "Tested prompts, expected time saved, and what to watch out for — shared by people you work with.",
     },
     {
+      glyph: "✦",
       title: "Find collaborators",
       body: "Discover who's tried what, ask follow-up questions, and build on each other's ideas.",
     },
@@ -94,14 +105,17 @@ function AnonLanding() {
 
   return (
     <Layout>
-      <VStack spacing={16} align="stretch" pb={12}>
+      <VStack spacing={20} align="stretch" pb={12}>
         {/* Hero */}
-        <VStack spacing={8} align="center" textAlign="center" pt={16}>
-          <VStack spacing={4} maxW="3xl">
-            <Heading size="2xl" fontWeight="bold" lineHeight="1.1">
-              How your colleagues are actually using AI
+        <VStack spacing={8} align="center" textAlign="center" pt={{ base: 10, md: 20 }}>
+          <VStack spacing={5} maxW="3xl">
+            <Text textStyle="eyebrow" color="brand.300">
+              School of Marketing and Management
+            </Text>
+            <Heading size="2xl" fontWeight="700" lineHeight="1.1">
+              How your colleagues are <GradientText>actually using AI</GradientText>
             </Heading>
-            <Text color="whiteAlpha.700" fontSize="xl" lineHeight="1.5">
+            <Text color="whiteAlpha.700" fontSize="xl" lineHeight="1.6" maxW="2xl">
               A private space for the School of Marketing and Management to share real AI use cases,
               prompts, and lessons learned. Curtin staff and approved collaborators only.
             </Text>
@@ -121,29 +135,34 @@ function AnonLanding() {
             </Button>
           </HStack>
 
-          <Text fontSize="sm" color="whiteAlpha.500" pt={2}>
+          <Text fontSize="sm" color="whiteAlpha.500">
             Browsing ideas requires a Curtin (or whitelisted) account.
           </Text>
         </VStack>
 
         {/* What's inside */}
-        <VStack align="stretch" spacing={6}>
+        <VStack align="stretch" spacing={8}>
           <Heading size="lg" textAlign="center">
             What you'll find inside
           </Heading>
-          <SimpleGrid columns={{ base: 1, md: 3 }} spacing={6}>
+          <SimpleGrid columns={{ base: 1, md: 3 }} spacing={5}>
             {features.map((f) => (
-              <Box
-                key={f.title}
-                bg="dark.card"
-                border="1px"
-                borderColor="dark.border"
-                borderRadius="md"
-                p={6}
-              >
-                <VStack align="flex-start" spacing={3}>
+              <Box key={f.title} layerStyle="cardHover" p={6}>
+                <VStack align="flex-start" spacing={4}>
+                  <Flex
+                    w={10}
+                    h={10}
+                    align="center"
+                    justify="center"
+                    borderRadius="lg"
+                    bg="whiteAlpha.100"
+                    color="brand.300"
+                    fontSize="lg"
+                  >
+                    {f.glyph}
+                  </Flex>
                   <Heading size="sm">{f.title}</Heading>
-                  <Text fontSize="sm" color="whiteAlpha.700" lineHeight="1.5">
+                  <Text fontSize="sm" color="whiteAlpha.700" lineHeight="1.6">
                     {f.body}
                   </Text>
                 </VStack>
@@ -153,7 +172,7 @@ function AnonLanding() {
         </VStack>
 
         {/* How it works */}
-        <VStack align="stretch" spacing={6}>
+        <VStack align="stretch" spacing={8}>
           <Heading size="lg" textAlign="center">
             How it works
           </Heading>
@@ -171,24 +190,34 @@ function AnonLanding() {
               },
               { step: "3", title: "Share", body: "Post your own — anonymously if you'd rather." },
             ].map((s) => (
-              <Box key={s.step} textAlign="center" p={4}>
-                <Heading size="3xl" color="brand.400" mb={3}>
+              <VStack key={s.step} spacing={4} p={4}>
+                <Flex
+                  w={12}
+                  h={12}
+                  align="center"
+                  justify="center"
+                  borderRadius="full"
+                  bgGradient={BRAND_GRADIENT}
+                  fontFamily="heading"
+                  fontWeight="700"
+                  fontSize="xl"
+                  color="white"
+                >
                   {s.step}
-                </Heading>
-                <Heading size="sm" mb={2}>
-                  {s.title}
-                </Heading>
-                <Text fontSize="sm" color="whiteAlpha.700">
+                </Flex>
+                <Heading size="sm">{s.title}</Heading>
+                <Text fontSize="sm" color="whiteAlpha.700" textAlign="center">
                   {s.body}
                 </Text>
-              </Box>
+              </VStack>
             ))}
           </SimpleGrid>
         </VStack>
 
         {/* Final CTA */}
-        <Center>
-          <VStack spacing={3}>
+        <Box layerStyle="card" p={{ base: 8, md: 12 }} textAlign="center">
+          <VStack spacing={4}>
+            <Heading size="md">Ready to see what your colleagues are building?</Heading>
             <Button size="lg" colorScheme="brand" onClick={() => navigate("/register")}>
               Get started
             </Button>
@@ -199,7 +228,7 @@ function AnonLanding() {
               </Button>
             </Text>
           </VStack>
-        </Center>
+        </Box>
       </VStack>
     </Layout>
   );
@@ -242,27 +271,26 @@ function AuthedHome() {
 
   return (
     <Layout>
-      <VStack spacing={12} align="stretch">
+      <VStack spacing={14} align="stretch">
         {/* Hero Section */}
-        <VStack spacing={6} align="center" textAlign="center" pt={8}>
-          <VStack spacing={3}>
-            <Heading size="2xl" fontWeight="bold" lineHeight="tight">
-              Discover How Colleagues Use AI Across Our School
+        <VStack spacing={7} align="center" textAlign="center" pt={8}>
+          <VStack spacing={4}>
+            <Heading size="2xl" fontWeight="700" lineHeight="1.15" maxW="2xl">
+              Discover how colleagues use <GradientText>AI across our school</GradientText>
             </Heading>
-            <Text color="whiteAlpha.600" fontSize="lg" maxW="lg">
-              Share use cases, research insights, and practical applications • Find collaborators •
-              Build together
+            <Text color="whiteAlpha.600" fontSize="lg" maxW="xl">
+              Share use cases, research insights, and practical applications. Find collaborators.
+              Build together.
             </Text>
           </VStack>
 
-          <InputGroup maxW="md">
-            <InputLeftElement pointerEvents="none">
-              <Icon as={SearchIcon} color="gray.400" />
+          <InputGroup maxW="lg">
+            <InputLeftElement pointerEvents="none" h="full">
+              <Icon as={SearchIcon} color="whiteAlpha.400" />
             </InputLeftElement>
             <Input
               placeholder="Search ideas, tools, area, or faculty"
               size="lg"
-              borderRadius="md"
               onKeyDown={(e) => {
                 if (e.key === "Enter") {
                   const query = e.currentTarget.value;
@@ -273,7 +301,7 @@ function AuthedHome() {
             />
           </InputGroup>
 
-          <HStack spacing={4} pt={2}>
+          <HStack spacing={4}>
             <Button size="lg" colorScheme="brand" onClick={() => navigate("/resources/new")}>
               Share Your Idea
             </Button>
@@ -289,7 +317,7 @@ function AuthedHome() {
         </VStack>
 
         {/* Area Grid */}
-        <VStack align="stretch" spacing={4}>
+        <VStack align="stretch" spacing={5}>
           <Heading size="lg">Explore by Area</Heading>
           <SimpleGrid columns={{ base: 2, md: 4 }} spacing={4}>
             {disciplines.map((d) => (
@@ -299,7 +327,7 @@ function AuthedHome() {
         </VStack>
 
         {/* Recent Contributions */}
-        <VStack align="stretch" spacing={4}>
+        <VStack align="stretch" spacing={5}>
           <HStack justify="space-between">
             <Heading size="lg">Recent Contributions</Heading>
             <Button variant="link" colorScheme="brand" onClick={() => navigate("/resources")}>
@@ -311,14 +339,7 @@ function AuthedHome() {
               <Spinner />
             </Center>
           ) : recentResources.length === 0 ? (
-            <Box
-              bg="dark.card"
-              p={8}
-              border="1px"
-              borderColor="dark.border"
-              borderRadius="md"
-              textAlign="center"
-            >
+            <Box layerStyle="card" p={8} textAlign="center">
               <Text color="whiteAlpha.600">
                 No resources shared yet. Be the first to share an idea!
               </Text>
@@ -347,7 +368,7 @@ function AuthedHome() {
         </VStack>
 
         {/* Most Popular */}
-        <VStack align="stretch" spacing={4} pb={8}>
+        <VStack align="stretch" spacing={5} pb={8}>
           <HStack justify="space-between">
             <Heading size="lg">Most Popular</Heading>
             <Button
@@ -363,14 +384,7 @@ function AuthedHome() {
               <Spinner />
             </Center>
           ) : mostPopularResources.length === 0 ? (
-            <Box
-              bg="dark.card"
-              p={8}
-              border="1px"
-              borderColor="dark.border"
-              borderRadius="md"
-              textAlign="center"
-            >
+            <Box layerStyle="card" p={8} textAlign="center">
               <Text color="whiteAlpha.600">No resources available yet.</Text>
             </Box>
           ) : (

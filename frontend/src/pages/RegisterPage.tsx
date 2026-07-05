@@ -16,8 +16,9 @@ import {
   Alert,
   AlertIcon,
   useToast,
+  FormControl,
   FormLabel,
-  Checkbox,
+  FormHelperText,
 } from "@chakra-ui/react";
 import { useRegister } from "@/hooks/useAuth";
 import { useAuth } from "@/context/AuthContext";
@@ -144,36 +145,38 @@ export default function RegisterPage() {
           </Text>
         </VStack>
 
-        <Box width="full" as="form" onSubmit={handleSubmit}>
-          <VStack spacing={4}>
-            <Box width="full">
-              <Text fontSize="sm" fontWeight="medium" mb={2}>
-                Full Name
-              </Text>
+        <Box
+          width="full"
+          layerStyle="card"
+          p={{ base: 6, md: 8 }}
+          as="form"
+          onSubmit={handleSubmit}
+        >
+          <VStack spacing={5}>
+            <FormControl isRequired>
+              <FormLabel requiredIndicator={<></>}>Full Name</FormLabel>
               <Input
                 type="text"
                 placeholder="John Doe"
                 value={fullName}
                 onChange={(e) => setFullName(e.target.value)}
-                required
+                autoComplete="name"
               />
-            </Box>
+            </FormControl>
 
-            <Box width="full">
-              <Text fontSize="sm" fontWeight="medium" mb={2}>
-                Email (Curtin domain)
-              </Text>
+            <FormControl isRequired>
+              <FormLabel requiredIndicator={<></>}>Email (Curtin domain)</FormLabel>
               <Input
                 type="email"
                 placeholder="you@curtin.edu.au"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                required
+                autoComplete="email"
               />
-              <Text fontSize="xs" color="whiteAlpha.600" mt={1}>
+              <FormHelperText color="whiteAlpha.600">
                 Only Curtin University email addresses are allowed
-              </Text>
-            </Box>
+              </FormHelperText>
+            </FormControl>
 
             <ConfigSelect
               label="Professional Specialty"
@@ -186,51 +189,65 @@ export default function RegisterPage() {
               helpText="Your specialty helps others find your expertise. You can also request a new specialty if yours isn't listed."
             />
 
-            <Box width="full">
-              <FormLabel fontSize="sm" fontWeight="medium" mb={2}>
-                Professional Roles (select all that apply)
-              </FormLabel>
-              <VStack align="flex-start" spacing={2}>
-                {PROFESSIONAL_ROLES.map((role) => (
-                  <Checkbox
-                    key={role}
-                    isChecked={selectedRoles.includes(role)}
-                    onChange={() => handleRoleToggle(role)}
-                  >
-                    <Text fontSize="sm">{role}</Text>
-                  </Checkbox>
-                ))}
-              </VStack>
-              <Text fontSize="xs" color="whiteAlpha.600" mt={2}>
+            <FormControl>
+              <FormLabel>Professional Roles (select all that apply)</FormLabel>
+              <HStack spacing={2} flexWrap="wrap">
+                {PROFESSIONAL_ROLES.map((role) => {
+                  const isSelected = selectedRoles.includes(role);
+                  return (
+                    <Box
+                      key={role}
+                      as="button"
+                      type="button"
+                      px={4}
+                      py={2}
+                      borderRadius="full"
+                      border="1px solid"
+                      borderColor={isSelected ? "brand.400" : "dark.border"}
+                      bg={isSelected ? "brand.900" : "dark.subtle"}
+                      color={isSelected ? "brand.200" : "whiteAlpha.700"}
+                      fontSize="sm"
+                      fontWeight={isSelected ? "600" : "500"}
+                      transition="all 0.15s ease"
+                      _hover={{ borderColor: "brand.300" }}
+                      aria-pressed={isSelected}
+                      onClick={() => handleRoleToggle(role)}
+                    >
+                      {role}
+                    </Box>
+                  );
+                })}
+              </HStack>
+              <FormHelperText color="whiteAlpha.600">
                 Select all roles that apply to you. This helps others find the right expertise.
-              </Text>
-            </Box>
+              </FormHelperText>
+            </FormControl>
 
-            <Box width="full">
-              <Text fontSize="sm" fontWeight="medium" mb={2}>
-                Password
-              </Text>
+            <FormControl isRequired>
+              <FormLabel requiredIndicator={<></>}>Password</FormLabel>
               <Input
                 type="password"
                 placeholder="••••••••"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                required
+                autoComplete="new-password"
               />
-            </Box>
+              <FormHelperText color="whiteAlpha.500">
+                10+ characters with an uppercase letter, lowercase letter, digit, and special
+                character.
+              </FormHelperText>
+            </FormControl>
 
-            <Box width="full">
-              <Text fontSize="sm" fontWeight="medium" mb={2}>
-                Confirm Password
-              </Text>
+            <FormControl isRequired>
+              <FormLabel requiredIndicator={<></>}>Confirm Password</FormLabel>
               <Input
                 type="password"
                 placeholder="••••••••"
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
-                required
+                autoComplete="new-password"
               />
-            </Box>
+            </FormControl>
 
             {(passwordError || apiError) && (
               <Alert status="error" borderRadius="md">
@@ -241,6 +258,7 @@ export default function RegisterPage() {
 
             <Button
               width="full"
+              size="lg"
               colorScheme="brand"
               type="submit"
               isLoading={registerMutation.isPending}

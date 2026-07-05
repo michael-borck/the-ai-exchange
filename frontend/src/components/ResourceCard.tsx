@@ -4,7 +4,18 @@
  */
 
 import { useNavigate } from "react-router-dom";
-import { Box, Button, Heading, HStack, Text, VStack, useToast } from "@chakra-ui/react";
+import {
+  Badge,
+  Box,
+  Button,
+  Heading,
+  HStack,
+  Icon,
+  Text,
+  VStack,
+  useToast,
+} from "@chakra-ui/react";
+import { ViewIcon, RepeatIcon, StarIcon, TimeIcon } from "@chakra-ui/icons";
 import { useSaveResource, useIsResourceSaved, useTriedResource } from "@/hooks/useEngagement";
 import { useDeleteResource } from "@/hooks/useResources";
 import { useAuth } from "@/hooks/useAuth";
@@ -25,6 +36,15 @@ export interface ResourceCardProps {
   user_id?: string; // Resource owner ID, needed for admin delete capability
 }
 
+function StatItem({ icon, value, label }: { icon: typeof ViewIcon; value: number; label: string }) {
+  return (
+    <HStack spacing={1} title={label} color="whiteAlpha.500">
+      <Icon as={icon} boxSize={3} />
+      <Text>{value}</Text>
+    </HStack>
+  );
+}
+
 export const ResourceCard: React.FC<ResourceCardProps> = ({
   id,
   title,
@@ -37,7 +57,6 @@ export const ResourceCard: React.FC<ResourceCardProps> = ({
   tried,
   saves = 0,
   created_at,
-  variant = "home",
   user_id,
 }) => {
   const navigate = useNavigate();
@@ -118,268 +137,143 @@ export const ResourceCard: React.FC<ResourceCardProps> = ({
     }
   };
 
-  if (variant === "browse") {
-    return (
-      <Box
-        bg="dark.card"
-        border="1px"
-        borderColor="dark.border"
-        borderRadius="md"
-        p={4}
-        cursor="pointer"
-        _hover={{ boxShadow: "md", transform: "translateY(-2px)" }}
-        transition="all 0.2s"
-        onClick={() => navigate(`/resources/${id}`)}
-      >
-        <VStack align="flex-start" spacing={3}>
-          {/* Header with badges */}
-          <HStack spacing={2} width="full" justify="space-between">
-            <HStack spacing={2}>
-              {area && (
-                <Text
-                  fontSize="xs"
-                  fontWeight="bold"
-                  color="brand.200"
-                  bg="brand.900"
-                  px={2}
-                  py={1}
-                  borderRadius="full"
-                >
-                  {area}
-                </Text>
-              )}
-            </HStack>
-          </HStack>
-
-          {/* Title */}
-          <Heading size="sm" lineHeight="tight">
-            {title}
-          </Heading>
-
-          {/* Author info - only for logged-in users */}
-          {isLoggedIn && (
-            <Text fontSize="xs" color="gray.600">
-              {author} • {timeSaved || 2} hrs/week saved
-            </Text>
+  return (
+    <Box
+      layerStyle="cardHover"
+      p={5}
+      cursor="pointer"
+      display="flex"
+      flexDirection="column"
+      onClick={() => navigate(`/resources/${id}`)}
+    >
+      <VStack align="flex-start" spacing={3} flex={1} width="full">
+        {/* Area badge + time saved */}
+        <HStack spacing={2} width="full" justify="space-between">
+          {area ? (
+            <Badge bg="brand.900" color="brand.200" fontSize="xs">
+              {area}
+            </Badge>
+          ) : (
+            <Box />
           )}
+          {isLoggedIn && timeSaved !== undefined && timeSaved > 0 && (
+            <HStack spacing={1} color="green.300" fontSize="xs" flexShrink={0}>
+              <Icon as={TimeIcon} boxSize={3} />
+              <Text fontWeight="600">{timeSaved} hrs/wk saved</Text>
+            </HStack>
+          )}
+        </HStack>
 
-          {/* Summary */}
-          <Text fontSize="sm" color="whiteAlpha.700" lineHeight="1.4">
-            {quickSummary}
+        {/* Title */}
+        <Heading size="sm" lineHeight="1.35" noOfLines={2}>
+          {title}
+        </Heading>
+
+        {/* Author info - only for logged-in users */}
+        {isLoggedIn && (
+          <Text fontSize="xs" color="whiteAlpha.600">
+            {author}
           </Text>
+        )}
 
-          {/* Tools */}
+        {/* Summary */}
+        <Text fontSize="sm" color="whiteAlpha.700" lineHeight="1.5" noOfLines={3}>
+          {quickSummary}
+        </Text>
+
+        {/* Tools */}
+        {tools.length > 0 && (
           <HStack spacing={2} fontSize="xs" flexWrap="wrap">
             {tools.map((tool: string) => (
-              <Text key={tool} bg="whiteAlpha.100" px={2} py={1} borderRadius="full">
+              <Text
+                key={tool}
+                bg="whiteAlpha.100"
+                color="whiteAlpha.700"
+                px={2}
+                py={0.5}
+                borderRadius="full"
+              >
                 {tool}
               </Text>
             ))}
           </HStack>
-
-          {/* Created date and engagement stats */}
-          <HStack
-            spacing={2}
-            fontSize="xs"
-            color="whiteAlpha.500"
-            width="full"
-            justify="space-between"
-            pt={1}
-            pb={2}
-          >
-            <Text>
-              {new Date(created_at || new Date()).toLocaleDateString("en-US", {
-                year: "numeric",
-                month: "short",
-                day: "numeric",
-              })}
-            </Text>
-            <HStack spacing={2}>
-              <Text title="Views">👁️ {views}</Text>
-              <Text title="Tried It">🧪 {tried}</Text>
-              <Text title="Saves">📌 {saves}</Text>
-            </HStack>
-          </HStack>
-
-          {/* Action buttons */}
-          <HStack
-            spacing={2}
-            fontSize="sm"
-            width="full"
-            justify="flex-end"
-            pt={2}
-            borderTop="1px"
-            borderColor="dark.divider"
-          >
-            {isLoggedIn ? (
-              <>
-                {canDelete && (
-                  <Button
-                    size="xs"
-                    variant="ghost"
-                    colorScheme="red"
-                    onClick={handleDelete}
-                    isLoading={deleteResourceMutation.isPending}
-                  >
-                    Delete
-                  </Button>
-                )}
-                <Button
-                  size="xs"
-                  variant="ghost"
-                  colorScheme="green"
-                  onClick={handleTried}
-                  isLoading={triedResourceMutation.isPending}
-                >
-                  🧪 Tried
-                </Button>
-                <Button
-                  size="xs"
-                  variant={hasSaved ? "solid" : "ghost"}
-                  colorScheme="brand"
-                  onClick={handleSave}
-                  isLoading={saveResourceMutation.isPending}
-                >
-                  {hasSaved ? "✓ Saved" : "📌 Save"}
-                </Button>
-              </>
-            ) : (
-              <Button size="xs" variant="ghost" colorScheme="brand" onClick={handleLoginClick}>
-                Login to collaborate
-              </Button>
-            )}
-          </HStack>
-        </VStack>
-      </Box>
-    );
-  }
-
-  // Default "home" variant
-  return (
-    <Box
-      bg="dark.card"
-      border="1px"
-      borderColor="dark.border"
-      borderRadius="md"
-      p={4}
-      cursor="pointer"
-      _hover={{ boxShadow: "md", transform: "translateY(-2px)" }}
-      transition="all 0.2s"
-      onClick={() => navigate(`/resources/${id}`)}
-    >
-      <VStack align="flex-start" spacing={2}>
-        <HStack spacing={2} width="full" justify="space-between">
-          <HStack spacing={1}>
-            {area && (
-              <Text
-                fontSize="xs"
-                fontWeight="bold"
-                color="blue.600"
-                bg="blue.50"
-                px={2}
-                py={1}
-                borderRadius="full"
-              >
-                {area}
-              </Text>
-            )}
-          </HStack>
-        </HStack>
-
-        <Heading size="sm" lineHeight="tight">
-          {title}
-        </Heading>
-
-        {/* Only show author and time saved for logged-in users */}
-        {isLoggedIn && (
-          <Text fontSize="xs" color="whiteAlpha.600">
-            {author} • {timeSaved || 2} hrs/week saved
-          </Text>
         )}
+      </VStack>
 
-        <Text fontSize="sm" color="whiteAlpha.700" lineHeight="1.4">
-          {quickSummary}
-        </Text>
-
-        <HStack spacing={2} fontSize="xs">
-          {tools.map((tool: string) => (
-            <Text key={tool} bg="whiteAlpha.100" px={2} py={1} borderRadius="full">
-              {tool}
-            </Text>
-          ))}
-        </HStack>
-
-        {/* Created date */}
-        <Text fontSize="xs" color="whiteAlpha.500">
+      {/* Created date and engagement stats */}
+      <HStack
+        spacing={3}
+        fontSize="xs"
+        color="whiteAlpha.500"
+        width="full"
+        justify="space-between"
+        pt={3}
+      >
+        <Text>
           {new Date(created_at || new Date()).toLocaleDateString("en-US", {
             year: "numeric",
             month: "short",
             day: "numeric",
           })}
         </Text>
-
-        {/* Engagement stats - visible to all users */}
-        <HStack spacing={4} fontSize="xs" color="whiteAlpha.600" width="full" pt={1}>
-          <HStack spacing={1}>
-            <Text title="Views">👁️ {views}</Text>
-          </HStack>
-          <HStack spacing={1}>
-            <Text title="People who tried it">🧪 {tried}</Text>
-          </HStack>
-          <HStack spacing={1}>
-            <Text title="People who saved it">📌 {saves || 0}</Text>
-          </HStack>
+        <HStack spacing={3}>
+          <StatItem icon={ViewIcon} value={views} label="Views" />
+          <StatItem icon={RepeatIcon} value={tried} label="People who tried it" />
+          <StatItem icon={StarIcon} value={saves} label="People who saved it" />
         </HStack>
+      </HStack>
 
-        {/* Action buttons */}
-        <HStack
-          spacing={2}
-          fontSize="sm"
-          width="full"
-          justify="flex-end"
-          pt={2}
-          borderTop="1px"
-          borderColor="dark.divider"
-        >
-          {isLoggedIn ? (
-            <>
-              {canDelete && (
-                <Button
-                  size="xs"
-                  variant="ghost"
-                  colorScheme="red"
-                  onClick={handleDelete}
-                  isLoading={deleteResourceMutation.isPending}
-                >
-                  Delete
-                </Button>
-              )}
+      {/* Action buttons */}
+      <HStack
+        spacing={2}
+        fontSize="sm"
+        width="full"
+        justify="flex-end"
+        pt={3}
+        mt={3}
+        borderTop="1px solid"
+        borderColor="dark.divider"
+      >
+        {isLoggedIn ? (
+          <>
+            {canDelete && (
               <Button
                 size="xs"
                 variant="ghost"
-                colorScheme="green"
-                onClick={handleTried}
-                isLoading={triedResourceMutation.isPending}
+                colorScheme="red"
+                onClick={handleDelete}
+                isLoading={deleteResourceMutation.isPending}
               >
-                🧪 Tried
+                Delete
               </Button>
-              <Button
-                size="xs"
-                variant={hasSaved ? "solid" : "ghost"}
-                colorScheme="brand"
-                onClick={handleSave}
-                isLoading={saveResourceMutation.isPending}
-              >
-                {hasSaved ? "✓ Saved" : "📌 Save"}
-              </Button>
-            </>
-          ) : (
-            <Button size="xs" variant="ghost" colorScheme="brand" onClick={handleLoginClick}>
-              Login to collaborate
+            )}
+            <Button
+              size="xs"
+              variant="ghost"
+              colorScheme="green"
+              leftIcon={<RepeatIcon />}
+              onClick={handleTried}
+              isLoading={triedResourceMutation.isPending}
+            >
+              Tried
             </Button>
-          )}
-        </HStack>
-      </VStack>
+            <Button
+              size="xs"
+              variant={hasSaved ? "solid" : "ghost"}
+              colorScheme="brand"
+              leftIcon={<StarIcon />}
+              onClick={handleSave}
+              isLoading={saveResourceMutation.isPending}
+            >
+              {hasSaved ? "Saved" : "Save"}
+            </Button>
+          </>
+        ) : (
+          <Button size="xs" variant="ghost" colorScheme="brand" onClick={handleLoginClick}>
+            Login to collaborate
+          </Button>
+        )}
+      </HStack>
     </Box>
   );
 };

@@ -15,6 +15,7 @@ import {
   MenuButton,
   MenuList,
   MenuItem,
+  MenuDivider,
   Avatar,
   Heading,
   Container,
@@ -30,10 +31,37 @@ import {
 import { HamburgerIcon } from "@chakra-ui/icons";
 import { useAuth, useLogout } from "@/hooks/useAuth";
 import { Footer } from "@/components/Footer";
+import { BRAND_GRADIENT } from "@/theme";
 import { APP_VERSION } from "@/version";
 
 interface LayoutProps {
   children: React.ReactNode;
+}
+
+/** Gradient logo mark + wordmark, shared by header and footer. */
+export function BrandMark({ onClick }: { onClick?: () => void }) {
+  return (
+    <HStack spacing={3} cursor={onClick ? "pointer" : undefined} onClick={onClick}>
+      <Flex
+        w={8}
+        h={8}
+        align="center"
+        justify="center"
+        borderRadius="lg"
+        bgGradient={BRAND_GRADIENT}
+        fontFamily="heading"
+        fontWeight="700"
+        fontSize="sm"
+        color="white"
+        flexShrink={0}
+      >
+        AI
+      </Flex>
+      <Heading size="sm" whiteSpace="nowrap" letterSpacing="-0.01em">
+        The AI Exchange
+      </Heading>
+    </HStack>
+  );
 }
 
 export function Layout({ children }: LayoutProps) {
@@ -78,10 +106,10 @@ export function Layout({ children }: LayoutProps) {
         <Button
           key={item.href}
           width="full"
-          variant={isActive(item.href) ? "solid" : "ghost"}
-          colorScheme={isActive(item.href) ? "brand" : undefined}
-          color={isActive(item.href) ? "white" : "whiteAlpha.900"}
-          _hover={isActive(item.href) ? undefined : { bg: "whiteAlpha.200" }}
+          variant="ghost"
+          bg={isActive(item.href) ? "whiteAlpha.100" : undefined}
+          color={isActive(item.href) ? "brand.200" : "whiteAlpha.900"}
+          _hover={{ bg: "whiteAlpha.200" }}
           justifyContent="flex-start"
           onClick={() => handleNavClick(item.href)}
         >
@@ -101,12 +129,7 @@ export function Layout({ children }: LayoutProps) {
           >
             Login
           </Button>
-          <Button
-            width="full"
-            colorScheme="brand"
-            color="white"
-            onClick={() => handleNavClick("/register")}
-          >
+          <Button width="full" colorScheme="brand" onClick={() => handleNavClick("/register")}>
             Sign Up
           </Button>
         </>
@@ -144,7 +167,15 @@ export function Layout({ children }: LayoutProps) {
   return (
     <Flex height="100vh" flexDirection="column">
       {/* Header */}
-      <Box bg="dark.card" borderBottom="1px" borderColor="dark.border" px={4} py={4} boxShadow="sm">
+      <Box
+        bg="rgba(14, 15, 19, 0.85)"
+        backdropFilter="blur(12px) saturate(160%)"
+        borderBottom="1px solid"
+        borderColor="dark.border"
+        px={4}
+        py={3}
+        zIndex={10}
+      >
         <Container
           maxW="100%"
           px={6}
@@ -153,11 +184,9 @@ export function Layout({ children }: LayoutProps) {
           alignItems="center"
         >
           {/* Left: Logo */}
-          <HStack spacing={2} cursor="pointer" onClick={() => navigate("/")}>
-            <Heading size="md" whiteSpace="nowrap">
-              The AI Exchange
-            </Heading>
-            <Text fontSize="xs" color="whiteAlpha.500" fontWeight="normal">
+          <HStack spacing={2}>
+            <BrandMark onClick={() => navigate("/")} />
+            <Text fontSize="xs" color="whiteAlpha.400" fontWeight="normal" pt="1px">
               v{APP_VERSION}
             </Text>
           </HStack>
@@ -167,11 +196,12 @@ export function Layout({ children }: LayoutProps) {
             {navItems.map((item) => (
               <Button
                 key={item.href}
-                variant={isActive(item.href) ? "solid" : "ghost"}
-                colorScheme={isActive(item.href) ? "brand" : undefined}
-                color={isActive(item.href) ? "white" : "whiteAlpha.900"}
-                _hover={isActive(item.href) ? undefined : { bg: "whiteAlpha.200" }}
+                variant="ghost"
+                bg={isActive(item.href) ? "whiteAlpha.100" : undefined}
+                color={isActive(item.href) ? "brand.200" : "whiteAlpha.800"}
+                _hover={{ bg: "whiteAlpha.100", color: "white" }}
                 size="sm"
+                fontWeight="500"
                 onClick={() => navigate(item.href)}
               >
                 {item.label}
@@ -180,18 +210,17 @@ export function Layout({ children }: LayoutProps) {
           </HStack>
 
           {/* Right: Auth Section */}
-          <HStack spacing={4}>
+          <HStack spacing={3}>
             {!user ? (
               // Public/Guest View
               <>
                 <Button
-                  variant="outline"
+                  variant="ghost"
                   size="sm"
                   onClick={() => navigate("/login")}
                   display={{ base: "none", md: "flex" }}
-                  color="brand.200"
-                  borderColor="brand.400"
-                  _hover={{ bg: "brand.600", color: "white", borderColor: "brand.500" }}
+                  color="whiteAlpha.800"
+                  _hover={{ bg: "whiteAlpha.100", color: "white" }}
                 >
                   Login
                 </Button>
@@ -200,7 +229,6 @@ export function Layout({ children }: LayoutProps) {
                   size="sm"
                   onClick={() => navigate("/register")}
                   display={{ base: "none", md: "flex" }}
-                  color="white"
                 >
                   Sign Up
                 </Button>
@@ -213,7 +241,7 @@ export function Layout({ children }: LayoutProps) {
                     <Avatar size="sm" name={user?.full_name || "User"} src="" />
                   </MenuButton>
                   <MenuList>
-                    <MenuItem disabled>
+                    <MenuItem isDisabled _disabled={{ cursor: "default", opacity: 1 }}>
                       <VStack align="flex-start" spacing={0}>
                         <Text fontWeight="medium" fontSize="sm">
                           {user?.full_name}
@@ -223,18 +251,17 @@ export function Layout({ children }: LayoutProps) {
                         </Text>
                       </VStack>
                     </MenuItem>
+                    <MenuDivider borderColor="dark.divider" />
                     <MenuItem onClick={() => navigate("/profile")}>Profile</MenuItem>
                     <MenuItem onClick={handleLogout}>Logout</MenuItem>
                   </MenuList>
                 </Menu>
                 <Button
                   variant="outline"
+                  colorScheme="brand"
                   size="sm"
                   onClick={handleLogout}
                   display={{ base: "none", md: "flex" }}
-                  color="brand.200"
-                  borderColor="brand.400"
-                  _hover={{ bg: "brand.600", color: "white", borderColor: "brand.500" }}
                 >
                   Logout
                 </Button>
@@ -267,7 +294,12 @@ export function Layout({ children }: LayoutProps) {
       </Drawer>
 
       {/* Page Content (No Sidebar) */}
-      <Box flex={1} overflowY="auto">
+      <Box
+        flex={1}
+        overflowY="auto"
+        bgImage="radial-gradient(700px circle at 50% -10%, rgba(100, 120, 240, 0.08), transparent 70%)"
+        bgRepeat="no-repeat"
+      >
         <Container maxW="1200px" py={8} px={{ base: 4, md: 6 }}>
           {children}
         </Container>

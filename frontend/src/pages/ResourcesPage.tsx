@@ -191,8 +191,8 @@ export default function ResourcesPage() {
 
         {/* Search Bar */}
         <InputGroup size="lg">
-          <InputLeftElement pointerEvents="none">
-            <SearchIcon color="gray.400" />
+          <InputLeftElement pointerEvents="none" h="full">
+            <SearchIcon color="whiteAlpha.400" />
           </InputLeftElement>
           <Input
             placeholder="Search ideas, tools, area, or faculty"
@@ -220,14 +220,7 @@ export default function ResourcesPage() {
                 <Spinner />
               </Center>
             ) : mappedResources.length === 0 ? (
-              <Box
-                bg="dark.card"
-                p={12}
-                borderRadius="lg"
-                textAlign="center"
-                border="1px"
-                borderColor="dark.border"
-              >
+              <Box layerStyle="card" p={12} textAlign="center">
                 <Text color="whiteAlpha.600">No ideas found. Try adjusting your filters.</Text>
               </Box>
             ) : (

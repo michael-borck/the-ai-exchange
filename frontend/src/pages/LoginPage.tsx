@@ -15,6 +15,8 @@ import {
   Button,
   Alert,
   AlertIcon,
+  FormControl,
+  FormLabel,
   useToast,
   useDisclosure,
 } from "@chakra-ui/react";
@@ -114,33 +116,49 @@ export default function LoginPage() {
           </Alert>
         )}
 
-        <Box width="full" as="form" onSubmit={handleSubmit}>
-          <VStack spacing={4}>
-            <Box width="full">
-              <Text fontSize="sm" fontWeight="medium" mb={2}>
-                Email
-              </Text>
+        <Box
+          width="full"
+          layerStyle="card"
+          p={{ base: 6, md: 8 }}
+          as="form"
+          onSubmit={handleSubmit}
+        >
+          <VStack spacing={5}>
+            <FormControl isRequired>
+              <FormLabel requiredIndicator={<></>}>Email</FormLabel>
               <Input
                 type="email"
                 placeholder="you@curtin.edu.au"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                required
+                autoComplete="email"
               />
-            </Box>
+            </FormControl>
 
-            <Box width="full">
-              <Text fontSize="sm" fontWeight="medium" mb={2}>
-                Password
-              </Text>
+            <FormControl isRequired>
+              <HStack justify="space-between" align="center" mb={2}>
+                <FormLabel mb={0} requiredIndicator={<></>}>
+                  Password
+                </FormLabel>
+                <Button
+                  variant="link"
+                  size="sm"
+                  colorScheme="brand"
+                  fontWeight="500"
+                  onClick={onPasswordResetOpen}
+                >
+                  Forgot password?
+                </Button>
+              </HStack>
               <Input
                 type="password"
                 placeholder="••••••••"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
+                autoComplete="current-password"
                 required
               />
-            </Box>
+            </FormControl>
 
             {loginMutation.isError && (
               <Alert status="error" borderRadius="md">
@@ -151,6 +169,7 @@ export default function LoginPage() {
 
             <Button
               width="full"
+              size="lg"
               colorScheme="brand"
               type="submit"
               isLoading={loginMutation.isPending}
@@ -159,18 +178,6 @@ export default function LoginPage() {
             </Button>
           </VStack>
         </Box>
-
-        <VStack spacing={2} width="full">
-          <Button
-            width="full"
-            variant="ghost"
-            size="sm"
-            colorScheme="brand"
-            onClick={onPasswordResetOpen}
-          >
-            Forgot password?
-          </Button>
-        </VStack>
 
         <HStack spacing={1} justify="center">
           <Text fontSize="sm" color="whiteAlpha.600">
