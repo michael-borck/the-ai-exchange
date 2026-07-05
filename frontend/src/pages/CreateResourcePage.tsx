@@ -20,91 +20,18 @@ import {
   Checkbox,
   Text,
   HStack,
-  SimpleGrid,
   Divider,
 } from "@chakra-ui/react";
 import { useCreateResource } from "@/hooks/useResources";
 import { ResourceType } from "@/types/index";
+import {
+  RESOURCE_TYPES,
+  ResourceTypePicker,
+  ToolCategoryChips,
+  SectionHeading,
+} from "@/components/ResourceFormFields";
 
-const RESOURCE_TYPES = [
-  {
-    key: "REQUEST",
-    label: "Request",
-    description: "Ask for help, advice, or ideas from colleagues",
-  },
-  {
-    key: "USE_CASE",
-    label: "Use Case",
-    description: "A real-world example of AI applied in your work",
-  },
-  {
-    key: "PROMPT",
-    label: "Prompt Template",
-    description: "A reusable prompt you've found effective",
-  },
-  { key: "TOOL", label: "Tool", description: "An AI tool, software, or integration you use" },
-  { key: "POLICY", label: "Policy", description: "Guidelines, governance, or ethical frameworks" },
-  {
-    key: "PAPER",
-    label: "Paper",
-    description: "A research paper or article you've written or contributed to",
-  },
-  {
-    key: "PROJECT",
-    label: "Project",
-    description: "Something you've built, are building, or plan to build",
-  },
-  {
-    key: "CONFERENCE",
-    label: "Conference",
-    description: "A talk or presentation you gave or attended",
-  },
-  {
-    key: "DATASET",
-    label: "Dataset",
-    description: "A dataset you've created or curated for research",
-  },
-  { key: "BOOK", label: "Book", description: "A book or textbook you've authored or recommend" },
-  { key: "OTHER", label: "Other", description: "Anything that doesn't fit the categories above" },
-];
-
-const TOOL_CATEGORIES = [
-  { key: "LLM", label: "LLM", description: "Large language models like ChatGPT, Claude, Gemini" },
-  {
-    key: "CUSTOM_APP",
-    label: "Custom App",
-    description: "Purpose-built applications using AI APIs",
-  },
-  { key: "VISION", label: "Vision", description: "Image recognition, generation, or analysis" },
-  { key: "SPEECH", label: "Speech", description: "Speech-to-text, text-to-speech, or voice" },
-  {
-    key: "WORKFLOW",
-    label: "Workflow",
-    description: "Automation tools like Zapier, Make, or Power Automate",
-  },
-  {
-    key: "DEVELOPMENT",
-    label: "Development",
-    description: "AI coding assistants and development tools",
-  },
-  { key: "OTHER", label: "Other", description: "Any other AI tool or technology" },
-];
-
-/** Small uppercase section heading inside the form. */
-function SectionHeading({ title, hint }: { title: string; hint?: string }) {
-  return (
-    <VStack align="flex-start" spacing={1} width="full">
-      <Text textStyle="eyebrow" color="brand.300">
-        {title}
-      </Text>
-      {hint && (
-        <Text fontSize="sm" color="whiteAlpha.600">
-          {hint}
-        </Text>
-      )}
-    </VStack>
-  );
-}
+const TITLE_GUIDE_LENGTH = 120;
 
 export default function CreateResourcePage() {
   const navigate = useNavigate();
@@ -203,35 +130,7 @@ export default function CreateResourcePage() {
             {/* Type */}
             <FormControl isRequired>
               <FormLabel requiredIndicator={<></>}>What are you sharing?</FormLabel>
-              <SimpleGrid columns={{ base: 2, sm: 3, md: 4 }} spacing={2} role="radiogroup">
-                {RESOURCE_TYPES.map((rt) => {
-                  const isSelected = type === rt.key;
-                  return (
-                    <Box
-                      key={rt.key}
-                      as="button"
-                      type="button"
-                      role="radio"
-                      aria-checked={isSelected}
-                      borderWidth="1px"
-                      borderColor={isSelected ? "brand.400" : "dark.border"}
-                      bg={isSelected ? "brand.900" : "dark.subtle"}
-                      color={isSelected ? "brand.100" : "whiteAlpha.700"}
-                      borderRadius="lg"
-                      px={3}
-                      py={2}
-                      fontSize="sm"
-                      fontWeight={isSelected ? "600" : "500"}
-                      textAlign="center"
-                      transition="all 0.15s ease"
-                      _hover={{ borderColor: "brand.300" }}
-                      onClick={() => setType(rt.key as ResourceType)}
-                    >
-                      {rt.label}
-                    </Box>
-                  );
-                })}
-              </SimpleGrid>
+              <ResourceTypePicker value={type} onChange={setType} />
               {selectedType && (
                 <FormHelperText color="whiteAlpha.600">
                   {selectedType.label}: {selectedType.description}
@@ -245,16 +144,23 @@ export default function CreateResourcePage() {
                 <FormLabel mb={0} requiredIndicator={<></>}>
                   Title
                 </FormLabel>
-                <Text fontSize="xs" color={title.length > 100 ? "orange.300" : "whiteAlpha.400"}>
-                  {title.length}/120
+                <Text
+                  fontSize="xs"
+                  color={title.length > TITLE_GUIDE_LENGTH ? "orange.300" : "whiteAlpha.400"}
+                >
+                  {title.length}/{TITLE_GUIDE_LENGTH}
                 </Text>
               </HStack>
               <Input
                 value={title}
-                maxLength={120}
                 onChange={(e) => setTitle(e.target.value)}
                 placeholder="Give your resource a clear, descriptive title"
               />
+              {title.length > TITLE_GUIDE_LENGTH && (
+                <FormHelperText color="orange.300">
+                  Long titles get clipped on cards — consider trimming, but it will still save.
+                </FormHelperText>
+              )}
             </FormControl>
 
             {/* Content */}
@@ -280,35 +186,7 @@ export default function CreateResourcePage() {
             {/* Tools Used */}
             <FormControl>
               <FormLabel>AI Tools & Technologies Used</FormLabel>
-              <HStack spacing={2} flexWrap="wrap" rowGap={2}>
-                {TOOL_CATEGORIES.map((tool) => {
-                  const isSelected = selectedTools.includes(tool.key);
-                  return (
-                    <Box
-                      key={tool.key}
-                      as="button"
-                      type="button"
-                      title={tool.description}
-                      aria-pressed={isSelected}
-                      px={4}
-                      py={1.5}
-                      borderRadius="full"
-                      border="1px solid"
-                      borderColor={isSelected ? "brand.400" : "dark.border"}
-                      bg={isSelected ? "brand.900" : "dark.subtle"}
-                      color={isSelected ? "brand.200" : "whiteAlpha.700"}
-                      fontSize="sm"
-                      fontWeight={isSelected ? "600" : "500"}
-                      transition="all 0.15s ease"
-                      _hover={{ borderColor: "brand.300" }}
-                      onClick={() => handleToolToggle(tool.key)}
-                    >
-                      {isSelected ? "✓ " : ""}
-                      {tool.label}
-                    </Box>
-                  );
-                })}
-              </HStack>
+              <ToolCategoryChips selected={selectedTools} onToggle={handleToolToggle} />
               <FormHelperText color="whiteAlpha.500">Select all that apply</FormHelperText>
             </FormControl>
 

@@ -167,15 +167,7 @@ export function Layout({ children }: LayoutProps) {
   return (
     <Flex height="100vh" flexDirection="column">
       {/* Header */}
-      <Box
-        bg="rgba(14, 15, 19, 0.85)"
-        backdropFilter="blur(12px) saturate(160%)"
-        borderBottom="1px solid"
-        borderColor="dark.border"
-        px={4}
-        py={3}
-        zIndex={10}
-      >
+      <Box bg="dark.bg" borderBottom="1px solid" borderColor="dark.border" px={4} py={3}>
         <Container
           maxW="100%"
           px={6}

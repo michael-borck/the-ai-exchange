@@ -7,6 +7,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { Layout } from "@/components/Layout";
 import {
   VStack,
+  HStack,
   Heading,
   Input,
   Textarea,
@@ -21,42 +22,11 @@ import {
   Center,
   Text,
   Badge,
-  Tooltip,
+  Divider,
 } from "@chakra-ui/react";
 import { useAuth } from "@/hooks/useAuth";
 import { useResource, useUpdateResource } from "@/hooks/useResources";
-
-const RESOURCE_TYPES = [
-  { key: "REQUEST", label: "Request" },
-  { key: "USE_CASE", label: "Use Case" },
-  { key: "PROMPT", label: "Prompt Template" },
-  { key: "TOOL", label: "Tool" },
-  { key: "POLICY", label: "Policy" },
-  { key: "PAPER", label: "Paper" },
-  { key: "PROJECT", label: "Project" },
-  { key: "CONFERENCE", label: "Conference" },
-  { key: "DATASET", label: "Dataset" },
-  { key: "BOOK", label: "Book" },
-  { key: "OTHER", label: "Other" },
-];
-
-const TOOL_CATEGORIES = [
-  { key: "LLM", label: "LLM", tooltip: "Large language models like ChatGPT, Claude, Gemini" },
-  { key: "CUSTOM_APP", label: "Custom App", tooltip: "Purpose-built applications using AI APIs" },
-  { key: "VISION", label: "Vision", tooltip: "Image recognition, generation, or analysis tools" },
-  { key: "SPEECH", label: "Speech", tooltip: "Speech-to-text, text-to-speech, or voice tools" },
-  {
-    key: "WORKFLOW",
-    label: "Workflow",
-    tooltip: "Automation tools like Zapier, Make, or Power Automate",
-  },
-  {
-    key: "DEVELOPMENT",
-    label: "Development",
-    tooltip: "AI coding assistants and development tools",
-  },
-  { key: "OTHER", label: "Other", tooltip: "Any other AI tool or technology" },
-];
+import { RESOURCE_TYPES, ToolCategoryChips, SectionHeading } from "@/components/ResourceFormFields";
 
 export default function EditResourcePage() {
   const navigate = useNavigate();
@@ -188,7 +158,7 @@ export default function EditResourcePage() {
     return (
       <Layout>
         <Box textAlign="center" py={12}>
-          <Text color="red.600">You don't have permission to edit this resource</Text>
+          <Text color="red.300">You don't have permission to edit this resource</Text>
         </Box>
       </Layout>
     );
@@ -197,31 +167,28 @@ export default function EditResourcePage() {
   return (
     <Layout>
       <Box maxW="3xl" mx="auto">
-        <Heading size="lg" mb={6}>
+        <Heading size="lg" mb={8}>
           Edit Resource
         </Heading>
 
-        <Box
-          as="form"
-          onSubmit={handleSubmit}
-          bg="dark.card"
-          p={6}
-          borderRadius="lg"
-          boxShadow="sm"
-        >
-          <VStack spacing={6}>
+        <Box as="form" onSubmit={handleSubmit} layerStyle="card" p={{ base: 5, md: 8 }}>
+          <VStack spacing={7} align="stretch">
+            <SectionHeading title="The basics" />
+
             {/* Resource Type (read-only) */}
             <FormControl>
-              <FormLabel fontWeight="bold">Resource Type</FormLabel>
-              <Badge colorScheme="brand" fontSize="sm" px={3} py={1} borderRadius="md">
+              <FormLabel>Resource Type</FormLabel>
+              <Badge bg="brand.900" color="brand.200" fontSize="sm" px={3} py={1}>
                 {resourceTypeLabel}
               </Badge>
-              <FormHelperText>Resource type cannot be changed after creation</FormHelperText>
+              <FormHelperText color="whiteAlpha.500">
+                Resource type cannot be changed after creation
+              </FormHelperText>
             </FormControl>
 
             {/* Title */}
             <FormControl isRequired>
-              <FormLabel fontWeight="bold">Title</FormLabel>
+              <FormLabel requiredIndicator={<></>}>Title</FormLabel>
               <Input
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
@@ -231,7 +198,7 @@ export default function EditResourcePage() {
 
             {/* Description */}
             <FormControl isRequired>
-              <FormLabel fontWeight="bold">Description</FormLabel>
+              <FormLabel requiredIndicator={<></>}>Description</FormLabel>
               <Textarea
                 value={content}
                 onChange={(e) => setContent(e.target.value)}
@@ -240,79 +207,61 @@ export default function EditResourcePage() {
               />
             </FormControl>
 
+            <Divider />
+            <SectionHeading title="Add context" />
+
+            {/* Tools Used */}
+            <FormControl>
+              <FormLabel>AI Tools & Technologies Used</FormLabel>
+              <ToolCategoryChips selected={selectedTools} onToggle={handleToolToggle} />
+              <FormHelperText color="whiteAlpha.500">Select all that apply</FormHelperText>
+            </FormControl>
+
+            {/* Time Saved */}
+            <FormControl>
+              <FormLabel>Time Saved Per Week (hours)</FormLabel>
+              <Input
+                type="number"
+                value={timeSavedValue}
+                onChange={(e) => setTimeSavedValue(e.target.value)}
+                placeholder="e.g. 2"
+                min="0"
+                step="0.5"
+                maxW="200px"
+              />
+              <FormHelperText color="whiteAlpha.500">
+                Helps others understand the value of your resource
+              </FormHelperText>
+            </FormControl>
+
+            {/* User Tags */}
+            <FormControl>
+              <FormLabel>Tags</FormLabel>
+              <Input
+                value={userTags}
+                onChange={(e) => setUserTags(e.target.value)}
+                placeholder="Add tags separated by commas (e.g., ChatGPT, Assessment, Writing)"
+              />
+              <FormHelperText color="whiteAlpha.500">
+                Help others discover your resource with relevant keywords
+              </FormHelperText>
+            </FormControl>
+
+            <Divider />
+            <SectionHeading title="Attribution" />
+
             {/* Collaborators */}
             <FormControl>
-              <FormLabel fontWeight="bold">Collaborators (Optional)</FormLabel>
+              <FormLabel>Collaborators (Optional)</FormLabel>
               <Textarea
                 value={collaborators}
                 onChange={(e) => setCollaborators(e.target.value)}
                 placeholder="Add email addresses of collaborators involved in this idea (one per line, or separated by commas)"
                 minHeight="80px"
               />
-              <FormHelperText>
+              <FormHelperText color="whiteAlpha.500">
                 Enter email addresses of people collaborating on this resource. First email is the
                 primary contact.
-              </FormHelperText>
-            </FormControl>
-
-            {/* Tools Used */}
-            <FormControl>
-              <FormLabel fontWeight="bold">AI Tools & Technologies Used</FormLabel>
-              <Box
-                borderWidth="1px"
-                borderColor="dark.border"
-                borderRadius="md"
-                p={4}
-                bg="dark.subtle"
-              >
-                {TOOL_CATEGORIES.map((tool) => (
-                  <Tooltip
-                    key={tool.key}
-                    label={tool.tooltip}
-                    placement="right"
-                    hasArrow
-                    openDelay={300}
-                    closeOnClick
-                  >
-                    <Box display="inline-block">
-                      <Checkbox
-                        mb={2}
-                        isChecked={selectedTools.includes(tool.key)}
-                        onChange={() => handleToolToggle(tool.key)}
-                      >
-                        {tool.label}
-                      </Checkbox>
-                    </Box>
-                  </Tooltip>
-                ))}
-              </Box>
-              <FormHelperText>Select all that apply to your resource</FormHelperText>
-            </FormControl>
-
-            {/* Time Saved */}
-            <FormControl>
-              <FormLabel fontWeight="bold">Time Saved Per Week (hours)</FormLabel>
-              <Input
-                type="number"
-                value={timeSavedValue}
-                onChange={(e) => setTimeSavedValue(e.target.value)}
-                placeholder="How much time does this save per week?"
-                min="0"
-                step="0.5"
-              />
-              <FormHelperText>Helps others understand the value of your resource</FormHelperText>
-            </FormControl>
-
-            {/* User Tags */}
-            <FormControl>
-              <FormLabel fontWeight="bold">Tags</FormLabel>
-              <Input
-                value={userTags}
-                onChange={(e) => setUserTags(e.target.value)}
-                placeholder="Add tags separated by commas (e.g., ChatGPT, Assessment, Writing)"
-              />
-              <FormHelperText>
-                Help others discover your resource with relevant keywords
               </FormHelperText>
             </FormControl>
 
@@ -321,23 +270,32 @@ export default function EditResourcePage() {
               <Checkbox isChecked={resource.is_anonymous} isDisabled>
                 <Text ml={2}>Posted anonymously</Text>
               </Checkbox>
-              <FormHelperText>Anonymous setting cannot be changed after creation</FormHelperText>
+              <FormHelperText color="whiteAlpha.500">
+                Anonymous setting cannot be changed after creation
+              </FormHelperText>
             </FormControl>
 
             {/* Buttons */}
-            <div style={{ display: "flex", gap: "12px", width: "100%" }}>
+            <HStack spacing={3} width="full">
               <Button
                 colorScheme="brand"
                 type="submit"
                 isLoading={updateMutation.isPending}
                 flex={1}
+                size="lg"
               >
                 Save Changes
               </Button>
-              <Button variant="outline" onClick={() => navigate(`/resources/${id}`)} flex={1}>
+              <Button
+                variant="outline"
+                colorScheme="brand"
+                onClick={() => navigate(`/resources/${id}`)}
+                flex={1}
+                size="lg"
+              >
                 Cancel
               </Button>
-            </div>
+            </HStack>
           </VStack>
         </Box>
       </Box>

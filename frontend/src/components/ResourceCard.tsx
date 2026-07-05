@@ -32,7 +32,6 @@ export interface ResourceCardProps {
   tried: number;
   saves?: number;
   created_at: string;
-  variant?: "home" | "browse"; // Layout variant
   user_id?: string; // Resource owner ID, needed for admin delete capability
 }
 

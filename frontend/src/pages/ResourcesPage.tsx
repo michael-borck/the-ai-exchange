@@ -244,7 +244,6 @@ export default function ResourcesPage() {
                       tried={resource.tried}
                       saves={resource.saves}
                       created_at={resource.created_at}
-                      variant="browse"
                       user_id={resource.user_id}
                     />
                   ))}

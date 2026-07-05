@@ -57,7 +57,6 @@ const theme = extendTheme({
   shadows: {
     outline: "0 0 0 3px rgba(100, 120, 240, 0.4)",
     glow: "0 0 24px rgba(100, 120, 240, 0.18)",
-    cardHover: "0 8px 30px rgba(0, 0, 0, 0.45), 0 0 0 1px rgba(100, 120, 240, 0.35)",
   },
   styles: {
     global: {
@@ -209,12 +208,6 @@ const theme = extendTheme({
         },
       },
     },
-    Radio: {
-      defaultProps: { colorScheme: "brand" },
-      baseStyle: {
-        control: { borderColor: "whiteAlpha.400" },
-      },
-    },
     Badge: {
       baseStyle: {
         borderRadius: "full",
@@ -226,6 +219,9 @@ const theme = extendTheme({
     },
     Tooltip: {
       baseStyle: {
+        // Chakra's arrow reads --popper-arrow-bg (default gray.300 in dark
+        // mode), so it must be kept in sync with bg or arrows mismatch.
+        "--popper-arrow-bg": "colors.dark.raised",
         bg: "dark.raised",
         color: "whiteAlpha.900",
         borderRadius: "md",

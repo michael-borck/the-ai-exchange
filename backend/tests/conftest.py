@@ -83,7 +83,13 @@ def create_verified_user(
 
 
 def login_and_get_token(client: TestClient, email: str, password: str = TEST_PASSWORD) -> str:
-    """Login and return the access token from the httpOnly cookie."""
+    """Login and return the access token from the httpOnly cookie.
+
+    Removes the cookie from the client's jar afterwards: callers use the
+    returned token as a Bearer header, and get_current_user prefers the cookie
+    over the header — a leftover cookie from a later login would silently
+    authenticate every request as that last user.
+    """
     response = client.post(
         "/api/v1/auth/login",
         json={"email": email, "password": password},
@@ -91,4 +97,5 @@ def login_and_get_token(client: TestClient, email: str, password: str = TEST_PAS
     token = response.cookies.get("access_token")
     if not token:
         raise ValueError(f"Login failed or no cookie set: {response.status_code} {response.json()}")
+    client.cookies.delete("access_token")
     return token
